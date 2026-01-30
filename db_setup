@@ -1,0 +1,10 @@
+import json
+import sqlite3
+import pandas as pd
+
+df = pd.read_csv('anime-dataset-2023.csv')
+
+df.head()
+
+conn = sqlite3.connect('anime_database.db')
+df.to_sql('Anime_table', conn, if_exists='replace', index=False)
