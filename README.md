@@ -38,3 +38,51 @@ To add any new dependencies (libraries):
 ```bash
 uv add <library_name>
 ```
+
+## Working with HuggingFace Spaces Locally
+### Install Gradio with oAuth
+Run the following command in your Python environment (gradio uv install is broken):
+```bash
+pip install "gradio[oauth]"
+```
+
+### Ensure Working HuggingFace Hub
+On Mac, make sure HomeBrew is installed:
+```bash
+brew install huggingface-cli
+```
+On Windows, test this in command line:
+```commandline
+hf
+```
+If it does not work, run the following command:
+```commandline
+pip install huggingface-hub --force-reinstall
+```
+
+### Logging into HuggingFace
+Run the following command:
+```commandline
+hf auth login
+```
+Go to your HuggingFace profile at: https://huggingface.co/settings/tokens
+Generate a new token for your HuggingFace Space at `Create New Token` -> `Fine-grained` -> Write access for your specific Repository -> `Create Token`
+Paste the generated token into the console from the hf login. Press enter.
+
+### Debugging Gradio Issue
+In app.py, the line:
+```python
+chatbot = gr.ChatInterface(
+    respond,
+    type="messages",
+    ...
+)
+```
+might need to be changed to remove the type line as follows due to a deprecation issue on HuggingFace Spaces:
+```python
+chatbot = gr.ChatInterface(
+    respond,
+    ...
+)
+```
+With this, run the program and it should work locally on localhost server!
