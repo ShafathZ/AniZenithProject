@@ -17,6 +17,5 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN}}
         run: |
-          git remote add hf https://ShafathZ:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1
-          git push hf --force HEAD:main
+          git push --force https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1 HEAD:main
         
