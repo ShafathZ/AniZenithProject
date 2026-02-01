@@ -1,0 +1,153 @@
+/* ====== OVERALL APP CONTAINER ====== */
+.gradio-container {
+    background: var(--bg-gradient) !important;
+    color: var(--text-main) !important;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.block,
+[data-testid="number-input"],
+[data-testid="block-label"],
+[role="log"] {
+    background: var(--bg-gradient) !important;
+    color: var(--text-main) !important;
+}
+
+/* ====== CHATBOT CONTAINER ====== */
+.custom-chatbot,
+[role="log"] {
+    background: var(--bg-glass-strong) !important;
+    border-radius: 22px !important;
+}
+
+.block {
+    background: var(--bg-glass-strong) !important;
+}
+
+/* ====== CHAT MESSAGES ====== */
+.bot,
+.user {
+    padding: 16px 20px !important;
+    border-radius: 18px !important;
+    margin: 12px 0 !important;
+    max-width: 80% !important;
+    border: 1px solid var(--border-soft) !important;
+    box-shadow: 0 4px 20px rgba(122, 162, 255, 0.2);
+
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    min-width: min-content !important;
+    width: auto !important;
+}
+
+.bot {
+    background: var(--bot-message) !important;
+    color: var(--text-main) !important;
+    margin-right: auto !important;
+}
+
+.user {
+    background: var(--user-message) !important;
+    color: white !important;
+    margin-left: auto !important;
+}
+
+/* ====== CHAT INPUT AREA ====== */
+.gr-text-input,
+[data-testid="textbox"] {
+    background: rgba(40, 24, 65, 0.6) !important;
+    border-radius: 18px !important;
+    border: 1px solid var(--border-soft) !important;
+    min-height: 60px !important;
+    height: auto !important;
+    margin-right: 12px !important;
+    box-shadow: 0 0 10px rgba(255, 124, 229, 0.1);
+}
+
+.gr-text-input:hover,
+textarea:hover {
+    box-shadow: 0 0 15px var(--accent-glow) !important;
+    transition: box-shadow 0.3s ease !important;
+}
+
+.gr-text-input:focus,
+textarea:focus {
+    box-shadow: 0 0 20px var(--accent-glow) !important;
+    outline: none !important;
+    transition: box-shadow 0.3s ease !important;
+}
+
+textarea {
+    background: transparent !important;
+    color: var(--text-main) !important;
+    border: none !important;
+    border-radius: 16px !important;
+    padding: 16px 20px !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    min-height: 60px !important;
+    height: auto !important;
+    resize: vertical !important;
+    overflow-y: auto !important;
+    max-height: 200px !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+}
+
+textarea::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.75 !important;
+}
+
+/* ====== BUTTON STUFF ====== */
+button[data-testid="login-button"],
+.submit-button {
+    background: var(--bg-glass-strong);
+    border: none !important;
+    border-radius: 16px !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 16px 28px !important;
+    min-height: 60px !important;
+    box-shadow: 0 0 15px var(--accent-glow);
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+/* Sidebar buttons */
+.sidebar button {
+    background: linear-gradient(135deg, #ff7ce5, #7ac5ff) !important;
+}
+
+.sidebar button:hover {
+    background: linear-gradient(135deg, #ff9de0, #7ac5ff) !important;
+}
+
+/* ====== SLIDERS ====== */
+.custom-slider input[type="range"]::-webkit-slider-thumb {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) !important;
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 50% !important;
+    border: 2px solid white !important;
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ====== SIDEBAR ====== */
+.sidebar {
+    background-image:
+        linear-gradient(rgba(20, 24, 55, 0.4), rgba(20, 24, 55, 0.4)),
+        url('/gradio_api/file=static/images/sidebar.jpg');
+    background-size: auto, cover;
+    background-position: top left, center;
+    background-repeat: no-repeat, no-repeat;
+
+    border-right: 1px solid var(--border-soft) !important;
+    backdrop-filter: blur(15px);
+    padding: 20px !important;
+}
