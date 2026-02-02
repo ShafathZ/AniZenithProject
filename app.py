@@ -20,7 +20,7 @@ with gr.Blocks() as homepage:
         elem_classes=["system-msg"]
     )
 
-    # Drop down section (Advanced Settings) – stored in variables
+    # Drop down section (Advanced Settings)
     with gr.Accordion("Advanced Settings", open=False):
         max_tokens_slider = gr.Slider(
             minimum=1,
