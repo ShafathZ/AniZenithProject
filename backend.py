@@ -1,7 +1,7 @@
 from typing import List
 
 from huggingface_hub import InferenceClient
-from transformers import pipeline
+from transformers import pipeline, GenerationConfig
 
 from retrieval_utils import get_recommendations
 
@@ -23,9 +23,14 @@ def query_model(system_message, history, user_message, use_local_model, max_toke
     # Determine which model to use (local or external)
     if use_local_model:
         # Local Model -- Use pipeline
-        pipe_liquid = pipeline(task='text-generation', model='LiquidAI/LFM2.5-1.2B-Thinking')
-        response3 = pipe_liquid(messages, do_sample=False, max_tokens=max_tokens)
-        response_string = response3[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
+        pipe_liquid = pipeline(task='text-generation',
+                               model='LiquidAI/LFM2.5-1.2B-Thinking',
+                               max_new_tokens=max_tokens,
+                               temperature=temperature,
+                               do_sample=False,
+                               top_p=top_p)
+        response = pipe_liquid(messages)
+        response_string = response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
         yield response_string
     elif not use_local_model:
         # Non-local Model -- Use InferenceClient
@@ -50,12 +55,15 @@ def query_model(system_message, history, user_message, use_local_model, max_toke
 def process_user_query(system_message, history, user_message, use_local_model, max_tokens, temperature, top_p, hf_token):
     # 1. Retrieve genres from the user message using naive approach
     genre_list = detect_genres(user_message)
+    print(f"Requested genres: {genre_list}")
 
     # 2. Retrieve relevant results from DB
     recommendations_string = get_recommendations(genre_list)
+    print(f"Recommendations found: {recommendations_string}")
 
     # 3. Append recommendation string to system message
     system_message = system_message + recommendations_string
+
 
     # 4. Query the model
     for result in query_model(system_message, history, user_message, use_local_model, max_tokens, temperature, top_p, hf_token):
