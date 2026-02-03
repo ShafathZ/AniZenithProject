@@ -5,10 +5,14 @@ from transformers import pipeline
 
 from retrieval_utils import get_recommendations
 
+genre_list = open("genrelist.txt", "r").read().splitlines()
 
 def detect_genres(message: str) -> List[str]:
-    # TODO: Detect genres from a genrelist.txt file. If message contains any, append that as genre to the list.
-    pass
+    requested_genres = []
+    for genre in genre_list:
+        if message.__contains__(genre):
+            requested_genres.append(genre)
+    return requested_genres
 
 def query_model(system_message, history, user_message, use_local_model, max_tokens, temperature, top_p, hf_token):
     # Construct prompt for language model

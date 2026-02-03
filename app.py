@@ -1,6 +1,6 @@
 import gradio as gr
 from pathlib import Path
-from backendtemp import respond
+from backend_adapter import respond
 
 theme_css = Path("static/css/theme.css").read_text() if Path("static/css/theme.css").exists() else ""
 main_css = Path("static/css/gradiomain.css").read_text()
