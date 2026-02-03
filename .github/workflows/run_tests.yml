@@ -34,5 +34,6 @@ jobs:
       - name: Run all Unit Tests (Quietly)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           pytest -q --ignore=tests/test_chat_models.py
