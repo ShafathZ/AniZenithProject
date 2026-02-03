@@ -1,0 +1,25 @@
+/* This page contains base theme colors for the app */
+:root {
+    /* Base backgrounds */
+    --bg-main: #0c0d23;
+    --bg-glass: rgba(28, 20, 55, 0.55);
+    --bg-glass-strong: rgba(28, 20, 55, 0.85);
+    --bg-gradient: linear-gradient(135deg, #1b1b40, #3a1f5f);
+
+    /* Accents */
+    --accent-primary: #ff7ce5;
+    --accent-secondary: #7ac5ff;
+    --accent-glow: rgba(255, 124, 229, 0.5);
+
+    /* Borders and shadows */
+    --border-soft: rgba(255, 255, 255, 0.08);
+    --shadow-soft: 0 15px 35px rgba(255, 124, 229, 0.3);
+
+    /* Text */
+    --text-main: #f0f0ff;
+    --text-muted: #b9b6ff;
+
+    /* Chat messages */
+    --user-message: linear-gradient(135deg, #ff9de0, #7ac5ff);
+    --bot-message: linear-gradient(135deg, #ff9de0, #7ac5ff);
+}
