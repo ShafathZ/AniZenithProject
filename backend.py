@@ -1,14 +1,47 @@
 from typing import List
 
+from huggingface_hub import InferenceClient
+from transformers import pipeline
+
 from retrieval_utils import get_recommendations
+
 
 def detect_genres(message: str) -> List[str]:
     # TODO: Detect genres from a genrelist.txt file. If message contains any, append that as genre to the list.
     pass
 
 def query_model(system_message, history, user_message, use_local_model, max_tokens, temperature, top_p, hf_token):
-    # TODO: Program calling model using Amaan's code
-    pass
+    # Construct prompt for language model
+    messages = [{"role": "system", "content": system_message}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_message})
+
+    # Determine which model to use (local or external)
+    if use_local_model:
+        # Local Model -- Use pipeline
+        pipe_liquid = pipeline(task='text-generation', model='LiquidAI/LFM2.5-1.2B-Thinking')
+        response3 = pipe_liquid(messages, do_sample=False, max_tokens=max_tokens)
+        response_string = response3[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
+        yield response_string
+    elif not use_local_model:
+        # Non-local Model -- Use InferenceClient
+        client = InferenceClient(
+            token=hf_token.token,
+            model="openai/gpt-oss-20b",
+        )
+
+        response = ""
+        for chunk in client.chat_completion(
+                messages=messages,
+                max_tokens=max_tokens,
+                stream=True,
+                temperature=temperature,
+                top_p=top_p,
+        ):
+            if chunk.choices and chunk.choices[0].delta.content:
+                token = chunk.choices[0].delta.content
+                response += token
+                yield response
 
 def process_user_query(system_message, history, user_message, use_local_model, max_tokens, temperature, top_p, hf_token):
     # 1. Retrieve genres from the user message using naive approach
