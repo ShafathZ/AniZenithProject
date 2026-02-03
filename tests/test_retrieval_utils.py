@@ -83,7 +83,7 @@ def test_get_recommendations_orders_by_match_count_then_score(tmp_path: Path,
                                                               monkeypatch: pytest.MonkeyPatch):
     # Setup Test Data and Mocks
     # Construct a temporary path for the Test DB
-    db_path = tmp_path / "anime.db"
+    db_path = tmp_path / "test.db"
 
     # Setup the test db
     _setup_test_db(str(db_path))
@@ -105,7 +105,7 @@ def test_get_recommendations_respects_limit(tmp_path: Path,
                                             monkeypatch: pytest.MonkeyPatch):
     # Setup Test Data and Mocks
     # Construct a temporary path for the Test DB
-    db_path = tmp_path / "anime.db"
+    db_path = tmp_path / "test.db"
 
     # Setup the test db
     _setup_test_db(str(db_path))
@@ -126,7 +126,7 @@ def test_get_recommendations_single_genre(tmp_path: Path,
                                           monkeypatch: pytest.MonkeyPatch):
     # Setup Test Data and Mocks
     # Construct a temporary path for the Test DB
-    db_path = tmp_path / "anime.db"
+    db_path = tmp_path / "test.db"
 
     # Setup the test db
     _setup_test_db(db_path)
@@ -144,10 +144,10 @@ def test_get_recommendations_single_genre(tmp_path: Path,
 
 
 def test_get_recommendations_no_genre(tmp_path: Path, 
-                                          monkeypatch: pytest.MonkeyPatch):
+                                      monkeypatch: pytest.MonkeyPatch):
     # Setup Test Data and Mocks
     # Construct a temporary path for the Test DB
-    db_path = tmp_path / "anime.db"
+    db_path = tmp_path / "test.db"
 
     # Setup the test db
     _setup_test_db(db_path)
