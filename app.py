@@ -1,6 +1,6 @@
 import gradio as gr
 from pathlib import Path
-from backend_adapter import respond
+import backend
 
 theme_css = Path("static/css/theme.css").read_text() if Path("static/css/theme.css").exists() else ""
 main_css = Path("static/css/gradiomain.css").read_text()
@@ -8,6 +8,20 @@ CSS = theme_css + "\n\n" + main_css
 
 # Load static directory
 gr.set_static_paths(paths=[Path.cwd().absolute()/"static"])
+
+# Adapter function between frontend and backend. Returns a generator yielding backend results.
+def respond(
+    message,
+    history: list[dict[str, str]],
+    system_message,
+    use_local_model,
+    max_tokens,
+    temperature,
+    top_p,
+    hf_token: gr.OAuthToken,
+):
+    for r in backend.process_user_query(system_message, history, message, use_local_model, max_tokens, temperature, top_p, hf_token):
+        yield r
 
 with gr.Blocks() as homepage:
     gr.Markdown(
