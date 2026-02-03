@@ -13,9 +13,24 @@ jobs:
           ref: production
           fetch-depth: 0
           lfs: true
+      - name: Install xet
+        run: |
+          curl -fsSL https://xet.sh/install.sh | bash
+          echo "$HOME/.xet/bin" >> $GITHUB_PATH
+      - name: Authenticate xet
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          xet auth login --token "$HF_TOKEN"
+      - name: Track binary files with xet
+        run: |
+          xet track "*.db"
+          xet track "*.png"
+          xet track "*.jpg"
       - name: Push to HuggingFace
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN}}
         run: |
+          git config user.name "github-actions"
           git push --force https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1 HEAD:main
         
