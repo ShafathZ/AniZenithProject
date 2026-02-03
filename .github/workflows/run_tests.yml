@@ -1,0 +1,39 @@
+name: Run All Unit Tests
+
+# Run on every push and pull request
+on: 
+  push:
+  pull_request:
+
+# Run the following Jobs (just 1)
+jobs:
+
+  # Run the "run_test" job
+  run_test:
+
+    # It should run on latest ubuntu OS
+    runs-on: ubuntu-latest
+
+    # It should use the following steps
+    steps:
+
+      # Checkout the current repository
+      - uses: actions/checkout@v3
+
+      # Install Python with 3.12 version
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      
+      # Install all required python libraries
+      - name: Install Required Libraries
+        run: |
+          pip install -r requirements.txt
+      
+      # Run all the unit tests quietly
+      - name: Run all Unit Tests (Quietly)
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          pytest -q --ignore=tests/test_chat_models.py

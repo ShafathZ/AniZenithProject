@@ -1,70 +1,91 @@
 import gradio as gr
-from huggingface_hub import InferenceClient
+from pathlib import Path
+import backend
 
+theme_css = Path("static/css/theme.css").read_text() if Path("static/css/theme.css").exists() else ""
+main_css = Path("static/css/gradiomain.css").read_text()
+CSS = theme_css + "\n\n" + main_css
 
+# Load static directory
+gr.set_static_paths(paths=[Path.cwd().absolute()/"static"])
+
+# Adapter function between frontend and backend. Returns a generator yielding backend results.
 def respond(
     message,
     history: list[dict[str, str]],
     system_message,
+    use_local_model,
     max_tokens,
     temperature,
     top_p,
     hf_token: gr.OAuthToken,
 ):
-    """
-    For more information on `huggingface_hub` Inference API support, please check the docs: https://huggingface.co/docs/huggingface_hub/v0.22.2/en/guides/inference
-    """
-    client = InferenceClient(token=hf_token.token, model="openai/gpt-oss-20b")
+    for r in backend.process_user_query(system_message, history, message, use_local_model, max_tokens, temperature, top_p, hf_token):
+        yield r
 
-    messages = [{"role": "system", "content": system_message}]
+with gr.Blocks() as homepage:
+    gr.Markdown(
+        """
+        # Anime Recommendation Chatbot
+        An AI designed to give recommendations of the best anime options based on your preferences! Has knowledge of a full database of anime!
+        """,
+        elem_classes=["page-header"]
+    )
 
-    messages.extend(history)
+    with gr.Sidebar():
+        gr.LoginButton()
 
-    messages.append({"role": "user", "content": message})
+    # System message textbox
+    system_msg = gr.Textbox(
+        value="You are a friendly Chatbot.",
+        label="System message",
+        elem_classes=["system-msg"]
+    )
 
-    response = ""
-
-    for message in client.chat_completion(
-        messages,
-        max_tokens=max_tokens,
-        stream=True,
-        temperature=temperature,
-        top_p=top_p,
-    ):
-        choices = message.choices
-        token = ""
-        if len(choices) and choices[0].delta.content:
-            token = choices[0].delta.content
-
-        response += token
-        yield response
-
-
-"""
-For information on how to customize the ChatInterface, peruse the gradio docs: https://www.gradio.app/docs/chatinterface
-"""
-chatbot = gr.ChatInterface(
-    respond,
-    type="messages",
-    additional_inputs=[
-        gr.Textbox(value="You are a friendly Chatbot.", label="System message"),
-        gr.Slider(minimum=1, maximum=2048, value=512, step=1, label="Max new tokens"),
-        gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
-        gr.Slider(
+    # Drop down section (Advanced Settings)
+    with gr.Accordion("Advanced Settings", open=False):
+        max_tokens_slider = gr.Slider(
+            minimum=1,
+            maximum=2048,
+            value=512,
+            step=1,
+            label="Max new tokens",
+            elem_classes=["custom-slider"]
+        )
+        temperature_slider = gr.Slider(
+            minimum=0.1,
+            maximum=2.0,
+            value=0.7,
+            step=0.1,
+            label="Temperature",
+            elem_classes=["custom-slider"]
+        )
+        top_p_slider = gr.Slider(
             minimum=0.1,
             maximum=1.0,
             value=0.95,
             step=0.05,
             label="Top-p (nucleus sampling)",
-        ),
-    ],
-)
+            elem_classes=["custom-slider"]
+        )
+        use_local_model = gr.Checkbox(
+            label="Use Local Model?",
+            value=False,
+            elem_classes=["toggle-button"]
+        )
 
-with gr.Blocks() as demo:
-    with gr.Sidebar():
-        gr.LoginButton()
-    chatbot.render()
-
+    # Main chatbot interface
+    chatbot = gr.ChatInterface(
+        respond,
+        additional_inputs=[
+            system_msg,
+            use_local_model,
+            max_tokens_slider,
+            temperature_slider,
+            top_p_slider
+        ],
+    )
+    chatbot.chatbot.elem_classes = ["custom-chatbot"]
 
 if __name__ == "__main__":
-    demo.launch()
+    homepage.launch(css=CSS)
