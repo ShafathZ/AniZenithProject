@@ -1,7 +1,7 @@
 from typing import List
 
 from huggingface_hub import InferenceClient
-from transformers import pipeline, GenerationConfig
+from transformers import pipeline
 
 from retrieval_utils import get_recommendations
 
@@ -55,11 +55,11 @@ def query_model(system_message, history, user_message, use_local_model, max_toke
 def process_user_query(system_message, history, user_message, use_local_model, max_tokens, temperature, top_p, hf_token):
     # 1. Retrieve genres from the user message using naive approach
     genre_list = detect_genres(user_message)
-    print(f"Requested genres: {genre_list}")
+    #print(f"Requested genres: {genre_list}")
 
     # 2. Retrieve relevant results from DB
     recommendations_string = get_recommendations(genre_list)
-    print(f"Recommendations found: {recommendations_string}")
+    #print(f"Recommendations found: {recommendations_string}")
 
     # 3. Append recommendation string to system message
     system_message = system_message + recommendations_string
