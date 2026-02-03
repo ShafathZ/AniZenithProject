@@ -141,3 +141,23 @@ def test_get_recommendations_single_genre(tmp_path: Path,
     # Assert on the results
     assert [item["name"] for item in result] == ["Alpha", "Gamma"]
     assert all("description" in item for item in result)
+
+
+def test_get_recommendations_no_genre(tmp_path: Path, 
+                                          monkeypatch: pytest.MonkeyPatch):
+    # Setup Test Data and Mocks
+    # Construct a temporary path for the Test DB
+    db_path = tmp_path / "anime.db"
+
+    # Setup the test db
+    _setup_test_db(db_path)
+
+    # Monkeypatch the DB_PATH variable of retrieval_utils file
+    monkeypatch.setattr(retrieval_utils, "DB_PATH", str(db_path))
+
+    # Execute the Method under Test
+    result_json = get_recommendations([], limit=5)
+    result = json.loads(result_json)
+
+    # Assert on the results
+    assert len(result) == 0
