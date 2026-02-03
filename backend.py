@@ -9,6 +9,7 @@ genre_list = open("genrelist.txt", "r").read().splitlines()
 
 def detect_genres(message: str) -> List[str]:
     requested_genres = []
+    # Simple naive genre check by detecting if any of our system stored genres are within the user query
     for genre in genre_list:
         if message.__contains__(genre):
             requested_genres.append(genre)

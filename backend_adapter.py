@@ -2,6 +2,7 @@ import gradio as gr
 import backend
 
 
+# Adapter function between frontend and backend. Returns a generator yielding backend results.
 def respond(
     message,
     history: list[dict[str, str]],
