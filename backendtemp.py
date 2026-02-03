@@ -6,31 +6,38 @@ def respond(
     message,
     history: list[dict[str, str]],
     system_message,
+    use_local_model,
     max_tokens,
     temperature,
     top_p,
     hf_token: gr.OAuthToken,
 ):
-    client = InferenceClient(
-        token=hf_token.token,
-        model="openai/gpt-oss-20b"
-    )
+    if not use_local_model:
+        client = InferenceClient(
+            token=hf_token.token,
+            model="google/gemma-3-27b-it:scaleway"
+        )
 
-    messages = [{"role": "system", "content": system_message}]
-    messages.extend(history)
-    messages.append({"role": "user", "content": message})
+        messages = [{"role": "system", "content": system_message}]
+        messages.extend(history)
+        messages.append({"role": "user", "content": message})
 
-    for chunk in client.chat_completion(
-        messages,
-        max_tokens=max_tokens,
-        stream=True,
-        temperature=temperature,
-        top_p=top_p,
-    ):
-        if chunk.choices and chunk.choices[0].delta.content:
-            token = chunk.choices[0].delta.content
-            response += token
-            yield response
+        response = ""
+
+        for chunk in client.chat_completion(
+            messages,
+            max_tokens=max_tokens,
+            stream=True,
+            temperature=temperature,
+            top_p=top_p,
+        ):
+            if chunk.choices and chunk.choices[0].delta.content:
+                token = chunk.choices[0].delta.content
+                response += token
+                yield response
+    else:
+        #yield "Local model requested, but code not yet implemented."
+        yield "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 # 1) respond(message,
 #     history: list[dict[str, str]],

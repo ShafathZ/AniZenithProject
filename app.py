@@ -10,6 +10,14 @@ CSS = theme_css + "\n\n" + main_css
 gr.set_static_paths(paths=[Path.cwd().absolute()/"static"])
 
 with gr.Blocks() as homepage:
+    gr.Markdown(
+        """
+        # Anime Recommendation Chatbot
+        An AI designed to give recommendations of the best anime options based on your preferences! Has knowledge of a full database of anime!
+        """,
+        elem_classes=["page-header"]
+    )
+
     with gr.Sidebar():
         gr.LoginButton()
 
@@ -32,7 +40,7 @@ with gr.Blocks() as homepage:
         )
         temperature_slider = gr.Slider(
             minimum=0.1,
-            maximum=4.0,
+            maximum=2.0,
             value=0.7,
             step=0.1,
             label="Temperature",
@@ -46,12 +54,18 @@ with gr.Blocks() as homepage:
             label="Top-p (nucleus sampling)",
             elem_classes=["custom-slider"]
         )
+        use_local_model = gr.Checkbox(
+            label="Use Local Model?",
+            value=False,
+            elem_classes=["toggle-button"]
+        )
 
     # Main chatbot interface
     chatbot = gr.ChatInterface(
         respond,
         additional_inputs=[
             system_msg,
+            use_local_model,
             max_tokens_slider,
             temperature_slider,
             top_p_slider

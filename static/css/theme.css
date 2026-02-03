@@ -22,4 +22,14 @@
     /* Chat messages */
     --user-message: linear-gradient(135deg, #ff9de0, #7ac5ff);
     --bot-message: linear-gradient(135deg, #ff9de0, #7ac5ff);
+
+    /* Buttons */
+    --btn-bg: linear-gradient(135deg, #7ac5ff, #9aa4ff);
+    --btn-bg-hover: linear-gradient(135deg, #8fd0ff, #aab3ff);
+    --btn-bg-active: linear-gradient(135deg, #6bb6f5, #8f98ff);
+
+    --btn-text: #0c0d23;
+    --btn-border: rgba(122, 197, 255, 0.45);
+
+    --btn-glow: 0 0 18px rgba(122, 197, 255, 0.55);
 }
