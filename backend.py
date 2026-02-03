@@ -64,7 +64,6 @@ def process_user_query(system_message, history, user_message, use_local_model, m
     # 3. Append recommendation string to system message
     system_message = system_message + recommendations_string
 
-
     # 4. Query the model
     for result in query_model(system_message, history, user_message, use_local_model, max_tokens, temperature, top_p, hf_token):
         yield result
