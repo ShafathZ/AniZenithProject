@@ -1,7 +1,7 @@
 import gradio as gr
 from pathlib import Path
 import backend
-from constants import SYSTEM_PROMPT
+from constants import *
 
 theme_css = Path("static/css/theme.css").read_text() if Path("static/css/theme.css").exists() else ""
 main_css = Path("static/css/gradiomain.css").read_text()
@@ -16,12 +16,9 @@ def respond(
     history: list[dict[str, str]],
     system_message,
     use_local_model,
-    max_tokens,
-    temperature,
-    top_p,
     hf_token: gr.OAuthToken,
 ):
-    for r in backend.process_user_query(system_message, history, message, use_local_model, max_tokens, temperature, top_p, hf_token.token):
+    for r in backend.process_user_query(system_message, history, message, use_local_model, MAX_TOKENS, TEMPERATURE, TOP_P, hf_token.token):
         yield r
 
 with gr.Blocks() as homepage:
@@ -43,47 +40,18 @@ with gr.Blocks() as homepage:
         elem_classes=["system-msg"]
     )
 
-    # Drop down section (Advanced Settings)
-    with gr.Accordion("Advanced Settings", open=False):
-        max_tokens_slider = gr.Slider(
-            minimum=1,
-            maximum=2048,
-            value=512,
-            step=1,
-            label="Max new tokens",
-            elem_classes=["custom-slider"]
-        )
-        temperature_slider = gr.Slider(
-            minimum=0.1,
-            maximum=2.0,
-            value=0.7,
-            step=0.1,
-            label="Temperature",
-            elem_classes=["custom-slider"]
-        )
-        top_p_slider = gr.Slider(
-            minimum=0.1,
-            maximum=1.0,
-            value=0.95,
-            step=0.05,
-            label="Top-p (nucleus sampling)",
-            elem_classes=["custom-slider"]
-        )
-        use_local_model = gr.Checkbox(
-            label="Use Local Model?",
-            value=False,
-            elem_classes=["toggle-button"]
-        )
+    local_model = gr.Checkbox(
+        label="Use Local Model?",
+        value=False,
+        elem_classes=["toggle-button"]
+    )
 
     # Main chatbot interface
     chatbot = gr.ChatInterface(
         respond,
         additional_inputs=[
             system_msg,
-            use_local_model,
-            max_tokens_slider,
-            temperature_slider,
-            top_p_slider
+            local_model,
         ],
     )
     chatbot.chatbot.elem_classes = ["custom-chatbot"]

@@ -9,3 +9,7 @@ If the RECOMMENDATIONS JSON String is not given:
 2. Do not reference anything about a RECOMMENDATION JSON
 3. Ask the user to provide their favorite genre(s) for Anime Recommendations
 """
+
+MAX_TOKENS = 2048
+TEMPERATURE = 0.7
+TOP_P = 0.7
