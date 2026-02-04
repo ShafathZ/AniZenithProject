@@ -64,7 +64,7 @@ def query_model(
     elif not use_local_model:
         # Non-local Model -- Use InferenceClient
         client = InferenceClient(
-            token=hf_token.token,
+            token=hf_token,
             model="openai/gpt-oss-20b",
         )
 
