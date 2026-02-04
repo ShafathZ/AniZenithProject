@@ -1,6 +1,7 @@
 import gradio as gr
 from pathlib import Path
 import backend
+from constants import SYSTEM_PROMPT
 
 theme_css = Path("static/css/theme.css").read_text() if Path("static/css/theme.css").exists() else ""
 main_css = Path("static/css/gradiomain.css").read_text()
