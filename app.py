@@ -20,7 +20,7 @@ def respond(
     top_p,
     hf_token: gr.OAuthToken,
 ):
-    for r in backend.process_user_query(system_message, history, message, use_local_model, max_tokens, temperature, top_p, hf_token):
+    for r in backend.process_user_query(system_message, history, message, use_local_model, max_tokens, temperature, top_p, hf_token.token):
         yield r
 
 with gr.Blocks() as homepage:
