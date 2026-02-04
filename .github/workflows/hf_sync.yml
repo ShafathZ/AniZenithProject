@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: production
-          fetch-depth: 0
+          fetch-depth: 1
           lfs: true
       - name: Install xet
         run: |
@@ -26,10 +26,9 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           git xet install
-          git xet track "*.db" "*.png" "*.jpg" "*.jpeg"
+          git xet track "*.db" "static/images/*"
           
-          git rm -r --cached *.db *.jpg *.png *.jpeg 2>/dev/null || true
-          git add -A
+          git add *
           git commit -m "Track binaries with xet" || echo "No changes to commit"
 
           git remote add huggingface "https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1"
