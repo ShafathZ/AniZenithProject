@@ -23,14 +23,15 @@ jobs:
           git config user.email "actions@github.com"
       - name: Convert binaries to xet and Push to HuggingFace
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN}}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git xet track "*.db" "*.png" "*.jpg"
-          ls -la
-          git add .xetconfig
-          git rm -r --cached *.db *.jpg *.png
-          git add *
-          git status
+          git remote add huggingface "https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1"
+          git xet remote add huggingface
+          git xet track "*.db" "*.png" "*.jpg" "*.jpeg"
+          
+          git rm -r --cached *.db *.jpg *.png *.jpeg 2>/dev/null || true
+          git add -A
           git commit -m "Track binaries with xet" || echo "No changes to commit"
-          git push --force https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1 HEAD:main
-        
+
+          # Push to HuggingFace with Xet
+          git push huggingface production --force
