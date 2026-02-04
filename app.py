@@ -1,6 +1,7 @@
 import gradio as gr
 from pathlib import Path
 import backend
+from constants import SYSTEM_PROMPT
 
 theme_css = Path("static/css/theme.css").read_text() if Path("static/css/theme.css").exists() else ""
 main_css = Path("static/css/gradiomain.css").read_text()
@@ -20,7 +21,7 @@ def respond(
     top_p,
     hf_token: gr.OAuthToken,
 ):
-    for r in backend.process_user_query(system_message, history, message, use_local_model, max_tokens, temperature, top_p, hf_token):
+    for r in backend.process_user_query(SYSTEM_PROMPT, history, message, use_local_model, max_tokens, temperature, top_p, hf_token):
         yield r
 
 with gr.Blocks() as homepage:

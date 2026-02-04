@@ -5,18 +5,6 @@ from retrieval_utils import get_recommendations
 
 genre_list = open("genrelist.txt", "r").read().splitlines()
 
-SYSTEM_PROMPT = f"""
-You are an expert on recommending Anime shows. Please use the RECOMMENDATIONS to answer the user's question.
-The RECOMMENDATIONS is a JSON String that contains information of top Anime sorted in descending order by:
-1. Number of Requested Genre Matches from the User
-2. The Score of the Anime
-
-If the RECOMMENDATIONS JSON String is not given: 
-1. Then answer the question like a Friendly Chatbot!
-2. Do not reference anything about a RECOMMENDATION JSON
-3. Ask the user to provide their favorite genre(s) for Anime Recommendations
-"""
-
 def process_user_query(system_message: str, history: List[dict], user_message: str, use_local_model: bool, max_tokens: int, temperature: float, top_p: float, hf_token):
     # 1. Retrieve genres from the user message using naive approach
     genre_list = detect_genres(user_message)
@@ -55,14 +43,14 @@ def query_model(
         user_message: str,
         recommendations_string: str,
         use_local_model: bool,
-        max_tokens: int,
-        temperature: float,
-        top_p: float,
+        max_tokens: int, # TODO: Remove this and hardcode a value in constants.py
+        temperature: float, # TODO: Remove this and hardcode a value in constants.py
+        top_p: float, # TODO: Remove this and hardcode a value in constants.py
         hf_token):
     
     # Construct messages for the language model
     # Start by adding system prompt
-    system_prompt = SYSTEM_PROMPT
+    system_prompt = system_message
     if recommendations_string:
         system_prompt += "\nRECOMMENDATION JSON:" + f"\n{recommendations_string}"
     messages = [{"role": "system", "content": system_prompt}]
