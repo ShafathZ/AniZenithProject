@@ -24,9 +24,8 @@ jobs:
           git xet track "*.jpg"
       - name: Convert binaries to xet
         run: |
-          git rm -r --cached *
+          git rm -r --cached *.db *.jpg *.png
           git add *
-          git add .xetconfig
           git commit -m "Track binaries with xet" || echo "No changes to commit"
       - name: Push to HuggingFace
         env:
