@@ -25,13 +25,8 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git remote add huggingface "https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1"
-          git xet remote add huggingface
+          git xet init --force
           git xet track "*.db" "*.png" "*.jpg" "*.jpeg"
-          
-          git rm -r --cached *.db *.jpg *.png *.jpeg 2>/dev/null || true
-          git add -A
-          git commit -m "Track binaries with xet" || echo "No changes to commit"
 
-          # Push to HuggingFace with Xet
+          git remote add huggingface "https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1"
           git push huggingface production --force
