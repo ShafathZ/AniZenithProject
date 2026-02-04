@@ -26,7 +26,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN}}
         run: |
           git xet track "*.db" "*.png" "*.jpg"
-          ls
+          ls -la
           git add .xetconfig
           git rm -r --cached *.db *.jpg *.png
           git add *
