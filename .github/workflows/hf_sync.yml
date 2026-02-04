@@ -15,7 +15,7 @@ jobs:
           lfs: true
       - name: Install xet
         run: |
-          curl -fsSL https://xet.sh/install.sh | bash
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/huggingface/xet-core/refs/heads/main/git_xet/install.sh | sh
           echo "$HOME/.xet/bin" >> $GITHUB_PATH
       - name: Authenticate xet
         env:
