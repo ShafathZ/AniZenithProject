@@ -25,12 +25,28 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git filter-branch --force --index-filter "git rm --cached --ignore-unmatch *.db *.jpg *.png" --prune-empty --tag-name-filter cat -- --all
-        
+          # 1. Install Xet
           git xet install
-          git xet track "*.db" "static/images/*"
 
-          git add *
-          git commit -m "Track binaries with xet" || echo "No changes to commit"
+          # 2. Create a fresh, empty branch for deployment
+          # This disconnects from previous history, removing the "binary in history" error
+          git checkout --orphan deployment-branch
+          
+          # 3. Unstage everything so we can re-add them properly with Xet
+          git reset
 
+          # 4. Configure Xet tracking
+          # We do this *before* adding files so Xet handles them correctly
+          git xet track "anime.db" "static/images/*"
+
+          # 5. Add all files
+          # Since we are in a fresh branch, this adds everything currently on disk
+          git add .
+
+          # 6. Commit and Force Push
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git commit -m "Deploy to Spaces with Xet"
+          
+          # Force push to 'main' on Hugging Face
           git push --force https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1 HEAD:main
