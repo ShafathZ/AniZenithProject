@@ -27,6 +27,8 @@ jobs:
         run: |
           git xet install
           git xet track "*.db" "static/images/*"
+
+          git filter-branch --force --index-filter "git rm --cached --ignore-unmatch anime.db" --prune-empty --tag-name-filter cat -- --all
           
           git add *
           git commit -m "Track binaries with xet" || echo "No changes to commit"
