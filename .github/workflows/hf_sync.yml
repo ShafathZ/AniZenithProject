@@ -16,8 +16,7 @@ jobs:
       - name: Install xet
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/huggingface/xet-core/refs/heads/main/git_xet/install.sh | sh
-          chmod +x xet
-          sudo mv xet /usr/local/bin/xet
+          echo "$HOME/.xet/bin" >> $GITHUB_PATH
       - name: Set git user for xet security
         run: |
           git config user.name "github-actions"
@@ -26,10 +25,12 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN}}
         run: |
-          xet track "*.db" "*.png" "*.jpg"
+          git xet track "*.db" "*.png" "*.jpg"
+          ls
           git add .xetconfig
           git rm -r --cached *.db *.jpg *.png
           git add *
+          git status
           git commit -m "Track binaries with xet" || echo "No changes to commit"
           git push --force https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1 HEAD:main
         
