@@ -33,5 +33,4 @@ jobs:
           git add *
           git commit -m "Track binaries with xet" || echo "No changes to commit"
 
-          git remote add huggingface "https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1"
-          git push huggingface main --force
+          git push --force https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1 HEAD:main
