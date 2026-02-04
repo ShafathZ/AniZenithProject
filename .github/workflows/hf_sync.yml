@@ -25,7 +25,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git filter-branch --force --index-filter "git rm --cached --ignore-unmatch anime.db" --prune-empty --tag-name-filter cat -- --all
+          git filter-branch --force --index-filter "git rm --cached --ignore-unmatch *.db *.jpg *.png" --prune-empty --tag-name-filter cat -- --all
         
           git xet install
           git xet track "*.db" "static/images/*"
