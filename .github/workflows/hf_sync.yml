@@ -21,12 +21,12 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          xet auth login --token "$HF_TOKEN"
+          git xet auth login --token "$HF_TOKEN"
       - name: Track binary files with xet
         run: |
-          xet track "*.db"
-          xet track "*.png"
-          xet track "*.jpg"
+          git xet track "*.db"
+          git xet track "*.png"
+          git xet track "*.jpg"
       - name: Push to HuggingFace
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN}}
