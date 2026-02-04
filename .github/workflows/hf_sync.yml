@@ -26,14 +26,12 @@ jobs:
           git xet track "*.db"
           git xet track "*.png"
           git xet track "*.jpg"
-      - name: Convert binaries to xet
+      - name: Convert binaries to xet and Push to HuggingFace
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN}}
         run: |
           git rm -r --cached *.db *.jpg *.png
           git add *
           git commit -m "Track binaries with xet" || echo "No changes to commit"
-      - name: Push to HuggingFace
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN}}
-        run: |
           git push --force https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1 HEAD:main
         
