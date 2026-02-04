@@ -17,6 +17,10 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/huggingface/xet-core/refs/heads/main/git_xet/install.sh | sh
           echo "$HOME/.xet/bin" >> $GITHUB_PATH
+      - name: Set git user for xet security
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
       - name: Track binary files with xet
         run: |
           git xet track "*.db"
@@ -31,6 +35,5 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN}}
         run: |
-          git config user.name "github-actions"
           git push --force https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1 HEAD:main
         
