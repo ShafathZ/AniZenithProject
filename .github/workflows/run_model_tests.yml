@@ -3,7 +3,7 @@ name: Run Model Tests on Production Branch
 # Run on every push and pull request
 on:
   push:
-    branches: [ "production", "chatmodel-test" ]
+    branches: [ "production" ]
   workflow_dispatch:
 
 # Run the following Jobs (just 1)
@@ -21,7 +21,7 @@ jobs:
       # Checkout the current repository
       - uses: actions/checkout@v3
         with:
-          ref: chatmodel-test
+          ref: production
           fetch-depth: 0
           lfs: true
 
