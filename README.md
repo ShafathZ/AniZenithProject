@@ -16,6 +16,12 @@ license: mit
 
 An Anime Recommendation chatbot using [Gradio](https://gradio.app), [`huggingface_hub`](https://huggingface.co/docs/huggingface_hub/v0.22.2/en/index), and the [Hugging Face Inference API](https://huggingface.co/docs/api-inference/index).
 
+## Models Used by our Chatbot
+| Type of Model | Model Name (Hugging Face Path) |
+|---------------|--------------------------------|
+| Local Model   | `google/gemma-3-1b-it`         |
+| Inference Client Model| `openai/gpt-oss-20b`   |
+
 
 ## Working with UV (Ultra-Violet)
 ### Install UV
