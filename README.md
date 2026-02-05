@@ -19,7 +19,7 @@ An Anime Recommendation chatbot using [Gradio](https://gradio.app), [`huggingfac
 ## Models Used by our Chatbot
 | Type of Model | Model Name (Hugging Face Path) |
 |---------------|--------------------------------|
-| Local Model   | `google/gemma-3-1b-it`         |
+| Local Model   | `Qwen/Qwen3-0.6B`         |
 | Inference Client Model| `openai/gpt-oss-20b`   |
 
 
