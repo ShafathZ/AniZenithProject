@@ -1,7 +1,7 @@
 /* ====== MAIN APP CONTAINER AND HEADER ====== */
 .page-header {
     text-align: center;
-    border-radius: 22px !important;
+    border-radius: 22px;
     margin-bottom: 1rem;
     margin-top: 0.25rem;
 }
@@ -38,7 +38,7 @@
 .block,
 .form,
 .gr-group {
-    background: var(--bg-glass-strong) !important;
+    background: var(--bg-glass-strong);
     border-radius: 22px !important;
 }
 
@@ -154,10 +154,10 @@ button[data-testid="login-button"],
 }
 
 /* Toggle Buttons */
-.block .toggle-button {
-    display: flex;
-    justify-content: center;
-    width: 100%;
+.block.toggle-button {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: fit-content;
 }
 
 .toggle-button input[type="checkbox"] {
