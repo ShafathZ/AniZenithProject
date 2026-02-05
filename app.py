@@ -14,17 +14,16 @@ gr.set_static_paths(paths=[Path.cwd().absolute()/"static"])
 def respond(
     message,
     history: list[dict[str, str]],
-    system_message,
     use_local_model,
     hf_token: gr.OAuthToken,
 ):
-    for r in backend.process_user_query(system_message, history, message, use_local_model, MAX_TOKENS, TEMPERATURE, TOP_P, hf_token.token):
+    for r in backend.process_user_query(SYSTEM_PROMPT, history, message, use_local_model, MAX_TOKENS, TEMPERATURE, TOP_P, hf_token.token):
         yield r
 
 with gr.Blocks() as homepage:
     gr.Markdown(
         """
-        # Anime Recommendation Chatbot
+        # Ani<span style="font-size: 2rem;">ℤ</span>enith
         An AI designed to give recommendations of the best anime options based on your preferences! Has knowledge of a full database of anime!
         """,
         elem_classes=["page-header"]
@@ -32,13 +31,6 @@ with gr.Blocks() as homepage:
 
     with gr.Sidebar():
         gr.LoginButton()
-
-    # System message textbox
-    system_msg = gr.Textbox(
-        value="You are a friendly Chatbot.",
-        label="System message",
-        elem_classes=["system-msg"]
-    )
 
     local_model = gr.Checkbox(
         label="Use Local Model?",
@@ -50,7 +42,6 @@ with gr.Blocks() as homepage:
     chatbot = gr.ChatInterface(
         respond,
         additional_inputs=[
-            system_msg,
             local_model,
         ],
     )
