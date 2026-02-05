@@ -1,12 +1,19 @@
 name: Sync to HuggingFace Spaces
 on: 
-  push:
+  workflow_run:
+    workflows: ["Run All Unit Tests", "Run Model Tests on Production Branch"]
+    types:
+      - completed
     branches: [ "production" ]
   workflow_dispatch:
 
 jobs:
   sync-to-hub:
     runs-on: ubuntu-latest
+
+    # Only run if the triggering workflows succeeded or when we run it manually from GH Actions UI
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
     steps:
       - uses: actions/checkout@v3
         with:

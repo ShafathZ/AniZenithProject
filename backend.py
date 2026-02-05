@@ -65,7 +65,7 @@ def query_model(
     if use_local_model:
         # Local Model -- Uses pipeline from transformers library
         pipeline_local_model = pipeline(task='text-generation',
-                               model='google/gemma-3-1b-it',
+                               model='Qwen/Qwen3-0.6B',
                                max_new_tokens=max_tokens,
                                temperature=temperature,
                                do_sample=False,
@@ -75,7 +75,7 @@ def query_model(
         response = pipeline_local_model(messages)
         
         # Parse the output and yield it
-        yield response[0]['generated_text'][-1]['content'].strip()
+        yield response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
             
 
     elif not use_local_model:

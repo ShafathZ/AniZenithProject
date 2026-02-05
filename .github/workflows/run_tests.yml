@@ -3,7 +3,7 @@ name: Run All Unit Tests
 # Run on every push and pull request
 on: 
   push:
-  pull_request:
+  workflow_dispatch:
 
 # Run the following Jobs (just 1)
 jobs:
