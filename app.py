@@ -1,27 +1,33 @@
-from pathlib import Path
-from flask import Flask, render_template, request, jsonify
-import backend
-from configurations import DevelopmentConfig
-from constants import *
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
-app = Flask(__name__, static_folder="static")
-app.config.from_object(DevelopmentConfig)
+# Create FastAPI app
+app = FastAPI()
 
-@app.context_processor
-def inject_context():
-    return dict()
+# Set up accessible directories
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
-@app.route("/", methods=["GET"])
-def home():
-    return render_template("home.html")
+# Home page
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse(
+        "home.html",
+        {"request": request}
+    )
 
-@app.route("/chat", methods=["POST"])
-def send_chat():
-    # TODO: Decompose response and convert into message history for backend
-    pass
+# Chat message handling
+@app.post("/chat")
+async def send_chat(request: Request):
+    data = await request.json()
+
+    return JSONResponse({
+        "response": data
+    })
+
 
 if __name__ == "__main__":
-    app.run(debug=True,
-            host="localhost",
-            port=4007
-    )
+    import uvicorn
+    uvicorn.run("app:app", host="localhost", port=4007, reload=True)

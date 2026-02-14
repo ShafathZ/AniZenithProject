@@ -1,13 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Aniℤenith</title>
-    <h1>Ani<span style="font-size: 2rem;">ℤ</span>enith
-        An AI designed to give recommendations of the best anime options based on your preferences! Has knowledge of a full database of anime!
-    </h1>
-</head>
-<body>
+{% extends "main.html" %}
 
-</body>
-</html>
+{% block imports %}
+<link rel="stylesheet" href="/static/css/home.css">
+<script src="/static/js/home.js"></script>
+{% endblock %}
+
+{% block title %}AniZenith{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    <!-- TODO: Add this in CSS to avoid CSRF protect issues -->
+    Ani<span style="font-size: 3rem;">ℤ</span>enith
+</h1>
+
+<span class="subtitle">
+    An AI designed to give recommendations of the best anime options based on your preferences! Has knowledge of a full database of anime!
+</span>
+
+<div class="chat-container">
+
+    <!-- ===== Toggle Local Model ===== -->
+    <div class="toggle-wrapper">
+        <input type="checkbox" id="localModelToggle">
+        <label for="localModelToggle" class="no-select">Use Local Model?</label>
+    </div>
+
+    <!-- ===== Chat Messages ===== -->
+    <div class="chat-box" id="chatBox">
+        <!-- Messages will appear here -->
+    </div>
+
+    <!-- ===== Input Row ===== -->
+    <div class="input-row">
+        <textarea id="userInput"
+                  class="chat-input"
+                  placeholder="Ask for anime recommendations..."></textarea>
+
+        <!-- TODO: Change sendMessage to add click event through script for CSRF protection -->
+        <button class="submit-button" onclick="sendMessage()">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+
+</div>
+
+{% endblock %}
