@@ -18,6 +18,16 @@
     An AI designed to give recommendations of the best anime options based on your preferences! Has knowledge of a full database of anime!
 </span>
 
+<div class="model-toggle-wrapper" id="fixedToggle">
+    <div class="model-toggle offline" onclick="toggleLocalModel()">
+        <i class="fa-solid fa-globe toggle-icon online"></i>
+        <div class="toggle-switch">
+            <div class="toggle-dot"></div>
+        </div>
+        <i class="fa-solid fa-server toggle-icon offline"></i>
+    </div>
+</div>
+
 <div class="chat-container">
 
     <!-- ===== Toggle Local Model ===== -->
@@ -27,9 +37,24 @@
     </div>
 
     <!-- ===== Chat Messages ===== -->
-    <div class="chat-box" id="chatBox">
-        <!-- Messages will appear here -->
+    <div class="chatbot-area">
+        <div class="chat-box" id="chatBox">
+            <!-- Messages will appear here -->
+        </div>
+        <button class="reset-button" onclick="clearChat()">
+            <i class="fa-solid fa-trash"></i>
+        </button>
     </div>
+
+
+    <!-- ===== Quick Suggestions ===== -->
+    <div class="quick-suggestions">
+        <button onclick="sendPreset('Action')">Action</button>
+        <button onclick="sendPreset('Romance')">Romance</button>
+        <button onclick="sendPreset('Drama')">Drama</button>
+        <button class="add-button" onclick="addCustomPreset()">+</button>
+    </div>
+
 
     <!-- ===== Input Row ===== -->
     <div class="input-row">
