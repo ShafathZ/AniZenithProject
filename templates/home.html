@@ -19,16 +19,6 @@
     An AI designed to give recommendations of the best anime options based on your preferences! Has knowledge of a full database of anime!
 </span>
 
-<div class="model-toggle-wrapper" id="fixedToggle">
-    <div class="model-toggle offline" onclick="toggleLocalModel()">
-        <i class="fa-solid fa-globe toggle-icon online"></i>
-        <div class="toggle-switch">
-            <div class="toggle-dot"></div>
-        </div>
-        <i class="fa-solid fa-server toggle-icon offline"></i>
-    </div>
-</div>
-
 <div class="chat-container">
 
     <!-- ===== Toggle Local Model ===== -->
@@ -70,9 +60,17 @@
                 </div>
             </div>
         </div>
-        <button class="reset-button" onclick="clearChat()">
-            <i class="fa-solid fa-trash"></i>
-        </button>
+        <div class="top-buttons">
+            <button class="full-chat-button share-button" onclick="shareChat()">
+                <i class="fas fa-share-alt"></i>
+            </button>
+            <button class="full-chat-button copy-button" onclick="copyChat()">
+                <i class="fas fa-copy"></i>
+            </button>
+            <button class="full-chat-button reset-button" onclick="clearChat()">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
     </div>
 
 

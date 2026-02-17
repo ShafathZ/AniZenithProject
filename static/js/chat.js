@@ -60,6 +60,57 @@ function addMessage({ role, msg }) {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     // TODO: Trim the last N chat messages to avoid long chats on visual display
+    updateButtons();
+}
+
+function updateButtons() {
+
+    // Add Copy button logic
+    const copyButtons = document.querySelectorAll(".action-btn.copy");
+
+    copyButtons.forEach(copyBtn => {
+        copyBtn.addEventListener("click", () => {
+            const message = copyBtn.closest(".message");
+            const textDiv = message.querySelector(".text").textContent.trim();
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(textDiv)
+                .then(() => {
+                    copyBtn.innerHTML = '<span style="font-size: 10px;">✓</span>';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                    }, 1000);
+                })
+                .catch(err => console.error("Failed to copy:", err));
+        });
+    });
+
+    // Add Share button logic
+    const shareButtons = document.querySelectorAll(".action-btn.share");
+    shareButtons.forEach(shareBtn => {
+        shareBtn.addEventListener("click", async () => {
+            const message = shareBtn.closest(".message");
+            const textDiv = message.querySelector(".text").textContent.trim();
+
+            // Native share method
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        text: textDiv
+                    });
+                    console.log("Message shared successfully!");
+                } catch (err) {
+                    console.error("Share canceled or failed:", err);
+                }
+            } else {
+                // Prompt the user to copy it manually
+                const shareTarget = prompt(
+                    "Web Share not supported. Copy this text to share:",
+                    textDiv
+                );
+            }
+        });
+    });
 }
 
 // Logic for when send is activated
@@ -74,3 +125,7 @@ function sendMessage() {
 
     input.focus();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateButtons();
+});
