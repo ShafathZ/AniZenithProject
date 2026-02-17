@@ -3,6 +3,7 @@
 {% block imports %}
 <link rel="stylesheet" href="/static/css/home.css">
 <script src="/static/js/home.js"></script>
+<script src="/static/js/chat.js"></script>
 {% endblock %}
 
 {% block title %}AniZenith{% endblock %}
@@ -39,7 +40,35 @@
     <!-- ===== Chat Messages ===== -->
     <div class="chatbot-area">
         <div class="chat-box" id="chatBox">
-            <!-- Messages will appear here -->
+            <!-- Bot Message Example -->
+            <div class="message bot">
+                <div class="message-row">
+                    <img src="/static/images/bot.jpg" alt="Bot" class="avatar no-select">
+                    <div class="text">
+                        Hi! This is an example bot message! Tell me what kind of anime you like and I’ll give you recommendations!
+                    </div>
+                </div>
+                <div class="actions">
+                    <span class="action-btn refresh" title="Refresh"><i class="fas fa-sync-alt"></i></span>
+                    <span class="action-btn copy" title="Copy"><i class="fas fa-copy"></i></span>
+                    <span class="action-btn share" title="Share"><i class="fas fa-share-alt"></i></span>
+                </div>
+            </div>
+
+            <!-- User Message -->
+            <div class="message user">
+                <div class="message-row">
+                    <div class="text">
+                        As an example, I like action anime with strong main characters and emotional moments.
+                    </div>
+                    <img src="/static/images/user.jpg" alt="User" class="avatar no-select">
+                </div>
+                <div class="actions">
+                    <span class="action-btn edit" title="Edit"><i class="fas fa-pen"></i></span>
+                    <span class="action-btn copy" title="Copy"><i class="fas fa-copy"></i></span>
+                    <span class="action-btn trash" title="Delete"><i class="fas fa-trash-alt"></i></span>
+                </div>
+            </div>
         </div>
         <button class="reset-button" onclick="clearChat()">
             <i class="fa-solid fa-trash"></i>
@@ -48,7 +77,7 @@
 
 
     <!-- ===== Quick Suggestions ===== -->
-    <div class="quick-suggestions">
+    <div class="quick-suggestions no-select">
         <button onclick="sendPreset('Action')">Action</button>
         <button onclick="sendPreset('Romance')">Romance</button>
         <button onclick="sendPreset('Drama')">Drama</button>

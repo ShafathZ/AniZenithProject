@@ -1,3 +1,5 @@
+@import url('chat.css');
+
 /* ===== PAGE TITLE & SUBTITLE ===== */
 .page-title {
     text-align: center;
@@ -81,49 +83,6 @@
     height: 75vh;
 }
 
-/* ===== CHAT BOX ===== */
-.chatbot-area {
-    position: relative;
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-box {
-    flex: 1 1 auto;
-    height: 100%;
-    background: var(--bg-glass-darker);
-    backdrop-filter: blur(18px);
-    overflow-y: auto;
-    padding: 15px;
-    border-radius: 18px;
-    border: 1px solid var(--border-soft);
-    margin-bottom: 10px;
-}
-
-.reset-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    border: none;
-    border-radius: 8px;
-    color: white;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: 0.2s ease;
-    z-index: 100;
-}
-
-.reset-button:hover {
-    box-shadow: 0 0 12px var(--accent-glow);
-}
-
 /* ===== QUICK SUGGESTIONS ===== */
 .quick-suggestions {
     display: flex;
@@ -159,26 +118,6 @@
     box-shadow: 0 0 15px var(--accent-glow);
 }
 
-/* ===== CHAT MESSAGES ===== */
-.message {
-    padding: 14px 18px;
-    border-radius: 18px;
-    margin: 10px 0;
-    max-width: 70%;
-    word-wrap: break-word;
-    box-shadow: 0 4px 20px rgba(122, 162, 255, 0.2);
-}
-
-.message.user {
-    background: var(--user-message);
-    margin-left: auto;
-}
-
-.message.bot {
-    background: var(--bot-message);
-    margin-right: auto;
-}
-
 /* ===== CHAT INPUT AREA ===== */
 .input-row {
     display: flex;
@@ -198,7 +137,6 @@
     min-height: 55px;
     max-height: 150px;
     outline: none;
-    transition: box-shadow 0.2s ease;
 }
 
 .chat-input:focus,
