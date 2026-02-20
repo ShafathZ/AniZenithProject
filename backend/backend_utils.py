@@ -1,11 +1,19 @@
 from typing import List
 from huggingface_hub import InferenceClient
 from transformers import pipeline
-from retrieval_utils import get_recommendations
+from backend.retrieval_utils import get_recommendations
 
 genre_list = open("genrelist.txt", "r").read().splitlines()
 
-def process_user_query(system_message: str, history: List[dict], user_message: str, use_local_model: bool, max_tokens: int, temperature: float, top_p: float, hf_token):
+def process_user_query(system_message: str, 
+                       history: List[dict], 
+                       user_message: str, 
+                       use_local_model: bool, 
+                       max_tokens: int, 
+                       temperature: float, 
+                       top_p: float, 
+                       hf_token):
+    
     # 1. Retrieve genres from the user message using naive approach
     genre_list = detect_genres(user_message)
 
@@ -37,16 +45,16 @@ def detect_genres(message: str) -> List[str]:
     return requested_genres
 
 
-def query_model(
-        system_message: str,
-        history: List[dict],
-        user_message: str,
-        recommendations_string: str,
-        use_local_model: bool,
-        max_tokens: int, # TODO: Remove this and hardcode a value in constants.py
-        temperature: float, # TODO: Remove this and hardcode a value in constants.py
-        top_p: float, # TODO: Remove this and hardcode a value in constants.py
-        hf_token):
+def query_model(system_message: str,
+                history: List[dict],
+                user_message: str,
+                recommendations_string: str,
+                use_local_model: bool,
+                max_tokens: int, # TODO: Remove this and hardcode a value in constants.py
+                temperature: float, # TODO: Remove this and hardcode a value in constants.py
+                top_p: float, # TODO: Remove this and hardcode a value in constants.py
+                hf_token):
+
     
     # Construct messages for the language model
     # Start by adding system prompt
