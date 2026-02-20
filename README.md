@@ -97,3 +97,28 @@ chatbot = gr.ChatInterface(
 )
 ```
 With this, run the program and it should work locally on localhost server!
+
+## SSH Commands to SSH into VMs for Case Study 2
+
+### Login to Frontend VM (Not working atm)
+```bash
+ssh -i ssh_keys/group_key -p 7002 frontend@paffenroth-23.dyn.wpi.edu
+```
+
+```bash
+ssh -i ssh_keys/group02_key -p 22000 frontend@paffenroth-23.dyn.wpi.edu
+```
+
+
+
+
+### Login to Backend VM
+Login Using Common Key (Shouldn't work now):
+```bash
+ssh -i ssh_keys/group_key -p 22002 group02@paffenroth-23.dyn.wpi.edu
+```
+
+Using our Group Key (Please contact sgoyal@wpi.edu to get access to the keys):
+```bash
+ssh -i ssh_keys/group02_key -p 22002 group02@paffenroth-23.dyn.wpi.edu
+```
