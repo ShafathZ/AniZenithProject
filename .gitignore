@@ -5,6 +5,7 @@
 *.pub
 group_key
 group02_key
+group02_key_passphrase
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
