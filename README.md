@@ -67,49 +67,12 @@ HF_TOKEN=XXXXXXXXX
 hf auth login
 ```
 
-### Running Gradio App on HuggingFace Spaces Locally
-Run the following command:
-```bash
-python app.py
-```
-
-It will spit out logs indicating the url to open in browser:
-```
-...
-* Running on local URL:  http://127.0.0.1:7860
-...
-```
-
-### Debugging Gradio Issue
-In app.py, the line:
-```python
-chatbot = gr.ChatInterface(
-    respond,
-    type="messages",
-    ...
-)
-```
-might need to be changed to remove the type line as follows due to a deprecation issue on HuggingFace Spaces:
-```python
-chatbot = gr.ChatInterface(
-    respond,
-    ...
-)
-```
-With this, run the program and it should work locally on localhost server!
-
 ## SSH Commands to SSH into VMs for Case Study 2
 
 ### Login to Frontend VM (Not working atm)
 ```bash
-ssh -i ssh_keys/group_key -p 7002 frontend@paffenroth-23.dyn.wpi.edu
-```
-
-```bash
 ssh -i ssh_keys/group02_key -p 22000 frontend@paffenroth-23.dyn.wpi.edu
 ```
-
-
 
 
 ### Login to Backend VM
