@@ -1,21 +1,25 @@
-from typing import List
+from typing import List, Dict
 from huggingface_hub import InferenceClient
 from transformers import pipeline
 from backend.retrieval_utils import get_recommendations
+from backend.constants import *
+from dotenv import load_dotenv
+import os
 
-genre_list = open("genrelist.txt", "r").read().splitlines()
+# Load all Environment Variables
+load_dotenv()
+HF_TOKEN = os.getenv('HF_TOKEN')
 
-def process_user_query(system_message: str, 
-                       history: List[dict], 
-                       user_message: str, 
-                       use_local_model: bool, 
-                       max_tokens: int, 
-                       temperature: float, 
-                       top_p: float, 
-                       hf_token):
+# Load the List of All Supported Genres in Memory, at App Startup
+genre_list = open("backend/genrelist.txt", "r").read().splitlines()
+
+
+# TODO: Make this Method Async Later
+def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
     
-    # 1. Retrieve genres from the user message using naive approach
-    genre_list = detect_genres(user_message)
+    # Retrieve genres from the user message using naive approach
+    # The Last Message should be user's message
+    genre_list = detect_genres(messages[-1]['content'])
 
     # 2. Retrieve relevant results from DB if the genre_list is not empty
     recommendations_string = ""
@@ -23,15 +27,7 @@ def process_user_query(system_message: str,
         recommendations_string = get_recommendations(genre_list)
 
     # 3. Query the model
-    for result in query_model(system_message, 
-                              history, 
-                              user_message,
-                              recommendations_string, 
-                              use_local_model, 
-                              max_tokens, 
-                              temperature, 
-                              top_p, 
-                              hf_token):
+    for result in query_model(messages, use_local_model, recommendations_string):
         yield result
 
 
@@ -45,42 +41,38 @@ def detect_genres(message: str) -> List[str]:
     return requested_genres
 
 
-def query_model(system_message: str,
-                history: List[dict],
-                user_message: str,
-                recommendations_string: str,
-                use_local_model: bool,
-                max_tokens: int, # TODO: Remove this and hardcode a value in constants.py
-                temperature: float, # TODO: Remove this and hardcode a value in constants.py
-                top_p: float, # TODO: Remove this and hardcode a value in constants.py
-                hf_token):
+# TODO: Make this method Async later
+def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommendations_string: str):
 
-    
-    # Construct messages for the language model
-    # Start by adding system prompt
-    system_prompt = system_message
+    # Determine System Prompt
+    # Start with the Fixed System Prompt
+    system_prompt = SYSTEM_PROMPT
+
+    # If the recommendations_string is not None
     if recommendations_string:
+
+        # Append its data to the System Prompt
         system_prompt += "\nRECOMMENDATION JSON:" + f"\n{recommendations_string}"
-    messages = [{"role": "system", "content": system_prompt}]
 
-    # Add the rest of the history
-    messages.extend(history)
+    # Add the System Prompt to the Input Messages to the LLM
+    input_messages = [{"role": "system", "content": system_prompt}]
 
-    # Add the current user prompt
-    messages.append({"role": "user", "content": user_message})
+    # Add the rest of the messages
+    input_messages.extend(messages)
 
     # Determine which model to use (local or external)
     if use_local_model:
-        # Local Model -- Uses pipeline from transformers library
+        # Local Model
+        # Uses pipeline from transformers library
         pipeline_local_model = pipeline(task='text-generation',
-                               model='Qwen/Qwen3-0.6B',
-                               max_new_tokens=max_tokens,
-                               temperature=temperature,
-                               do_sample=False,
-                               top_p=top_p
-                               )
+                                        model='Qwen/Qwen3-0.6B',
+                                        max_new_tokens=MAX_NEW_TOKENS,
+                                        temperature=TEMPERATURE,
+                                        do_sample=False,
+                                        top_p=TOP_P)
+        
         # Get the response from the local model
-        response = pipeline_local_model(messages)
+        response = pipeline_local_model(input_messages)
         
         # Parse the output and yield it
         yield response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
@@ -89,17 +81,17 @@ def query_model(system_message: str,
     elif not use_local_model:
         # Non-local Model -- Use InferenceClient
         client = InferenceClient(
-            token=hf_token,
+            token=HF_TOKEN,
             model="openai/gpt-oss-20b",
         )
 
         response = ""
         for chunk in client.chat_completion(
-                messages=messages,
-                max_tokens=max_tokens,
+                messages=input_messages,
+                max_tokens=MAX_NEW_TOKENS,
                 stream=True,
-                temperature=temperature,
-                top_p=top_p,
+                temperature=TEMPERATURE,
+                top_p=TOP_P,
         ):
             if chunk.choices and chunk.choices[0].delta.content:
                 token = chunk.choices[0].delta.content

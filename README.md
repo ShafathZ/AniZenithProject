@@ -97,3 +97,39 @@ chatbot = gr.ChatInterface(
 )
 ```
 With this, run the program and it should work locally on localhost server!
+
+## cURL commands to Test Backend Chat API
+
+### Locally Hosted Backend
+For Using Online Model:
+```bash
+curl --location 'http://localhost:4007/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello"
+        }
+    ],
+    "use_local": false
+}'
+```
+
+For Using Local Model:
+```bash
+curl --location 'http://localhost:4007/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello"
+        }
+    ],
+    "use_local": true
+}'
+```
+
+### Remoted Hosted Backend (on VMs)
+TODO

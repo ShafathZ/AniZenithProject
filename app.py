@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import RequestValidationError
 from backend.AniZenithExchange import AniZenithRequest, AniZenithResponse
 from backend.validation_utils import validate_anizenith_request
+from backend.backend_utils import chat_with_llm
 import logging
 
 # Configure logging at Startup
@@ -41,19 +42,30 @@ async def handle_chat_request(request: AniZenithRequest):
     # Log the request
     logger.info(f"Received Chat Request: {request}")
 
-    # TODO: Perform Validations
+    # Perform Validations
     validation_error_response = validate_anizenith_request(request)
+
+    # If there was a validation error response, return it
     if validation_error_response:
         return validation_error_response
 
-    # TODO: Call Backend Utils
+    # Chat with LLM using the messages in the request
+    assistant_message = ""
+    for streamed_response in chat_with_llm(request.messages, request.use_local):
+        assistant_message = streamed_response
 
-    # TODO: Construct an AniZenithResponse based on output from Backend Utils
+    # Construct an AniZenithResponse based on Assistant Message
+    # Copy the old set of messages
     response_messages = request.messages
-    response = AniZenithResponse(messages=response_messages)
 
-    # Return the AniZenithResponse
-    return response
+    # Add the Assistant Message
+    response_messages.append({
+        "role": "assistant",
+        "content": assistant_message
+    })
+
+    # Construct an AniZenithResponse and return it
+    return AniZenithResponse(messages=response_messages)
 
 
 # ┌───────────────────────────────────────────────┐
