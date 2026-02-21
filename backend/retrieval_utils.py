@@ -3,7 +3,7 @@ from typing import List, Tuple
 import json
 
 # Constants
-DB_PATH = "anime.db"
+DB_PATH = "backend/anime.db"
 
 def get_recommendations(requested_genres: List[str], limit: int = 5) -> str:
     # Establish Connection and Cursor
