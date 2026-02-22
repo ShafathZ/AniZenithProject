@@ -113,6 +113,16 @@ function updateButtons() {
     });
 }
 
+// Clears the full chat UI
+function clearFullChat() {
+    if (confirm('Are you sure you want to clear the chat?')) {
+        const chatMessages = document.querySelectorAll('.message');
+        chatMessages.forEach(message => {
+            message.remove();
+        });
+    }
+}
+
 // Logic for when send is activated
 function sendMessage() {
     const input = document.getElementById("userInput");
