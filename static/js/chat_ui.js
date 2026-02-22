@@ -1,4 +1,4 @@
-function addMessage({ role, msg }) {
+function addUIMessage({ role, msg }) {
 
     console.log(msg);
 
