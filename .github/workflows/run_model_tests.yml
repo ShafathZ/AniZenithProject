@@ -2,8 +2,10 @@ name: Run Model Tests on Production Branch
 
 # Run on every push and pull request
 on:
-  push:
-    branches: [ "production" ]
+  # Disabling for Case Study 2
+  # push:
+  #   branches: [ "production" ]
+  
   workflow_dispatch:
 
 # Run the following Jobs (just 1)

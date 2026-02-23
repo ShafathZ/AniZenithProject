@@ -1,10 +1,11 @@
 name: Sync to HuggingFace Spaces
 on: 
-  workflow_run:
-    workflows: ["Run All Unit Tests", "Run Model Tests on Production Branch"]
-    types:
-      - completed
-    branches: [ "production" ]
+  # Disabling for Case Study 2
+  # workflow_run:
+  #   workflows: ["Run All Unit Tests", "Run Model Tests on Production Branch"]
+  #   types:
+  #     - completed
+  #   branches: [ "production" ]
   workflow_dispatch:
 
 jobs:
