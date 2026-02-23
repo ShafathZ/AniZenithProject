@@ -2,8 +2,6 @@
 
 {% block imports %}
 <link rel="stylesheet" href="/static/css/home.css">
-<script src="/static/js/home.js"></script>
-<script src="/static/js/chat.js"></script>
 {% endblock %}
 
 {% block title %}AniZenith{% endblock %}
@@ -61,13 +59,13 @@
             </div>
         </div>
         <div class="top-buttons">
-            <button class="full-chat-button share-button" onclick="shareChat()">
+            <button class="full-chat-button share-button" onclick="shareFullChat()">
                 <i class="fas fa-share-alt"></i>
             </button>
-            <button class="full-chat-button copy-button" onclick="copyChat()">
+            <button class="full-chat-button copy-button" onclick="copyFullChat()">
                 <i class="fas fa-copy"></i>
             </button>
-            <button class="full-chat-button reset-button" onclick="clearChat()">
+            <button class="full-chat-button reset-button" onclick="clearFullChat()">
                 <i class="fa-solid fa-trash"></i>
             </button>
         </div>
@@ -96,5 +94,6 @@
     </div>
 
 </div>
-
+<script src="/static/js/home.js"></script>
+<script src="/static/js/chat_ui.js"></script>
 {% endblock %}

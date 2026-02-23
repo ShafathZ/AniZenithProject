@@ -1,6 +1,12 @@
 # Ignore CSV files
 *.csv
 
+# Ignore SSH Keys
+*.pub
+group_key
+group02_key
+group02_key_passphrase
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

@@ -1,4 +1,4 @@
-function addMessage({ role, msg }) {
+function addUIMessage({ role, msg }) {
 
     console.log(msg);
 
@@ -15,8 +15,8 @@ function addMessage({ role, msg }) {
     // Add image of avatar
     const avatar = document.createElement("img");
     avatar.classList.add("avatar", "no-select");
-    avatar.src = role === "bot" ? "/static/images/bot.jpg" : "/static/images/user.jpg";
-    avatar.alt = role === "bot" ? "Bot" : "User";
+    avatar.src = role === "assistant" ? "/static/images/bot.jpg" : "/static/images/user.jpg";
+    avatar.alt = role === "assistant" ? "Assistant" : "User";
 
     // Add message
     const textDiv = document.createElement("div");
@@ -24,7 +24,7 @@ function addMessage({ role, msg }) {
     textDiv.textContent = msg;
 
     // Combine into the row in correct order
-    if (role === "bot") {
+    if (role === "assistant") {
         row.appendChild(avatar);
         row.appendChild(textDiv);
     } else {
@@ -38,7 +38,7 @@ function addMessage({ role, msg }) {
     actions.classList.add("actions");
 
     // Add buttons based on which role / side of conversation
-    if (role === "bot") {
+    if (role === "assistant") {
         actions.innerHTML = `
             <span class="action-btn refresh" title="Refresh"><i class="fas fa-sync-alt"></i></span>
             <span class="action-btn copy" title="Copy"><i class="fas fa-copy"></i></span>
@@ -113,6 +113,16 @@ function updateButtons() {
     });
 }
 
+// Clears the full chat UI
+function clearFullChat() {
+    if (confirm('Are you sure you want to clear the chat?')) {
+        const chatMessages = document.querySelectorAll('.message');
+        chatMessages.forEach(message => {
+            message.remove();
+        });
+    }
+}
+
 // Logic for when send is activated
 function sendMessage() {
     const input = document.getElementById("userInput");
@@ -120,7 +130,10 @@ function sendMessage() {
 
     if (!text) return;
 
-    addMessage({ role: "user", msg: text });
+    // Add the message to the UI
+    addUIMessage({ role: "user", msg: text });
+
+    // Clear user input text area
     input.value = "";
 
     input.focus();

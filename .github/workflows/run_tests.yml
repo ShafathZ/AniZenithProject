@@ -2,7 +2,9 @@ name: Run All Unit Tests
 
 # Run on every push and pull request
 on: 
-  push:
+  # Disabling for Case Study 2
+  # push:
+  
   workflow_dispatch:
 
 # Run the following Jobs (just 1)
