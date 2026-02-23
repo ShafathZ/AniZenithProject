@@ -56,7 +56,7 @@ check_ssh() {
 
     # Run ssh inside timeout
 
-    SSH_BASE=(ssh -i "$key" -p "$ssh_port" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$user"@"$host")
+    SSH_BASE=(ssh -i "$key" -p "$ssh_port" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$user"@"$host exit")
     echo -e "${SSH_BASE[@]}"
 
     timeout "${timeout}s" "${SSH_BASE[@]}"
