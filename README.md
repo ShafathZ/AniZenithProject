@@ -81,7 +81,44 @@ Login Using Common Key (Shouldn't work now):
 ssh -i ssh_keys/group_key -p 22002 group02@paffenroth-23.dyn.wpi.edu
 ```
 
-Using our Group Key (Please contact sgoyal@wpi.edu to get access to the keys):
+Login using our Group Key (Please contact sgoyal@wpi.edu to get access to the keys):
 ```bash
 ssh -i ssh_keys/group02_key -p 22002 group02@paffenroth-23.dyn.wpi.edu
 ```
+
+
+## cURL commands to Test Backend Chat API
+
+### Locally Hosted Backend
+For Using Online Model:
+```bash
+curl --location 'http://localhost:4007/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello"
+        }
+    ],
+    "use_local": false
+}'
+```
+
+For Using Local Model:
+```bash
+curl --location 'http://localhost:4007/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello"
+        }
+    ],
+    "use_local": true
+}'
+```
+
+### Remote Hosted Backend (on VMs)
+TODO
