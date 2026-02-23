@@ -77,8 +77,8 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
         # Parse the output and yield it
         yield response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
             
-
-    elif not use_local_model:
+    # Use Inference Client for the default case
+    else:
         # Non-local Model -- Use InferenceClient
         client = InferenceClient(
             token=HF_TOKEN,
