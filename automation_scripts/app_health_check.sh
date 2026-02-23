@@ -31,11 +31,13 @@ check_http() {
     local timeout=$3
 
     CURL_BASE=(curl -Is --connect-timeout "$timeout" "http://$host:$port")
-    local status=$?
     echo -e "${CURL_BASE[@]}"
+
+    "${CURL_BASE[@]}" >/dev/null 2>&1
+    local status=$?
     if [ $status -eq 0 ]; then
         return 0 # 0 if success
-    elif [ $status -eq 52 ]; then
+    elif [ $status -eq 28 ]; then
         echo "HTTP check for $host:$port timed out"
         return 2 # 2 if timeout
     else
