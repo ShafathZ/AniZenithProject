@@ -2,8 +2,8 @@ import json
 import sqlite3
 from pathlib import Path
 import pytest
-import retrieval_utils
-from retrieval_utils import get_recommendations
+import backend.retrieval_utils as retrieval_utils
+from backend.retrieval_utils import get_recommendations
 
 # Setup Test DB
 def _setup_test_db(db_path: str):
