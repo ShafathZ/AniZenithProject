@@ -31,14 +31,15 @@ check_http() {
     local timeout=$3
 
     CURL_BASE=(curl -Is --connect-timeout "$timeout" "http://$host:$port")
-    echo -e "${CURL_BASE[@]}"
+    #echo -e "${CURL_BASE[@]}"
 
     "${CURL_BASE[@]}" >/dev/null 2>&1
     local status=$?
     if [ $status -eq 0 ]; then
+        echo "HTTP check for $host:$port success."
         return 0 # 0 if success
     elif [ $status -eq 28 ]; then
-        echo "HTTP check for $host:$port timed out"
+        echo "HTTP check for $host:$port timed out."
         return 2 # 2 if timeout
     else
         echo "HTTP check failed for $host:$port (exit $status)"
@@ -52,24 +53,30 @@ check_ssh() {
     local host=$2
     local key=$3
     local ssh_port=$4
-    local timeout=$5
+    local ssh_timeout=$5
 
-    # Run ssh inside timeout
+    # Build SSH command
+    SSH_BASE=(ssh -i "$key" \
+                 -p "$ssh_port" \
+                 -o StrictHostKeyChecking=no \
+                 -o UserKnownHostsFile=/dev/null \
+                 -o ConnectTimeout="$ssh_timeout" \
+                 -o BatchMode=yes \
+                 "$user@$host" exit)
 
-    SSH_BASE=(ssh -i "$key" -p "$ssh_port" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$user"@"$host exit")
-    echo -e "${SSH_BASE[@]}"
-
-    timeout "${timeout}s" "${SSH_BASE[@]}"
+    # Run SSH
+    "${SSH_BASE[@]}" >/dev/null 2>&1
     local status=$?
 
     if [ $status -eq 0 ]; then
+        echo "SSH check for $user@$host:$ssh_port success."
         return 0 # 0 if success
-    elif [ $status -eq 124 ]; then
-        echo "SSH check for $user@$host:$ssh_port timed out"
+    elif [ $status -eq 255 ]; then
+        echo "SSH check for $user@$host:$ssh_port timed out."
         return 2 # 2 if timeout
     else
         echo "SSH check failed for $user@$host:$ssh_port (exit $status)"
-        return 1 # 1 for failed but not timed out
+        return 1 # 1 if failed but not timed out
     fi
 }
 
@@ -89,7 +96,7 @@ report_status() {
     elif [ $http_ok -eq 2 ] || [ $ssh_ok -eq 2 ]; then
         echo -e "${YELLOW}$name: Server timed out (Make sure you are on correct VPN and connected to internet. If so, server connection may be down)${RESET}"
     elif [ $http_ok -ne 0 ] && [ $ssh_ok -eq 0 ]; then
-        echo -e "${RED}$name: Server down | VM accessible (Backend likely crashed)${RESET}"
+        echo -e "${RED}$name: Server down | VM accessible (${name} Server likely crashed)${RESET}"
     elif [ $http_ok -ne 0 ] && [ $ssh_ok -ne 0 ]; then
         echo -e "${RED}$name: Server down | VM inaccessible (VM may have reset)${RESET}"
     elif [ $http_ok -eq 0 ] && [ $ssh_ok -ne 0 ]; then
