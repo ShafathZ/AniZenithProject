@@ -1,10 +1,9 @@
 name: Run Model Tests on Production Branch
 
-# Run on every push and pull request
+# Run on every pull request to 'main' branch
 on:
-  # Disabling for Case Study 2
-  # push:
-  #   branches: [ "production" ]
+  pull_request:
+    branches: [ "main" ]
   
   workflow_dispatch:
 

@@ -1,3 +1,6 @@
+"""
+This file handles special configurations for pytest.
+"""
 import sys
 from pathlib import Path
 
