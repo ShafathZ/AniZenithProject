@@ -1,4 +1,4 @@
-name: Run Model Tests on Production Branch
+name: Run Model Tests on Pull Requests to 'main' Branch
 
 # Run on every pull request to 'main' branch
 on:
