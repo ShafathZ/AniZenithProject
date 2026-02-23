@@ -11,5 +11,4 @@ dependencies = [
     "itsdangerous>=2.2.0",
     "torch>=2.10.0",
     "transformers>=5.0.0",
-    "flask>=3.1.2",
 ]
