@@ -69,9 +69,9 @@ hf auth login
 
 ## SSH Commands to SSH into VMs for Case Study 2
 
-### Login to Frontend VM (Not working atm)
+### Login to Frontend VM
 ```bash
-ssh -i ssh_keys/group02_key -p 22000 frontend@paffenroth-23.dyn.wpi.edu
+ssh -i ssh_keys/group_key -p 22000 group02@paffenroth-23.dyn.wpi.edu
 ```
 
 
