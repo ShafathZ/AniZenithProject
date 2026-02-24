@@ -1,22 +1,8 @@
----
-title: CS553 CaseStudy1
-emoji: 💬
-colorFrom: yellow
-colorTo: purple
-sdk: gradio
-sdk_version: 6.5.1
-python_version: 3.12.3
-app_file: app.py
-pinned: false
-hf_oauth: true
-hf_oauth_scopes:
-- inference-api
-license: mit
----
+# AniZenith
 
 An Anime Recommendation chatbot using [Gradio](https://gradio.app), [`huggingface_hub`](https://huggingface.co/docs/huggingface_hub/v0.22.2/en/index), and the [Hugging Face Inference API](https://huggingface.co/docs/api-inference/index).
 
-## Models Used by our Chatbot
+## Models Used by AniZenith
 | Type of Model | Model Name (Hugging Face Path) |
 |---------------|--------------------------------|
 | Local Model   | `Qwen/Qwen3-0.6B`         |
@@ -46,27 +32,6 @@ To add any new dependencies (libraries):
 uv add <library_name>
 ```
 
-## Working with HuggingFace Spaces Locally
-### Install Gradio with oAuth
-Run the following command in your Python environment:
-```bash
-uv add "gradio[oauth]"
-```
-
-### Set up HuggingFace Token
-1. Go to your HuggingFace profile at: https://huggingface.co/settings/tokens
-2. Generate a new token for your HuggingFace Space at `Create New Token` -> `Fine-grained`.
-3. Under `Repository permissions` section, search for the repo: "spaces/MLDevOps/CS553_CaseStudy1" and select it
-4. Check the box for "Write access to contents/settings of selected repos" and click "Create Token" at the bottom. 
-5. Copy and Paste the generated token into a `.env` file in the root directory of your local copy of CS553_CaseStudy1 repo:
-```
-HF_TOKEN=XXXXXXXXX
-```
-6. Login into HF:
-```bash
-hf auth login
-```
-
 ## SSH Commands to SSH into VMs for Case Study 2
 
 ### Login to Frontend VM
@@ -81,7 +46,7 @@ Login Using Common Key (Shouldn't work now):
 ssh -i ssh_keys/group_key -p 22002 group02@paffenroth-23.dyn.wpi.edu
 ```
 
-Login using our Group Key (Please contact sgoyal@wpi.edu to get access to the keys):
+Login using our Group Key (Please email `sgoyal@wpi.edu` to get access to the keys):
 ```bash
 ssh -i ssh_keys/group02_key -p 22002 group02@paffenroth-23.dyn.wpi.edu
 ```
