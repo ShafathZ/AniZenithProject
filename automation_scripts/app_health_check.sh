@@ -75,7 +75,7 @@ check_ssh() {
                  -o UserKnownHostsFile=/dev/null \
                  -o ConnectTimeout="$ssh_timeout" \
                  -o BatchMode=yes \
-                 "$user@$host" exit)
+                 "$user"@"$host" exit)
     #echo "${SSH_BASE[@]}"
 
     # Run SSH
