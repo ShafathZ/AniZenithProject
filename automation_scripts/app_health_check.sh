@@ -20,6 +20,19 @@ BACKEND_SSH_KEY="./ssh_keys/group02_key"
 
 TIMEOUT=5
 
+# Check if keys exist + chmod (In case they were not configured)
+if [ ! -f "$BACKEND_SSH_KEY" ]; then
+    echo "Error: Backend SSH key '$BACKEND_SSH_KEY' does not exist."
+    exit 1
+fi
+chmod 700 "$BACKEND_SSH_KEY"
+
+if [ ! -f "$FRONTEND_SSH_KEY" ]; then
+    echo "Error: Frontend SSH key '$FRONTEND_SSH_KEY' does not exist."
+    exit 1
+fi
+chmod 700 "$FRONTEND_SSH_KEY"
+
 # Tell user health script has started
 current_time=$(date +"%Y-%m-%d %H:%M:%S")
 echo "-----HEALTH CHECK SCRIPT STARTED AT: $current_time -----"
@@ -63,6 +76,7 @@ check_ssh() {
                  -o ConnectTimeout="$ssh_timeout" \
                  -o BatchMode=yes \
                  "$user@$host" exit)
+    #echo "${SSH_BASE[@]}"
 
     # Run SSH
     "${SSH_BASE[@]}" >/dev/null 2>&1
