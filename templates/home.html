@@ -31,7 +31,7 @@
             <!-- Bot Message Example -->
             <div class="message bot">
                 <div class="message-row">
-                    <img src="/static/images/bot.jpg" alt="Bot" class="avatar no-select">
+                    <img src="/static/images/assistant.jpg" alt="Bot" class="avatar no-select">
                     <div class="text">
                         Hi! This is an example bot message! Tell me what kind of anime you like and I’ll give you recommendations!
                     </div>
@@ -88,12 +88,12 @@
                   placeholder="Ask for anime recommendations..."></textarea>
 
         <!-- TODO: Change sendMessage to add click event through script for CSRF protection -->
-        <button class="submit-button" onclick="sendMessage()">
+        <button class="submit-button">
             <i class="fa-solid fa-paper-plane"></i>
         </button>
     </div>
 
 </div>
 <script src="/static/js/home.js"></script>
-<script src="/static/js/chat_ui.js"></script>
+<script type="module" src="/static/js/chat_ui.js"></script>
 {% endblock %}

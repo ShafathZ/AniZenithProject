@@ -1,12 +1,14 @@
-function addUIMessage({ role, msg }) {
+import { requestAssistantMessage } from "./chat_logic.js"
 
-    console.log(msg);
+function addUIMessage({ role, message }) {
+
+    console.log(message);
 
     const chatBox = document.getElementById("chatBox");
 
     // Create message container
-    const message = document.createElement("div");
-    message.classList.add("message", role);
+    const messageUI = document.createElement("div");
+    messageUI.classList.add("message", role);
 
     // Create message row
     const row = document.createElement("div");
@@ -15,13 +17,13 @@ function addUIMessage({ role, msg }) {
     // Add image of avatar
     const avatar = document.createElement("img");
     avatar.classList.add("avatar", "no-select");
-    avatar.src = role === "assistant" ? "/static/images/bot.jpg" : "/static/images/user.jpg";
+    avatar.src = role === "assistant" ? "/static/images/assistant.jpg" : "/static/images/user.jpg";
     avatar.alt = role === "assistant" ? "Assistant" : "User";
 
     // Add message
     const textDiv = document.createElement("div");
     textDiv.classList.add("text");
-    textDiv.textContent = msg;
+    textDiv.textContent = message;
 
     // Combine into the row in correct order
     if (role === "assistant") {
@@ -31,7 +33,7 @@ function addUIMessage({ role, msg }) {
         row.appendChild(textDiv);
         row.appendChild(avatar);
     }
-    message.appendChild(row);
+    messageUI.appendChild(row);
 
     // Create actions section
     const actions = document.createElement("div");
@@ -51,10 +53,10 @@ function addUIMessage({ role, msg }) {
             <span class="action-btn trash" title="Delete"><i class="fas fa-trash-alt"></i></span>
         `;
     }
-    message.appendChild(actions);
+    messageUI.appendChild(actions);
 
     // Append to chat box
-    chatBox.appendChild(message);
+    chatBox.appendChild(messageUI);
 
     // Scroll to bottom
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -111,6 +113,10 @@ function updateButtons() {
             }
         });
     });
+
+    // Update send button to function
+    const button = document.querySelector(".submit-button")
+    button.addEventListener("click", sendMessage);
 }
 
 // Clears the full chat UI
@@ -124,19 +130,23 @@ function clearFullChat() {
 }
 
 // Logic for when send is activated
-function sendMessage() {
+async function sendMessage() {
     const input = document.getElementById("userInput");
     const text = input.value.trim();
 
     if (!text) return;
 
-    // Add the message to the UI
-    addUIMessage({ role: "user", msg: text });
+    // Add the message to the UI and clear text
+    const new_message = { role: "user", message: text };
 
-    // Clear user input text area
     input.value = "";
-
     input.focus();
+
+    addUIMessage(new_message);
+
+    // Get assistant response and add it
+    const response = await requestAssistantMessage(new_message);
+    addUIMessage(response);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

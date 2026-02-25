@@ -1,37 +1,37 @@
 let messages = [];
 
-function renderMessages() {
-    const chatDiv = document.getElementById("chat");
-    chatDiv.innerHTML = "";
-
-    messages.forEach(msg => {
-        const div = document.createElement("div");
-        div.textContent = `${msg.role}: ${msg.content}`;
-        chatDiv.appendChild(div);
-    });
+export function addMessage({ role, msg }) {
+    messages.push({ role: role, message: msg});
 }
 
-async function sendMessage() {
-    const input = document.getElementById("input");
-    const userMessage = input.value;
+export async function requestAssistantMessage({ role, message }) {
+    addMessage({ role: role, message: message });
 
-    if (!userMessage) return;
+    try {
+        const response = await fetch("http://localhost:3000/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ messages })
+        });
 
-    messages.push({ role: "user", content: userMessage });
-    renderMessages();
+        // Handle non-200 responses
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
 
-    input.value = "";
+        const data = await response.json();
+        const assistant_response = { role: "assistant", message: data.message };
 
-    const response = await fetch("http://localhost:3000/chat", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ messages })
-    });
+        addMessage(assistant_response);
+        return assistant_response;
 
-    const data = await response.json();
+    } catch (error) {
+        // Fetch throws error during connection failure / bad headers
+        const failed_response = { role: "assistant", message: "Error: Failed to connect to the backend client." };
 
-    messages.push({ role: "assistant", content: data.reply });
-    renderMessages();
+        //addMessage(failed_response);
+        return failed_response;
+    }
 }
