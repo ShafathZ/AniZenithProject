@@ -1,8 +1,8 @@
 import { requestAssistantMessage } from "./chat_logic.js"
 
-function addUIMessage({ role, message }) {
+function addUIMessage({ role, content }) {
 
-    console.log(message);
+    console.log(content);
 
     const chatBox = document.getElementById("chatBox");
 
@@ -23,7 +23,7 @@ function addUIMessage({ role, message }) {
     // Add message
     const textDiv = document.createElement("div");
     textDiv.classList.add("text");
-    textDiv.textContent = message;
+    textDiv.textContent = content;
 
     // Combine into the row in correct order
     if (role === "assistant") {
@@ -137,7 +137,7 @@ async function sendMessage() {
     if (!text) return;
 
     // Add the message to the UI and clear text
-    const new_message = { role: "user", message: text };
+    const new_message = { role: "user", content: text };
 
     input.value = "";
     input.focus();

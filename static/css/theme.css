@@ -22,7 +22,7 @@
 
     /* Chat messages */
     --user-message: linear-gradient(135deg, #ff9de0, #7ac5ff);
-    --bot-message: linear-gradient(135deg, #ff9de0, #7ac5ff);
+    --assistant-message: linear-gradient(135deg, #ff9de0, #7ac5ff);
 
     /* Buttons */
     --btn-bg: linear-gradient(135deg, #7ac5ff, #9aa4ff);

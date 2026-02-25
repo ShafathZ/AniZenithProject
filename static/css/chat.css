@@ -76,7 +76,7 @@
     width: 100%;
 }
 
-.message.bot .message-row {
+.message.assistant .message-row {
     flex-direction: row;
     justify-content: flex-start;
 }
@@ -86,7 +86,7 @@
     justify-content: flex-end;
 }
 
-.message.bot .message-row .avatar {
+.message.assistant .message-row .avatar {
     margin-right: 10px;
 }
 
@@ -103,7 +103,7 @@
     object-fit: cover;
 }
 
-.message.bot .message-row .avatar {
+.message.assistant .message-row .avatar {
     margin-right: 10px;
 }
 
@@ -121,8 +121,8 @@
     color: var(--text-main);
 }
 
-.message.bot .text {
-    background: var(--bot-message);
+.message.assistant .text {
+    background: var(--assistant-message);
 }
 
 .message.user .text {
@@ -137,7 +137,7 @@
     flex-wrap: wrap;
 }
 
-.message.bot .actions {
+.message.assistant .actions {
     justify-content: flex-start;
 }
 

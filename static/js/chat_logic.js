@@ -1,19 +1,24 @@
 let messages = [];
 
-export function addMessage({ role, msg }) {
-    messages.push({ role: role, message: msg});
+export function addMessage({ role, content }) {
+    messages.push({ role: role, content: content});
 }
 
-export async function requestAssistantMessage({ role, message }) {
-    addMessage({ role: role, message: message });
+export async function requestAssistantMessage({ role, content }) {
+    addMessage({ role: role, content: content });
+
+    const payload = {
+        "messages": messages,
+        "use_local": false
+    }
 
     try {
-        const response = await fetch("http://localhost:3000/chat", {
+        const response = await fetch("http://localhost:4007/anizenith/chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ messages })
+            body: JSON.stringify(payload)
         });
 
         // Handle non-200 responses
@@ -22,14 +27,14 @@ export async function requestAssistantMessage({ role, message }) {
         }
 
         const data = await response.json();
-        const assistant_response = { role: "assistant", message: data.message };
+        const assistant_response = { role: "assistant", content: data.messages.at(-1).content };
 
         addMessage(assistant_response);
         return assistant_response;
 
     } catch (error) {
         // Fetch throws error during connection failure / bad headers
-        const failed_response = { role: "assistant", message: "Error: Failed to connect to the backend client." };
+        const failed_response = { role: "assistant", content: "Error: Failed to connect to the backend client." };
 
         //addMessage(failed_response);
         return failed_response;
