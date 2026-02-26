@@ -34,7 +34,7 @@ function createMessageElement({ role, content }, index) {
     textDiv.classList.add("text");
 
     if (role === "assistant") {
-        textDiv.innerHTML = marked.parse(content).trim();
+        textDiv.innerHTML = marked.parse(content);
         row.appendChild(avatar);
         row.appendChild(textDiv);
     } else {
