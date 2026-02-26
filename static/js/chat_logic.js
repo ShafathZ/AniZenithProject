@@ -1,17 +1,26 @@
-let messages = [];
+export let messages = [];
 
 export function addMessage({ role, content }) {
     messages.push({ role: role, content: content});
+    return messages.length - 1;
 }
 
-export async function requestAssistantMessage({ role, content }) {
-    addMessage({ role: role, content: content });
+export function deleteMessage(index) {
+    messages.splice(index);
+    return true;
+}
 
+export function editMessage(index, newContent) {
+    messages[index].content = newContent;
+    messages.splice(index + 1);
+    return true;
+}
+
+export async function sendMessagesToBackend() {
     const payload = {
         "messages": messages,
         "use_local": false
     }
-
     try {
         const response = await fetch("http://localhost:4007/anizenith/chat", {
             method: "POST",
