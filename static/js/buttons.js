@@ -258,19 +258,29 @@ function setupClearFullChatButton() {
 // Basic quick suggestion function that just auto fills the input area with a preset
 function setupQuickSuggestionButtons() {
     const buttons = document.querySelectorAll(".quick-suggestions button");
+    const userInput = document.getElementById("userInput");
+    const defaultPlaceholder = "Ask for anime recommendations...";
+
+    userInput.placeholder = defaultPlaceholder;
 
     buttons.forEach(button => {
-        button.onclick = () => {
-            // Skip the + icon (idk if we even need this)
-            if (button.classList.contains("add-button")) return;
+        if (button.classList.contains("add-button")) return;
 
-            const text = button.textContent.trim();
-            const userInput = document.getElementById("userInput");
+        const text = button.textContent.trim();
+        const hoverText = `Hi, can you recommend me some ${text} anime?`;
 
-            // Set the input to this and focus on the element so user can hit enter easily
-            userInput.value = `Hi, can you recommend me some ${text} anime?`;
+        button.addEventListener("mouseenter", () => {
+            userInput.placeholder = hoverText;
+        });
+
+        button.addEventListener("mouseleave", () => {
+            userInput.placeholder = defaultPlaceholder;
+        });
+
+        button.addEventListener("click", () => {
+            userInput.value = hoverText;
             userInput.focus();
-        };
+        });
     });
 }
 
