@@ -32,12 +32,13 @@ function createMessageElement({ role, content }, index) {
 
     const textDiv = document.createElement("div");
     textDiv.classList.add("text");
-    textDiv.textContent = content;
 
     if (role === "assistant") {
+        textDiv.innerHTML = marked.parse(content).trim();
         row.appendChild(avatar);
         row.appendChild(textDiv);
     } else {
+        textDiv.textContent = content;
         row.appendChild(textDiv);
         row.appendChild(avatar);
     }

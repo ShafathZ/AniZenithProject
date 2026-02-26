@@ -95,6 +95,13 @@
     margin-right: 0;
 }
 
+/* To make markdown work */
+.message.assistant .text * {
+    margin: 0;
+    padding: 0;
+}
+
+
 /* Avatar Image */
 .avatar {
     width: 36px;
