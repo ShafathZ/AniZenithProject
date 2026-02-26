@@ -26,7 +26,9 @@ echo "Found ssh_keys: $find_out"
 # │     REFRESH PRODUCTION CODE TO DEPLOY         │
 # └───────────────────────────────────────────────┘
 # Checkout main, do git pull (to get the latest production code)
-git checkout $PRODUCTION_BRANCH && git pull
+# TODO: if this fails, kill the script here
+git checkout $PRODUCTION_BRANCH && git pull || \
+{ echo "Git checkout and pull for production branch($PRODUCTION_BRANCH) failed"; exit 1; }
 
 # Build SSH command
 # TODO: Add Timeout Later
@@ -35,12 +37,6 @@ SSH_BASE=(ssh -i "$BACKEND_SSH_KEY" \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             "$BACKEND_USER"@"$BACKEND_HOST")
-
-# SCP_BASE=(scp -i "$BACKEND_SSH_KEY" \
-#             -p "$BACKEND_PORT" \
-#             -o StrictHostKeyChecking=no \
-#             -o UserKnownHostsFile=/dev/null \
-#             "$BACKEND_USER"@"$BACKEND_HOST")
 
 SCP_BASE=(scp -i "$BACKEND_SSH_KEY" \
             -P "$BACKEND_PORT" \
@@ -52,7 +48,6 @@ SCP_BASE=(scp -i "$BACKEND_SSH_KEY" \
 # 1. SSH into VM
 # Install Python 3.12 and venv using apt, 
 # Create backend root folder
-#
 "${SSH_BASE[@]}" "sudo apt update && \
  sudo add-apt-repository ppa:deadsnakes/ppa -y && \
  sudo apt install python3.12 python3.12-venv -y && \
@@ -61,17 +56,23 @@ SCP_BASE=(scp -i "$BACKEND_SSH_KEY" \
 
 
 # 2 SCP backend end folder and files into the VM
-"${SCP_BASE[@]}" -r backend app.py requirements.txt \
+"${SCP_BASE[@]}" -r backend/ app.py requirements.txt \
 "$BACKEND_USER@$BACKEND_HOST:~/$BACKEND_ROOT_FOLDER/" 
 
 
 # 3. Create Venv using requirements.txt
+"${SSH_BASE[@]}" "cd $BACKEND_ROOT_FOLDER && \
+ python3.12 -m venv .venv && \
+ source .venv/bin/activate && \
+ pip install -r requirements.txt"
 
-# 4. Activate the Virtual Env, Run the frontend app and route its logs to a log file
 
-
-
-
+# 4. Activate the Virtual Env, Run the backend app and route its logs to a log file
+"${SSH_BASE[@]}" "cd $BACKEND_ROOT_FOLDER && \
+ source .venv/bin/activate && \
+ nohup python app.py > backend.logs 2>&1 < /dev/null & \
+ echo \$! > backend.pid && \
+ echo Started backend with PID \$(cat backend.pid)"
 
 
 
