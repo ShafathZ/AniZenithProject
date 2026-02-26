@@ -1,4 +1,4 @@
-import { messages, addMessage, deleteMessage, editMessage, sendMessagesToBackend } from "./chat_logic.js"
+import { setLocalModelStatus, messages, addMessage, deleteMessage, editMessage, sendMessagesToBackend } from "./chat_logic.js"
 import { renderMessages } from "./chat_ui.js"
 
 export function updateButtons() {
@@ -284,6 +284,18 @@ function setupQuickSuggestionButtons() {
     });
 }
 
+// Toggle local model button now affects javascript so requests use it properly
+function setupLocalModelToggle() {
+    const toggle = document.getElementById("localModelToggle");
+    if (!toggle) return;
+
+    setLocalModelStatus(toggle.checked);
+
+    toggle.addEventListener("change", () => {
+        setLocalModelStatus(toggle.checked);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     updateButtons();
 
@@ -293,4 +305,5 @@ document.addEventListener("DOMContentLoaded", () => {
     setupCopyFullChatButton();
     setupClearFullChatButton();
     setupQuickSuggestionButtons();
+    setupLocalModelToggle();
 });

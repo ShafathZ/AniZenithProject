@@ -1,4 +1,9 @@
 export let messages = [];
+let useLocalModel = false;
+
+export function setLocalModelStatus(local) {
+    useLocalModel = local;
+}
 
 export function addMessage({ role, content }) {
     messages.push({ role: role, content: content});
@@ -19,7 +24,7 @@ export function editMessage(index, newContent) {
 export async function sendMessagesToBackend() {
     const payload = {
         "messages": messages,
-        "use_local": false
+        "use_local": useLocalModel
     }
     try {
         const response = await fetch("http://localhost:4007/anizenith/chat", {
