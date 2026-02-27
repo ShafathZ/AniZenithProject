@@ -20,17 +20,17 @@ logger.setLevel(logging.INFO)
 # Create FastAPI app
 app = FastAPI()
 
-# Set up accessible directories
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# # Set up accessible directories
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+# templates = Jinja2Templates(directory="templates")
 
-# Home page
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse(
-        "home.html",
-        {"request": request}
-    )
+# # Home page
+# @app.get("/", response_class=HTMLResponse)
+# async def home(request: Request):
+#     return templates.TemplateResponse(
+#         "home.html",
+#         {"request": request}
+#     )
 
 # ┌───────────────────────────────────────────────┐
 # │              BACKEND API ENDPOINTS            │

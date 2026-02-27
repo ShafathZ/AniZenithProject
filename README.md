@@ -121,4 +121,32 @@ curl --location 'http://localhost:4007/anizenith/chat' \
 ```
 
 ### Remote Hosted Backend (on VMs)
-TODO
+For Using Online Model:
+```bash
+curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello"
+        }
+    ],
+    "use_local": false
+}'
+```
+
+For Using Local Model:
+```bash
+curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello"
+        }
+    ],
+    "use_local": true
+}'
+```
