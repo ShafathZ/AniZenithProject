@@ -33,6 +33,15 @@ def validate_anizenith_request(request: AniZenithRequest) -> None | JSONResponse
             )
             break
 
+    # Checking if messages have role as either 'user' or 'assistant'
+    for message in request.messages:
+        if message["role"] not in ["user", "assistant"]:
+            num_errors_detected += 1
+            error_response_content["details"].append(
+                {"field": "messages", "reason": "Sending messages with role other than \'user\' or \'assistant\' is not permitted!"}
+            )
+            break
+
     # If no errors are detected, return empty object
     if num_errors_detected == 0:
         return

@@ -14,7 +14,7 @@
 </h1>
 
 <span class="subtitle">
-    An AI designed to give recommendations of the best anime options based on your preferences! Has knowledge of a full database of anime!
+    An AI designed to give recommendations of the best anime options based on your preferences!
 </span>
 
 <div class="chat-container">
@@ -29,11 +29,11 @@
     <div class="chatbot-area">
         <div class="chat-box" id="chatBox">
             <!-- Bot Message Example -->
-            <div class="message bot">
+            <div class="message assistant">
                 <div class="message-row">
-                    <img src="/static/images/bot.jpg" alt="Bot" class="avatar no-select">
+                    <img src="/static/images/assistant.jpg" alt="Assistant" class="avatar no-select">
                     <div class="text">
-                        Hi! This is an example bot message! Tell me what kind of anime you like and I’ll give you recommendations!
+                        Hi there! I am a friendly chatbot from Aniℤenith here to help find and recommend any anime you want! Just tell me some of your preferences, and I can help you accordingly!
                     </div>
                 </div>
                 <div class="actions">
@@ -44,6 +44,7 @@
             </div>
 
             <!-- User Message -->
+            <!--
             <div class="message user">
                 <div class="message-row">
                     <div class="text">
@@ -57,15 +58,16 @@
                     <span class="action-btn trash" title="Delete"><i class="fas fa-trash-alt"></i></span>
                 </div>
             </div>
+            -->
         </div>
         <div class="top-buttons">
-            <button class="full-chat-button share-button" onclick="shareFullChat()">
+            <button class="full-chat-button share-button">
                 <i class="fas fa-share-alt"></i>
             </button>
-            <button class="full-chat-button copy-button" onclick="copyFullChat()">
+            <button class="full-chat-button copy-button">
                 <i class="fas fa-copy"></i>
             </button>
-            <button class="full-chat-button reset-button" onclick="clearFullChat()">
+            <button class="full-chat-button reset-button">
                 <i class="fa-solid fa-trash"></i>
             </button>
         </div>
@@ -74,10 +76,9 @@
 
     <!-- ===== Quick Suggestions ===== -->
     <div class="quick-suggestions no-select">
-        <button onclick="sendPreset('Action')">Action</button>
-        <button onclick="sendPreset('Romance')">Romance</button>
-        <button onclick="sendPreset('Drama')">Drama</button>
-        <button class="add-button" onclick="addCustomPreset()">+</button>
+        <button>Action</button>
+        <button>Romance</button>
+        <button>Drama</button>
     </div>
 
 
@@ -87,13 +88,13 @@
                   class="chat-input"
                   placeholder="Ask for anime recommendations..."></textarea>
 
-        <!-- TODO: Change sendMessage to add click event through script for CSRF protection -->
-        <button class="submit-button" onclick="sendMessage()">
+        <button class="submit-button">
             <i class="fa-solid fa-paper-plane"></i>
         </button>
     </div>
 
 </div>
 <script src="/static/js/home.js"></script>
-<script src="/static/js/chat_ui.js"></script>
+<script type="module" src="/static/js/chat_ui.js"></script>
+<script type="module" src="/static/js/buttons.js"></script>
 {% endblock %}

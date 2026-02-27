@@ -118,7 +118,6 @@ echo "=== Copying backend files to VM ==="
  source .venv/bin/activate && \
  pip install -r requirements.txt"
 
-
 # ┌───────────────────────────────────────────────┐
 # │             5. START BACKEND                  │
 # └───────────────────────────────────────────────┘
@@ -158,3 +157,4 @@ echo "=== Copying backend files to VM ==="
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
 echo -e "\n=== Deployment complete! Total time: $((ELAPSED / 60))m $((ELAPSED % 60))s ==="
+

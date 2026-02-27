@@ -45,7 +45,7 @@
 }
 
 .full-chat-button {
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    background: var(--btn-bg);
     border: none;
     border-radius: 8px;
     color: white;
@@ -61,6 +61,7 @@
 
 .full-chat-button:hover {
     box-shadow: 0 0 12px var(--accent-glow);
+    background: var(--accent-gradient);
 }
 
 /* ===== CHAT MESSAGES ===== */
@@ -76,7 +77,7 @@
     width: 100%;
 }
 
-.message.bot .message-row {
+.message.assistant .message-row {
     flex-direction: row;
     justify-content: flex-start;
 }
@@ -86,7 +87,7 @@
     justify-content: flex-end;
 }
 
-.message.bot .message-row .avatar {
+.message.assistant .message-row .avatar {
     margin-right: 10px;
 }
 
@@ -94,6 +95,13 @@
     margin-left: 10px;
     margin-right: 0;
 }
+
+/* To make markdown work */
+.message.assistant .text * {
+    margin: 0;
+    padding: 0;
+}
+
 
 /* Avatar Image */
 .avatar {
@@ -103,7 +111,7 @@
     object-fit: cover;
 }
 
-.message.bot .message-row .avatar {
+.message.assistant .message-row .avatar {
     margin-right: 10px;
 }
 
@@ -121,8 +129,8 @@
     color: var(--text-main);
 }
 
-.message.bot .text {
-    background: var(--bot-message);
+.message.assistant .text {
+    background: var(--assistant-message);
 }
 
 .message.user .text {
@@ -137,7 +145,7 @@
     flex-wrap: wrap;
 }
 
-.message.bot .actions {
+.message.assistant .actions {
     justify-content: flex-start;
 }
 

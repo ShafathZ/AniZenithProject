@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from backend.AniZenithExchange import AniZenithRequest, AniZenithResponse
 from backend.validation_utils import validate_anizenith_request
 from backend.backend_utils import chat_with_llm
 import logging
+
+BACKEND_HTTP_PORT = 9002
 
 # Configure logging at Startup
 logging.basicConfig(
@@ -19,18 +19,6 @@ logger.setLevel(logging.INFO)
 
 # Create FastAPI app
 app = FastAPI()
-
-# # Set up accessible directories
-# app.mount("/static", StaticFiles(directory="static"), name="static")
-# templates = Jinja2Templates(directory="templates")
-
-# # Home page
-# @app.get("/", response_class=HTMLResponse)
-# async def home(request: Request):
-#     return templates.TemplateResponse(
-#         "home.html",
-#         {"request": request}
-#     )
 
 # ┌───────────────────────────────────────────────┐
 # │              BACKEND API ENDPOINTS            │
@@ -107,4 +95,4 @@ async def validation_exception_handler(request: Request, err: RequestValidationE
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="localhost", port=4007, reload=True, log_level="info")
+    uvicorn.run("app:app", host="0.0.0.0", port=BACKEND_HTTP_PORT, reload=False, log_level="info")
