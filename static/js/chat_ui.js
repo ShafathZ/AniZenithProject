@@ -1,4 +1,4 @@
-import { messages } from "./chat_logic.js"
+import { messages } from "./chat_utils.js"
 import { updateButtons } from "./buttons.js"
 
 // Render function that uses messages list internally to render page messages

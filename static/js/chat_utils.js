@@ -1,20 +1,26 @@
+// Client-side conversation message storage (Chats are only stored on client side for now)
 export let messages = [];
+// JS identifier for Local model toggle
 let useLocalModel = false;
 
+// Sets if user requests local model or not from backend
 export function setLocalModelStatus(local) {
     useLocalModel = local;
 }
 
+// Adds a message to conversation list. Returns the index of the message that got added
 export function addMessage({ role, content }) {
     messages.push({ role: role, content: content});
     return messages.length - 1;
 }
 
+// Deletes all messages from the requested index (Preserves CausalLM chain)
 export function deleteMessage(index) {
     messages.splice(index);
     return true;
 }
 
+// Edits a single message at a specific index in the conversation and deletes all future messages (Preserves CausalLM chain)
 export function editMessage(index, newContent) {
     messages[index].content = newContent;
     messages.splice(index + 1);
@@ -27,6 +33,7 @@ export async function sendMessagesToBackend() {
         "use_local": useLocalModel
     }
     try {
+        // TODO: Modify endpoint fetch to actual frontend endpoint
         const response = await fetch("http://localhost:4007/anizenith/chat", {
             method: "POST",
             headers: {
@@ -36,6 +43,7 @@ export async function sendMessagesToBackend() {
         });
 
         // Handle non-200 responses
+        // TODO: Make the response handling better for non-200 (e.g. 4XX different from 3XX or 5XX)
         if (!response.ok) {
             throw new Error("Server error");
         }
