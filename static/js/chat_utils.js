@@ -32,7 +32,7 @@ export async function sendMessagesToBackend() {
         "messages": messages,
         "use_local": useLocalModel
     }
-    console.log(payload);
+    //console.log(payload);
     try {
         const response = await fetch("/proxy/anizenith/chat", {
             method: "POST",
@@ -45,7 +45,7 @@ export async function sendMessagesToBackend() {
         // Handle non-200 responses
         // TODO: Make the response handling better for non-200 (e.g. 4XX different from 3XX or 5XX)
         if (!response.ok) {
-            console.log(response);
+            //console.log(response);
             throw new Error("Server error");
         }
 
