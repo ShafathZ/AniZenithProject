@@ -32,9 +32,9 @@ export async function sendMessagesToBackend() {
         "messages": messages,
         "use_local": useLocalModel
     }
+    console.log(payload);
     try {
-        // TODO: Modify endpoint fetch to actual frontend endpoint
-        const response = await fetch("http://localhost:4007/anizenith/chat", {
+        const response = await fetch("/proxy/anizenith/chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -45,6 +45,7 @@ export async function sendMessagesToBackend() {
         // Handle non-200 responses
         // TODO: Make the response handling better for non-200 (e.g. 4XX different from 3XX or 5XX)
         if (!response.ok) {
+            console.log(response);
             throw new Error("Server error");
         }
 
