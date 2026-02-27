@@ -11,6 +11,7 @@
     --accent-primary: #ff7ce5;
     --accent-secondary: #7ac5ff;
     --accent-glow: rgba(255, 124, 229, 0.5);
+    --accent-gradient: linear-gradient(135deg, #ff7ce5, #7ac5ff);
 
     /* Borders and shadows */
     --border-soft: rgba(255, 255, 255, 0.08);
@@ -18,14 +19,14 @@
 
     /* Text */
     --text-main: #f0f0ff;
-    --text-muted: #b9b6ff;
+    --text-muted: #c9ccf5;
 
     /* Chat messages */
-    --user-message: linear-gradient(135deg, #ff9de0, #7ac5ff);
-    --assistant-message: linear-gradient(135deg, #ff9de0, #7ac5ff);
+    --user-message: linear-gradient(135deg, #e052b5, #3f8cff);
+    --assistant-message: linear-gradient(-135deg, #e052b5, #3f8cff);
 
     /* Buttons */
-    --btn-bg: linear-gradient(135deg, #7ac5ff, #9aa4ff);
+    --btn-bg: linear-gradient(135deg, #e052b5, #3f8cff);
     --btn-bg-hover: linear-gradient(135deg, #8fd0ff, #aab3ff);
     --btn-bg-active: linear-gradient(135deg, #6bb6f5, #8f98ff);
 

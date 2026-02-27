@@ -45,7 +45,7 @@
 }
 
 .full-chat-button {
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    background: var(--btn-bg);
     border: none;
     border-radius: 8px;
     color: white;
@@ -61,6 +61,7 @@
 
 .full-chat-button:hover {
     box-shadow: 0 0 12px var(--accent-glow);
+    background: var(--accent-gradient);
 }
 
 /* ===== CHAT MESSAGES ===== */
