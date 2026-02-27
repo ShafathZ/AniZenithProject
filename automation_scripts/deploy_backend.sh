@@ -127,19 +127,28 @@ echo "=== Copying backend files to VM ==="
 # </dev/null detaches stdin so SSH can exit
 # & backgrounds the process, disown detaches it from the shell
 # pgrep -f checks if the process is running by matching the full command line
-"${SSH_BASE[@]}" "echo -e '\n=== Starting backend ===' && \
- cd $BACKEND_ROOT_FOLDER && \
- source .venv/bin/activate && \
- nohup uvicorn app:app --host 0.0.0.0 --port $BACKEND_HTTP_PORT --log-level info > backend.logs 2>&1 </dev/null & \
- disown \$!; \
- sleep 2; \
- if pgrep -f '[u]vicorn app:app' >/dev/null; then \
-   echo \"Backend started successfully\"; \
- else \
-   echo \"ERROR: Backend failed to start. Logs:\"; \
-   tail -20 ~/$BACKEND_ROOT_FOLDER/backend.logs; \
-   exit 1; \
- fi"
+
+"${SSH_BASE[@]}" "
+ # Navigate to the BACKEND_ROOT_FOLDER dir
+ # Activate the venv
+ echo -e '\n=== Starting backend ==='
+ cd $BACKEND_ROOT_FOLDER || exit 1
+ source .venv/bin/activate || exit 1
+
+ # Run the app using
+ nohup uvicorn app:app --host 0.0.0.0 --port $BACKEND_HTTP_PORT --log-level info > backend.logs 2>&1 </dev/null &
+ disown \$! || true
+
+ sleep 2
+ if pgrep -f '[u]vicorn app:app' >/dev/null; then
+   echo \"Backend started successfully\"
+   exit 0
+ else
+   echo \"ERROR: Backend failed to start. Logs:\"
+   tail -20 ~/$BACKEND_ROOT_FOLDER/backend.logs
+   exit 1
+ fi
+"
 
 
 # ┌───────────────────────────────────────────────┐
