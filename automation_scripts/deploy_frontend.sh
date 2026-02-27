@@ -38,7 +38,7 @@ SSH_BASE=(ssh -i "$FRONTEND_SSH_KEY" \
             "$FRONTEND_USER"@"$FRONTEND_HOST")
 
 SCP_BASE=(scp -i "$FRONTEND_SSH_KEY" \
-            -p "$FRONTEND_PORT" \
+            -P "$FRONTEND_PORT" \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null)
 
@@ -54,7 +54,7 @@ SCP_BASE=(scp -i "$FRONTEND_SSH_KEY" \
 
 
 # 2 SCP Front end folder and files into the VM
-"${SCP_BASE[@]}" -r static/ frontend_app.py requirements_frontend.txt \
+"${SCP_BASE[@]}" -r static/ templates/ frontend_app.py requirements_frontend.txt \
 "$FRONTEND_USER@$FRONTEND_HOST:~/$FRONTEND_ROOT_FOLDER/"
 
 # 3. Create Venv using requirements-frontend.txt

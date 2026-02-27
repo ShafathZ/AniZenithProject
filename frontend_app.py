@@ -59,4 +59,4 @@ async def proxy(path: str, request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("frontend_app:app", host="localhost", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
+    uvicorn.run("frontend_app:app", host="0.0.0.0", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
