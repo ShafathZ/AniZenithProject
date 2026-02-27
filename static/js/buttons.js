@@ -1,4 +1,4 @@
-import { setLocalModelStatus, messages, addMessage, deleteMessage, editMessage, sendMessagesToBackend } from "./chat_logic.js"
+import { setLocalModelStatus, messages, addMessage, deleteMessage, editMessage, sendMessagesToBackend } from "./chat_utils.js"
 import { renderMessages } from "./chat_ui.js"
 
 export function updateButtons() {
