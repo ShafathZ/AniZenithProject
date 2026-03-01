@@ -28,10 +28,7 @@ echo "Found ssh_keys: $find_out"
 
 
 # Build SSH base command and SCP base command
-# without -T, SSH to allocates a pseudo-terminal (PTY)
-# without -T, when we run uvicorn later, the PTY stays open
-# for as long as any process (when we run uvicorn) holds its file descriptors
-SSH_BASE=(ssh -T -i "$BACKEND_SSH_KEY" \
+SSH_BASE=(ssh -i "$BACKEND_SSH_KEY" \
             -p "$BACKEND_PORT" \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
@@ -56,32 +53,38 @@ git checkout $PRODUCTION_BRANCH && git pull || \
 # │     1. INSTALL PYTHON & SETUP ROOT FOLDER     │
 # └───────────────────────────────────────────────┘
 
-# Install Python 3.12 only if not already installed
-# Create backend root folder if it doesn't exist
-#
-# command -v python3.12 returns 0 if the command is found, 1 otherwise
-# &>/dev/null redirects stdout and stderr to null
-"${SSH_BASE[@]}" "echo -e '=== Setting up Python 3.12 ===' && \
- if ! command -v python3.12 &>/dev/null; then \
-   sudo apt update && \
-   sudo add-apt-repository ppa:deadsnakes/ppa -y && \
-   sudo apt install python3.12 python3.12-venv -y; \
- else \
-   echo 'Python 3.12 already installed, skipping...'; \
- fi && \
- python3.12 --version && \
- mkdir -p $BACKEND_ROOT_FOLDER"
+"${SSH_BASE[@]}" "
+echo -e '\n=== Setting up Python 3.12 ==='
+
+# If the command python3.12 is not found, then install it
+if ! command -v python3.12 &>/dev/null; then 
+  sudo apt update
+  sudo add-apt-repository ppa:deadsnakes/ppa -y
+  sudo apt install python3.12 python3.12-venv -y
+else
+  echo 'Python 3.12 already installed, skipping...'
+fi
+
+# Print the python version to confirm installation
+python3.12 --version
+
+# Make the directory for BACKEND_ROOT_FOLDER
+mkdir -p $BACKEND_ROOT_FOLDER"
 
 
 
 # ┌───────────────────────────────────────────────┐
 # │     2. STOP EXISTING BACKEND (IF RUNNING)     │
 # └───────────────────────────────────────────────┘
-# pkill -f matches against the full command line
-# || true prevents set -e from exiting if no process was found
-"${SSH_BASE[@]}" "echo -e '=== Stopping existing backend (if running) ===' && \
- (pkill -f '[u]vicorn app:app' && echo 'Stopped backend' || echo 'No backend running, skipping...'); \
- true"
+
+"${SSH_BASE[@]}" "
+echo -e '\n=== Stopping existing backend (if running) ==='
+
+# pkill -f matches against the full command. The [u] is a regex based trick to make sure we do not match the pkill command itself
+# If the command fails, print no backend running
+# Finally return true
+(pkill -f '[u]vicorn app:app' && echo 'Stopped backend' || echo 'No backend running, skipping...')
+true"
 
 
 # ┌───────────────────────────────────────────────┐
@@ -92,12 +95,12 @@ git checkout $PRODUCTION_BRANCH && git pull || \
 # - maxdepth 1 makes sure we look only at immediate children and don't recurse into subdirectories
 # ! -name '.venv' ! -name '.' excludes .venv folder and the current directory itself from the search
 # -exec rm -rf {} + delete evrything found using above filters
-"${SSH_BASE[@]}" "echo -e '=== Cleaning old code (preserving .venv) ===' && \
+"${SSH_BASE[@]}" "echo -e '\n=== Cleaning old code (preserving .venv) ===' && \
  cd $BACKEND_ROOT_FOLDER && \
  find . -maxdepth 1 ! -name '.venv' ! -name '.' -exec rm -rf {} +"
 
 # Copy backend folder, app.py, requirements.txt and .env file
-echo "=== Copying backend files to VM ==="
+echo -e "=== Copying backend files to VM ==="
 "${SCP_BASE[@]}" -r backend/ app.py requirements.txt .env \
   "$BACKEND_USER@$BACKEND_HOST:~/$BACKEND_ROOT_FOLDER/"
 
@@ -105,27 +108,29 @@ echo "=== Copying backend files to VM ==="
 # ┌───────────────────────────────────────────────┐
 # │     4. CREATE VENV & INSTALL DEPENDENCIES     │
 # └───────────────────────────────────────────────┘
-# Create venv only if it doesn't exist
-# pip install skips already-installed packages automatically
-"${SSH_BASE[@]}" "echo -e '\n=== Installing dependencies ===' && \
- cd $BACKEND_ROOT_FOLDER && \
- if [ ! -d .venv ]; then \
-   echo 'Creating new venv...' && \
-   python3.12 -m venv .venv; \
- else \
-   echo 'Reusing existing venv...'; \
- fi && \
- source .venv/bin/activate && \
- pip install -r requirements.txt"
+
+"${SSH_BASE[@]}" "
+echo -e '\n=== Installing dependencies ==='
+cd $BACKEND_ROOT_FOLDER
+
+# If .venv folder doesn't exist
+if [ ! -d .venv ]; then
+  echo 'Creating new venv...'
+  python3.12 -m venv .venv
+
+# Else, reuse the existing .venv
+else
+  echo 'Reusing existing venv...'
+fi
+
+# Activate the .venv and install / upgrade dependencies using requirements.txt
+source .venv/bin/activate
+pip install -r requirements.txt"
+
 
 # ┌───────────────────────────────────────────────┐
 # │             5. START BACKEND                  │
 # └───────────────────────────────────────────────┘
-# nohup makes the command immune to hang ups
-# > backend.logs 2>&1 redirects stdout and stderr to the same file
-# </dev/null detaches stdin so SSH can exit
-# & backgrounds the process, disown detaches it from the shell
-# pgrep -f checks if the process is running by matching the full command line
 
 "${SSH_BASE[@]}" "
  # Navigate to the BACKEND_ROOT_FOLDER dir
@@ -134,11 +139,16 @@ echo "=== Copying backend files to VM ==="
  cd $BACKEND_ROOT_FOLDER || exit 1
  source .venv/bin/activate || exit 1
 
- # Run the app using
- nohup uvicorn app:app --host 0.0.0.0 --port $BACKEND_HTTP_PORT --log-level info > backend.logs 2>&1 </dev/null &
- disown \$! || true
+ # Run the app using uvicorn in background
+ # Route stdout and stderr to backend.logs
+ # Route stdin to /dev/null
+ nohup uvicorn app:app --host 0.0.0.0 --port $BACKEND_HTTP_PORT --log-level info > backend.logs 2>&1 </dev/null & disown
+ # disown \$! || true
 
+ # Sleep for 2 seconds
  sleep 2
+
+ # Check if the uvicorn app is running or not
  if pgrep -f '[u]vicorn app:app' >/dev/null; then
    echo \"Backend started successfully\"
    exit 0
