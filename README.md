@@ -115,3 +115,6 @@ curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
     "use_local": true
 }'
 ```
+
+## Link to access Frontend deployed on VM
+`http://paffenroth-23.dyn.wpi.edu:7002/`
