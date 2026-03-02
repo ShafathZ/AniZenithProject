@@ -49,7 +49,6 @@ git checkout $PRODUCTION_BRANCH && git pull || \
 # ┌───────────────────────────────────────────────┐
 # │     1. INSTALL PYTHON & SETUP ROOT FOLDER     │
 # └───────────────────────────────────────────────┘
-
 "${SSH_BASE[@]}" "
 echo -e '\n=== Setting up Python 3.12 ==='
 
@@ -72,7 +71,6 @@ mkdir -p $FRONTEND_ROOT_FOLDER"
 # ┌───────────────────────────────────────────────┐
 # │     2. STOP EXISTING FRONTNED (IF RUNNING)    │
 # └───────────────────────────────────────────────┘
-
 "${SSH_BASE[@]}" "
 echo -e '\n=== Stopping existing frontend (if running) ==='
 
@@ -103,25 +101,9 @@ echo -e "=== Copying frontend files to VM ==="
   "$FRONTEND_USER@$FRONTEND_HOST:~/$FRONTEND_ROOT_FOLDER/"
 
 
-# # Old Code
-# # 2 SCP Front end folder and files into the VM
-# "${SCP_BASE[@]}" -r static/ templates/ frontend_app.py requirements_frontend.txt \
-# "$FRONTEND_USER@$FRONTEND_HOST:~/$FRONTEND_ROOT_FOLDER/"
-
-
-
 # ┌───────────────────────────────────────────────┐
 # │     4. CREATE VENV & INSTALL DEPENDENCIES     │
 # └───────────────────────────────────────────────┘
-
-# # Old code
-# # 3. Create Venv using requirements-frontend.txt
-# "${SSH_BASE[@]}" "cd $FRONTEND_ROOT_FOLDER && \
-#  python3.12 -m venv .venv && \
-#  source .venv/bin/activate && \
-#  pip install -r requirements_frontend.txt"
-
-
 "${SSH_BASE[@]}" "
 echo -e '\n=== Installing dependencies ==='
 cd $FRONTEND_ROOT_FOLDER
@@ -145,16 +127,6 @@ pip install -r requirements_frontend.txt"
 # ┌───────────────────────────────────────────────┐
 # │              5. START FRONTEND                │
 # └───────────────────────────────────────────────┘
-
-# # Old Code
-# # Activate the Virtual Env, Run the frontend app and route its logs to a log file
-# "${SSH_BASE[@]}" "cd $FRONTEND_ROOT_FOLDER && \
-#  source .venv/bin/activate && \
-#  nohup python frontend_app.py > frontend.logs 2>&1 < /dev/null & \
-#  echo \$! > frontend.pid && \
-#  echo Started frontend with PID \$(cat frontend.pid)"
-
-
 "${SSH_BASE[@]}" "
  # Navigate to the FRONTEND_ROOT_FOLDER dir
  # Activate the venv
