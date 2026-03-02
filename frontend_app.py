@@ -40,7 +40,8 @@ async def proxy(path: str, request: Request):
     backend_url = f"http://{BACKEND_HOST}:{BACKEND_HTTP_PORT}/{path}"
 
     # Store and re-send body to backend
-    body = await request.body()
+    body_bytes = await request.body()
+    body = body_bytes.decode("utf-8")
 
     # Forward request to backend via async http request
     async with httpx.AsyncClient() as client:
