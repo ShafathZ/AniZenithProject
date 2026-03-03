@@ -7,8 +7,7 @@ START_TIME=$(date +%s)
 # ┌───────────────────────────────────────────────┐
 # │              SETUP VARIABLES                  │
 # └───────────────────────────────────────────────┘
-# PRODUCTION_BRANCH="main" # TODO: Uncomment this before merging PR
-PRODUCTION_BRANCH="case-study2/deployment-script"
+PRODUCTION_BRANCH="main"
 BACKEND_PORT=22002
 BACKEND_HOST="paffenroth-23.dyn.wpi.edu"
 BACKEND_USER="group02"

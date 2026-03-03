@@ -7,8 +7,7 @@ START_TIME=$(date +%s)
 # ┌───────────────────────────────────────────────┐
 # │              SETUP VARIABLES                  │
 # └───────────────────────────────────────────────┘
-# PRODUCTION_BRANCH="main" # TODO: Uncomment this before merging PR
-PRODUCTION_BRANCH="case-study2/deployment-script"
+PRODUCTION_BRANCH="main"
 FRONTEND_PORT=22000
 FRONTEND_HOST="paffenroth-23.dyn.wpi.edu"
 FRONTEND_USER="group02"
