@@ -36,7 +36,7 @@ def detect_genres(message: str) -> List[str]:
     # Simple naive genre check by detecting if any of our system stored genres are within the user query
     # TODO: Improve genre detection instead to use Retriever and RAG framework in the future
     for genre in genre_list:
-        if message.__contains__(genre):
+        if message.lower().__contains__(genre.lower()):
             requested_genres.append(genre)
     return requested_genres
 

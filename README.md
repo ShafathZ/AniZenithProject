@@ -57,13 +57,13 @@ ssh -i ssh_keys/group02_key -p 22002 group02@paffenroth-23.dyn.wpi.edu
 ### Locally Hosted Backend
 For Using Online Model:
 ```bash
-curl --location 'http://localhost:4007/anizenith/chat' \
+curl --location 'http://localhost:9002/anizenith/chat' \
 --header 'Content-Type: application/json' \
 --data '{
     "messages": [
         {
             "role": "user",
-            "content": "Hello"
+            "content": "Give me action based anime"
         }
     ],
     "use_local": false
@@ -72,13 +72,13 @@ curl --location 'http://localhost:4007/anizenith/chat' \
 
 For Using Local Model:
 ```bash
-curl --location 'http://localhost:4007/anizenith/chat' \
+curl --location 'http://localhost:9002/anizenith/chat' \
 --header 'Content-Type: application/json' \
 --data '{
     "messages": [
         {
             "role": "user",
-            "content": "Hello"
+            "content": "Give me action based anime"
         }
     ],
     "use_local": true
@@ -86,4 +86,35 @@ curl --location 'http://localhost:4007/anizenith/chat' \
 ```
 
 ### Remote Hosted Backend (on VMs)
-TODO
+For Using Online Model:
+```bash
+curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Give me action based anime"
+        }
+    ],
+    "use_local": false
+}'
+```
+
+For Using Local Model:
+```bash
+curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Give me action based anime"
+        }
+    ],
+    "use_local": true
+}'
+```
+
+## Link to access Frontend deployed on VM
+`http://paffenroth-23.dyn.wpi.edu:7002/`
