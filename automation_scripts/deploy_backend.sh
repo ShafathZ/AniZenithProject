@@ -15,6 +15,38 @@ BACKEND_SSH_KEY="./ssh_keys/group02_key"
 BACKEND_ROOT_FOLDER="anizenith_backend"
 BACKEND_HTTP_PORT=9002
 
+# ┌───────────────────────────────────────────────┐
+# │           PARSE COMMAND LINE ARGS             │
+# └───────────────────────────────────────────────┘
+# Loop through each command line option
+# first ':' performs silent error handling mode
+# 'b' without a colon means it acts as a boolean flag (no argument required)
+while getopts ":b" opt; do
+
+  # Start a Switch Case block
+  case "$opt" in
+
+    # If option '-b' is provided, detect the current git branch
+    b) 
+      PRODUCTION_BRANCH=$(git branch --show-current)
+      
+      # Safety check in case the command fails (e.g., empty repository or detached HEAD)
+      if [[ -z "$PRODUCTION_BRANCH" ]]; then
+          echo "Error: Could not detect current git branch. Are you in a valid git repository?" >&2
+          exit 1
+      fi
+      ;;
+
+    # Handle unknown options
+    \?) echo "Invalid option: -$OPTARG" >&2; exit 1 ;;
+
+  esac
+done
+
+# Remove parsed options from $@, and leave only non-option positional args
+shift $((OPTIND - 1))
+
+echo "Using branch: $PRODUCTION_BRANCH"
 
 # Check if we are in the root directory (check for the ssh_keys folder)
 find_out="$(find . -type d -name "ssh_keys")"

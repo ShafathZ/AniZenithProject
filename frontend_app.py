@@ -43,6 +43,9 @@ async def proxy(path: str, request: Request):
     body_bytes = await request.body()
     body = body_bytes.decode("utf-8")
 
+    # Logging request forwarded to the backend server
+    logger.info(f"Forwarding Request to Backend Server: {backend_url}, body: {body}")
+
     # Forward request to backend via async http request
     async with httpx.AsyncClient() as client:
         backend_response = await client.post(
@@ -50,6 +53,7 @@ async def proxy(path: str, request: Request):
             content=body,
             headers=dict(request.headers),
             params=request.query_params,
+            timeout=httpx.Timeout(180.0)
         )
 
     # Return backend response directly

@@ -11,7 +11,16 @@ load_dotenv()
 HF_TOKEN = os.getenv('HF_TOKEN')
 
 # Load the List of All Supported Genres in Memory, at App Startup
-genre_list = open("backend/genrelist.txt", "r").read().splitlines()
+GENRE_LIST = open("backend/genrelist.txt", "r").read().splitlines()
+
+
+# Load the Local Pipeline Model at App Startup
+PIPELINE_LOCAL_MODEL = pipeline(task='text-generation',
+                                model='Qwen/Qwen3-0.6B',
+                                max_new_tokens=MAX_NEW_TOKENS,
+                                temperature=TEMPERATURE,
+                                do_sample=False,
+                                top_p=TOP_P)
 
 
 # TODO: Make this Method Async Later
@@ -35,7 +44,7 @@ def detect_genres(message: str) -> List[str]:
     requested_genres = []
     # Simple naive genre check by detecting if any of our system stored genres are within the user query
     # TODO: Improve genre detection instead to use Retriever and RAG framework in the future
-    for genre in genre_list:
+    for genre in GENRE_LIST:
         if message.lower().__contains__(genre.lower()):
             requested_genres.append(genre)
     return requested_genres
@@ -64,15 +73,8 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
     if use_local_model:
         # Local Model
         # Uses pipeline from transformers library
-        pipeline_local_model = pipeline(task='text-generation',
-                                        model='Qwen/Qwen3-0.6B',
-                                        max_new_tokens=MAX_NEW_TOKENS,
-                                        temperature=TEMPERATURE,
-                                        do_sample=False,
-                                        top_p=TOP_P)
-        
         # Get the response from the local model
-        response = pipeline_local_model(input_messages)
+        response = PIPELINE_LOCAL_MODEL(input_messages)
         
         # Parse the output and yield it
         yield response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
