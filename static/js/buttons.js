@@ -296,52 +296,6 @@ function setupLocalModelToggle() {
     });
 }
 
-function setupOAuthButtons() {
-    // OAuth Login Button
-    const loginButton = document.querySelector(".mal-login");
-    if (loginButton) {
-        loginButton.addEventListener("click", () => {
-            window.location.href = "/proxy/login/mal";
-        });
-    }
-
-    // Logout Button
-    const logoutButton = document.querySelector(".mal-logout");
-    if (logoutButton) {
-        logoutButton.addEventListener("click", async (event) => {
-            // 1. Ask user if they want to logout
-            const confirmed = window.confirm("Are you sure you want to log out from MAL? App features may be limited.");
-            if (!confirmed) {
-                event.preventDefault();
-                return;
-            }
-
-            // 2. Send POST request to /logout
-            try {
-                const response = await fetch("/proxy/logout", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ provider: "mal" })
-                });
-
-                if (response.ok) {
-                    // 3. Reload page on logout
-                    window.location.reload();
-                } else {
-                    // 4. If error response, give alert
-                    const data = await response.json();
-                    alert("Logout failed: " + (data.error || "Unknown error"));
-                }
-            } catch (err) {
-                console.error("Logout error:", err);
-                alert("Logout failed. Please try again.");
-            }
-        });
-    }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
     updateButtons();
 
@@ -352,5 +306,4 @@ document.addEventListener("DOMContentLoaded", () => {
     setupClearFullChatButton();
     setupQuickSuggestionButtons();
     setupLocalModelToggle();
-    setupOAuthButtons();
 });

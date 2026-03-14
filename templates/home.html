@@ -27,11 +27,8 @@
 
     <!-- ===== MAL Login Button ===== -->
     <div class="mal-login-wrapper">
-        {% if auth_status.auth_tokens and auth_status.auth_tokens.get('mal') %}
-            <button type="submit" class="mal-button mal-logout">Logout</button>
-        {% else %}
-            <button type="button" class="mal-button mal-login">Login with MyAnimeList</button>
-        {% endif %}
+        <button type="button" class="mal-button mal-login">Login with MyAnimeList</button>
+        <button type="submit" class="mal-button mal-logout" style="display:none;">Logout</button>
     </div>
 
     <!-- ===== Chat Messages ===== -->
@@ -104,6 +101,7 @@
 
 </div>
 <script src="/static/js/home.js"></script>
+<script src="/static/js/auth.js"></script>
 <script type="module" src="/static/js/chat_ui.js"></script>
 <script type="module" src="/static/js/buttons.js"></script>
 {% endblock %}

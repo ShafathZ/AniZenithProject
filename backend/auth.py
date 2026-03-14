@@ -4,7 +4,7 @@ from functools import wraps
 import httpx
 from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter, Request
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import RedirectResponse, JSONResponse, Response
 import secrets
 
 # Make API Router to connect to main App
@@ -42,20 +42,27 @@ async def mal_login(request: Request):
 
     return await mal.authorize_redirect(request, REDIRECT_URI, code_challenge=code_verifier, code_challenge_method="plain")
 
+@router.head("/login/mal")
+async def mal_login_head():
+    return Response(status_code=200)
+
 @router.get("/callback/mal")
 async def mal_callback(request: Request):
     # Exchange code for access token via callback
     code_verifier = request.session.pop("verifier")
-    if not code_verifier:
-        return {"error": "Missing PKCE verifier"}
+    code = request.query_params.get("code", None)
+
+    # Send user back to original frontend page
+    origin_url = request.session.pop("origin_url")
+
+    if not code or not code_verifier:
+        return RedirectResponse(origin_url)
 
     token = await mal.fetch_access_token(
         code_verifier=code_verifier,
         redirect_uri=REDIRECT_URI,
-        code=request.query_params.get("code")
+        code=code
     )
-    # Send user back to original frontend page
-    origin_url = request.session.pop("origin_url")
 
     # Add OAuth token
     auth_tokens = request.session.setdefault("auth_tokens", {})

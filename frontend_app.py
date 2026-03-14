@@ -30,26 +30,16 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     # Collect Auth Status from backend
-    # TODO: Move this into JavaScript so page loads
-    auth_status = {}
-    try:
-        auth_status = await proxy("auth/status", request)
-        auth_status = json.loads(auth_status.body)
-    except Exception as e:
-        # TODO: Log this
-        print("Silent Error in OAuth Detection:", e)
-
     return templates.TemplateResponse(
         "home.html",
         {
             "request": request,
-            "auth_status": auth_status
         }
     )
 
 # Proxy endpoint for posting requests to backend
 # Usage: Send POST to "localhost:7002/proxy/anizenith/chat"
-@app.api_route("/proxy/{path:path}", methods=["GET", "POST"])
+@app.api_route("/proxy/{path:path}", methods=["GET", "POST", "HEAD"])
 async def proxy(path: str, request: Request):
     backend_url = f"http://{BACKEND_HOST}:{BACKEND_HTTP_PORT}/{path}"
 
@@ -58,14 +48,22 @@ async def proxy(path: str, request: Request):
     body = body_bytes.decode("utf-8")
 
     # Forward request to backend via async http request
-    async with httpx.AsyncClient() as client:
-        backend_response = await client.request(
-            method=request.method.upper(),
-            url=backend_url,
-            content=body,
-            headers=dict(request.headers),
-            params=request.query_params,
-        )
+    try:
+        async with httpx.AsyncClient() as client:
+            backend_response = await client.request(
+                method=request.method.upper(),
+                url=backend_url,
+                content=body,
+                headers=dict(request.headers),
+                params=request.query_params,
+            )
+    except (httpx.ConnectError, httpx.TimeoutException):
+        # Cant connect to backend via proxy
+        return JSONResponse({"error": "Backend server has timed out. Please try again later."}, status_code=504)
+
+    except httpx.RequestError as e:
+        # Other httpx errors
+        return JSONResponse({"error": f"Backend request failed."}, status_code=502)
 
     # Return backend response directly
     return Response(
