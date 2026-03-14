@@ -27,7 +27,7 @@
 
     <!-- ===== MAL Login Button ===== -->
     <div class="mal-login-wrapper">
-        {% if auth_status.nodes.get('mal') %}
+        {% if auth_status.auth_tokens and auth_status.auth_tokens.get('mal') %}
             <button type="submit" class="mal-button mal-logout">Logout</button>
         {% else %}
             <button type="button" class="mal-button mal-login">Login with MyAnimeList</button>

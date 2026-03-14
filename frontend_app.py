@@ -13,9 +13,7 @@ BACKEND_HOST="localhost"
 BACKEND_HTTP_PORT=9002
 
 # Configure logging at Startup
-logging.basicConfig(
-    level = logging.INFO,
-)
+logging.basicConfig(level = logging.INFO)
 
 # Init Logger Instance
 logger = logging.getLogger(__name__)
@@ -32,12 +30,13 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     # Collect Auth Status from backend
+    # TODO: Move this into JavaScript so page loads
     auth_status = {}
     try:
         auth_status = await proxy("auth/status", request)
         auth_status = json.loads(auth_status.body)
-        print(f"Login Info: {auth_status}")
     except Exception as e:
+        # TODO: Log this
         print("Silent Error in OAuth Detection:", e)
 
     return templates.TemplateResponse(

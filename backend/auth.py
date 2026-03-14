@@ -11,6 +11,7 @@ import secrets
 router = APIRouter()
 
 # OAuth Client Library
+OAUTH_PROVIDERS = ["mal"]
 oauth = OAuth()
 mal = oauth.register(
     name="mal",
@@ -25,15 +26,20 @@ mal = oauth.register(
 # │          MyAnimeList OAuth Endpoint           │
 # └───────────────────────────────────────────────┘
 # TODO: Move these to better place
+# TODO: Change localhost to public facing backend callback endpoint (We have to do it this way because we don't have a third authentication server)
 BACKEND_HTTP_PORT = 9002
 REDIRECT_URI = f"http://localhost:{BACKEND_HTTP_PORT}/callback/mal"
-FRONTEND_URL = "http://localhost:7002/"
 
 @router.get("/login/mal")
-async def login(request: Request):
+async def mal_login(request: Request):
     # I hate OAuth2
     code_verifier = secrets.token_urlsafe(64)
     request.session['verifier'] = code_verifier
+
+    # Use Referral method to get frontend IP (Scalable with multiple frontend servers)
+    origin_url = request.headers.get("Origin") or request.headers.get("Referer")
+    request.session['origin_url'] = origin_url
+
     return await mal.authorize_redirect(request, REDIRECT_URI, code_challenge=code_verifier, code_challenge_method="plain")
 
 @router.get("/callback/mal")
@@ -48,30 +54,27 @@ async def mal_callback(request: Request):
         redirect_uri=REDIRECT_URI,
         code=request.query_params.get("code")
     )
-    request.session["mal_access_token"] = token["access_token"]
-    return RedirectResponse(f"{FRONTEND_URL}?login=success")
+    # Send user back to original frontend page
+    origin_url = request.session.pop("origin_url")
 
-@router.get("/logout")
+    # Add OAuth token
+    auth_tokens = request.session.setdefault("auth_tokens", {})
+    auth_tokens["mal"] = token["access_token"]
+    return RedirectResponse(origin_url)
+
+@router.post("/logout")
 async def logout(request: Request):
     # TODO: Make this more robust than just clearing entire session in case we use session cookie for something else
     request.session.clear()
-    return RedirectResponse(FRONTEND_URL)
+    return JSONResponse({"auth_tokens": request.session.get("auth_tokens")})
 
 @router.get("/auth/status")
 async def auth_status(request: Request):
-    # Dynamically checks all OAuth logins and sends back in this get request (In case we do more OAuth)
-    providers = ["mal"]
-    logged_in_nodes = {}
-
-    for provider in providers:
-        session_key = f"{provider}_access_token"
-        if session_key in request.session:
-            logged_in_nodes[provider] = True
-
-    return JSONResponse({"nodes": logged_in_nodes})
+    # Get the auth tokens currently accessible
+    return JSONResponse({"auth_tokens": request.session.get("auth_tokens")})
 
 # Error handling decorator for API in case key does not exist/bad auth
-def mal_error_handler(func):
+def oauth_error_handler(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
         try:
@@ -88,10 +91,10 @@ def mal_error_handler(func):
 
 # Testing endpoint to get my own profile
 @router.get("/mal/profile")
-@mal_error_handler
+@oauth_error_handler
 async def mal_profile(request: Request):
     # Fetch tokens from DB
-    access_token = request.session.get("mal_access_token")
+    access_token = request.session["auth_tokens"]["mal"]
 
     headers = {"Authorization": f"Bearer {access_token}"}
     async with httpx.AsyncClient() as client:
