@@ -54,13 +54,12 @@ async def home(request: Request):
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     # Add security headers before sending response
-    nonce = secrets.token_urlsafe(16) # Nonce is an appended hash before every request, prevents some unsafe JS attacks
     response = await call_next(request)
 
     CSP = (
         f"default-src 'self'; "
-        f"script-src 'self' https://cdn.jsdelivr.net 'nonce-{nonce}'; "
-        f"style-src 'self' https://cdnjs.cloudflare.com 'nonce-{nonce}'; "
+        f"script-src 'self' https://cdn.jsdelivr.net; "
+        f"style-src 'self' https://cdnjs.cloudflare.com; "
         f"img-src 'self' data:; "
         f"font-src 'self' https://cdnjs.cloudflare.com; "
         f"frame-ancestors 'none';"
@@ -68,9 +67,6 @@ async def add_security_headers(request: Request, call_next):
     response.headers["Content-Security-Policy"] = CSP
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-
-    # Store nonce so templates can use it
-    request.state.csp_nonce = nonce
     return response
 
 
