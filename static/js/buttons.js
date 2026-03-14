@@ -21,7 +21,7 @@ function setupCopyButtons() {
 
             navigator.clipboard.writeText(textDiv)
                 .then(() => {
-                    copyBtn.innerHTML = '<span style="font-size: 10px;">✓</span>';
+                    copyBtn.innerHTML = '✓';
                     setTimeout(() => {
                         copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
                     }, 1000);
@@ -229,7 +229,7 @@ function setupCopyFullChatButton() {
         navigator.clipboard.writeText(fullText)
             .then(() => {
                 const originalHTML = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<span style="font-size: 14px;">✔</span>';
+                copyBtn.innerHTML = '✔';
 
                 setTimeout(() => {
                     copyBtn.innerHTML = originalHTML;

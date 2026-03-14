@@ -1,6 +1,5 @@
 import fnmatch
 import posixpath
-import secrets
 
 import httpx
 from fastapi import FastAPI, Request
@@ -39,7 +38,7 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# Home page
+# Home page endpoint to get our HTML, CSS, JS
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     # Collect Auth Status from backend
@@ -50,7 +49,7 @@ async def home(request: Request):
         }
     )
 
-# Security pre-endpoint
+# Security middleware endpoint
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     # Add security headers before sending response
@@ -69,8 +68,7 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-Frame-Options"] = "DENY"
     return response
 
-
-
+# --------- PROXY ENDPOINT ----------
 ALLOWED_PROXY_ROUTES = {
     "anizenith/chat": ["POST"],
     "login/*": ["GET", "HEAD"],
