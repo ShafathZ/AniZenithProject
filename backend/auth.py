@@ -7,9 +7,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth
 
 # Central configuration for all OAuth authentication
-PROVIDERS = ["mal"]
-
-PROVIDER_CONFIGS = {
+PROVIDER_CONFIG = {
     "mal": {
         "client_id": os.getenv("MAL_CLIENT_ID"),
         "client_secret": os.getenv("MAL_CLIENT_SECRET"),
@@ -23,19 +21,7 @@ PROVIDER_CONFIGS = {
 oauth = OAuth()
 router = APIRouter()
 
-# Register all providers
-for provider_name in PROVIDERS:
-    cfg = PROVIDER_CONFIGS[provider_name]
-    oauth.register(
-        name=provider_name,
-        client_id=cfg["client_id"],
-        client_secret=cfg["client_secret"],
-        access_token_url=cfg["access_token_url"],
-        authorize_url=cfg["authorize_url"],
-        client_kwargs=cfg.get("client_kwargs", {}),
-    )
-
-# Base Redirect URL
+# Base Redirect URL of Auth server (Our Auth server = Backend server currently)
 # TODO: Move these at some point to centralized config
 BACKEND_HTTP_PORT = 9002
 BASE_REDIRECT_URI = f"http://localhost:{BACKEND_HTTP_PORT}"
@@ -58,7 +44,7 @@ def oauth_error_handler(func):
 
 
 # Adding App routes for each OAuth endpoint
-def add_provider_routes(router: APIRouter, provider: str, config: dict):
+def add_provider_routes(provider: str):
     # Login endpoint
     async def login(request: Request):
         code_verifier = secrets.token_urlsafe(64)
@@ -77,11 +63,11 @@ def add_provider_routes(router: APIRouter, provider: str, config: dict):
             code_challenge_method="plain",
         )
 
-    # HEAD request (returns 200 OK)
+    # HEAD request for auth server (returns 200 OK)
     async def login_head():
         return Response(status_code=200)
 
-    # Callback endpoint
+    # Callback endpoint after OAuth2 success
     async def callback(request: Request):
         code_verifier = request.session.pop(f"{provider}_verifier", None)
         code = request.query_params.get("code")
@@ -107,9 +93,20 @@ def add_provider_routes(router: APIRouter, provider: str, config: dict):
     router.add_api_route(f"/login/{provider}", login_head, methods=["HEAD"])
     router.add_api_route(f"/callback/{provider}", callback, methods=["GET"])
 
-# Generate provider routes on startup of app
-for provider_name in PROVIDERS:
-    add_provider_routes(router, provider_name, PROVIDER_CONFIGS[provider_name])
+# ----- REGISTER ALL OAUTH ENDPOINTS -----
+for provider, config in PROVIDER_CONFIG.items():
+    # Register OAuth2 server
+    oauth.register(
+        name=provider,
+        client_id=config["client_id"],
+        client_secret=config["client_secret"],
+        access_token_url=config["access_token_url"],
+        authorize_url=config["authorize_url"],
+        client_kwargs=config.get("client_kwargs", {}),
+    )
+
+    # Add provider's app routes
+    add_provider_routes(provider)
 
 
 # Logout node
