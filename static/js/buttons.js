@@ -296,6 +296,31 @@ function setupLocalModelToggle() {
     });
 }
 
+function setupOAuthButtons() {
+    // OAuth Login Button
+    const loginButton = document.querySelector(".mal-login");
+    if (loginButton) {
+        loginButton.addEventListener("click", () => {
+            window.location.href = "/proxy/login/mal";
+        });
+    }
+
+    // Logout Button
+    const logoutButton = document.querySelector(".mal-logout");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", (event) => {
+            const confirmed = window.confirm(
+                "Are you sure you want to log out from MAL? App features may be limited."
+            );
+            if (confirmed) {
+                window.location.href = "/proxy/logout";
+            } else {
+                event.preventDefault();
+            }
+        });
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     updateButtons();
 
@@ -306,4 +331,5 @@ document.addEventListener("DOMContentLoaded", () => {
     setupClearFullChatButton();
     setupQuickSuggestionButtons();
     setupLocalModelToggle();
+    setupOAuthButtons();
 });

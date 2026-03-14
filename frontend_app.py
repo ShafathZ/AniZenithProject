@@ -1,12 +1,15 @@
+import json
+
 import httpx
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import logging
 
 FRONTEND_HTTP_PORT = 7002
-BACKEND_HOST="paffenroth-23.dyn.wpi.edu"
+#BACKEND_HOST="paffenroth-23.dyn.wpi.edu"
+BACKEND_HOST="localhost"
 BACKEND_HTTP_PORT=9002
 
 # Configure logging at Startup
@@ -28,14 +31,26 @@ templates = Jinja2Templates(directory="templates")
 # Home page
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    # Collect Auth Status from backend
+    auth_status = {}
+    try:
+        auth_status = await proxy("auth/status", request)
+        auth_status = json.loads(auth_status.body)
+        print(f"Login Info: {auth_status}")
+    except Exception as e:
+        print("Silent Error in OAuth Detection:", e)
+
     return templates.TemplateResponse(
         "home.html",
-        {"request": request}
+        {
+            "request": request,
+            "auth_status": auth_status
+        }
     )
 
 # Proxy endpoint for posting requests to backend
 # Usage: Send POST to "localhost:7002/proxy/anizenith/chat"
-@app.post("/proxy/{path:path}")
+@app.api_route("/proxy/{path:path}", methods=["GET", "POST"])
 async def proxy(path: str, request: Request):
     backend_url = f"http://{BACKEND_HOST}:{BACKEND_HTTP_PORT}/{path}"
 
@@ -45,19 +60,21 @@ async def proxy(path: str, request: Request):
 
     # Forward request to backend via async http request
     async with httpx.AsyncClient() as client:
-        backend_response = await client.post(
-            backend_url,
+        backend_response = await client.request(
+            method=request.method.upper(),
+            url=backend_url,
             content=body,
             headers=dict(request.headers),
             params=request.query_params,
         )
 
     # Return backend response directly
-    return JSONResponse(
-        content=backend_response.json(),
-        status_code=backend_response.status_code
+    return Response(
+        content=backend_response.content,
+        status_code=backend_response.status_code,
+        headers=dict(backend_response.headers)
     )
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("frontend_app:app", host="0.0.0.0", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
+    uvicorn.run("frontend_app:app", host="localhost", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")

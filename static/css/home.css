@@ -72,6 +72,26 @@
     margin-left: 6px;
 }
 
+/* ===== MAL OAUTH LOGIN ===== */
+.mal-button {
+    display: block;
+    margin: 15px auto 10px auto;
+    background-color: #2E51A2;
+    color: var(--text-main);
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+.mal-button:hover {
+    background-color: #3a61c2;
+}
+
 /* ===== MAIN CHAT CONTAINER ===== */
 .chat-container {
     max-width: 900px;

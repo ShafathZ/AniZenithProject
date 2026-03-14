@@ -25,6 +25,15 @@
         <label for="localModelToggle" class="no-select">Use Local Model?</label>
     </div>
 
+    <!-- ===== MAL Login Button ===== -->
+    <div class="mal-login-wrapper">
+        {% if auth_status.nodes.get('mal') %}
+            <button type="submit" class="mal-button mal-logout">Logout</button>
+        {% else %}
+            <button type="button" class="mal-button mal-login">Login with MyAnimeList</button>
+        {% endif %}
+    </div>
+
     <!-- ===== Chat Messages ===== -->
     <div class="chatbot-area">
         <div class="chat-box" id="chatBox">
