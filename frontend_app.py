@@ -1,4 +1,6 @@
+import fnmatch
 import json
+import posixpath
 
 import httpx
 from fastapi import FastAPI, Request
@@ -37,17 +39,37 @@ async def home(request: Request):
         }
     )
 
+ALLOWED_PROXY_ROUTES = {
+    "anizenith/chat": ["POST"],
+    "login/*": ["GET", "HEAD"],
+    "logout/*": ["POST"],
+    "auth/status": ["GET"],
+    "mal/*": ["GET", "POST"]
+}
+
+def is_allowed_route(path: str, method: str) -> bool:
+    method = method.upper()
+    # Glob-based search for if route is allowed (Using loop because not many endpoints in our proxy allowed)
+    for pattern, methods in ALLOWED_PROXY_ROUTES.items():
+        if fnmatch.fnmatch(path, pattern) and method in methods:
+            return True
+    return False
+
 # Proxy endpoint for posting requests to backend
 # Usage: Send POST to "localhost:7002/proxy/anizenith/chat"
 @app.api_route("/proxy/{path:path}", methods=["GET", "POST", "HEAD"])
 async def proxy(path: str, request: Request):
+    # Simple way to prevent /.. or other local path tricks
+    path = posixpath.normpath(path).lstrip("/")
+    if not is_allowed_route(path, request.method):
+        return JSONResponse({"error": "Endpoint not allowed through proxy"}, status_code=403)
+
     backend_url = f"http://{BACKEND_HOST}:{BACKEND_HTTP_PORT}/{path}"
 
     # Store and re-send body to backend
     body_bytes = await request.body()
     body = body_bytes.decode("utf-8")
 
-    # Forward request to backend via async http request
     try:
         async with httpx.AsyncClient() as client:
             backend_response = await client.request(
@@ -58,14 +80,10 @@ async def proxy(path: str, request: Request):
                 params=request.query_params,
             )
     except (httpx.ConnectError, httpx.TimeoutException):
-        # Cant connect to backend via proxy
         return JSONResponse({"error": "Backend server has timed out. Please try again later."}, status_code=504)
+    except httpx.RequestError:
+        return JSONResponse({"error": "Internal Server Error."}, status_code=500)
 
-    except httpx.RequestError as e:
-        # Other httpx errors
-        return JSONResponse({"error": f"Backend request failed."}, status_code=502)
-
-    # Return backend response directly
     return Response(
         content=backend_response.content,
         status_code=backend_response.status_code,
