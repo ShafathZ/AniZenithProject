@@ -1,12 +1,13 @@
 import fnmatch
-import json
 import posixpath
+import secrets
 
 import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 FRONTEND_HTTP_PORT = 7002
@@ -24,6 +25,16 @@ logger.setLevel(logging.INFO)
 # Create FastAPI as Frontend App
 app = FastAPI()
 
+# Add Middleware security (Only allow requests to specific endpoints to prevent insertion attacks)
+origins = [f"http://localhost:{FRONTEND_HTTP_PORT}"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Set up accessible directories
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -38,6 +49,31 @@ async def home(request: Request):
             "request": request,
         }
     )
+
+# Security pre-endpoint
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    # Add security headers before sending response
+    nonce = secrets.token_urlsafe(16) # Nonce is an appended hash before every request, prevents some unsafe JS attacks
+    response = await call_next(request)
+
+    CSP = (
+        f"default-src 'self'; "
+        f"script-src 'self' https://cdn.jsdelivr.net 'nonce-{nonce}'; "
+        f"style-src 'self' https://cdnjs.cloudflare.com 'nonce-{nonce}'; "
+        f"img-src 'self' data:; "
+        f"font-src 'self' https://cdnjs.cloudflare.com; "
+        f"frame-ancestors 'none';"
+    )
+    response.headers["Content-Security-Policy"] = CSP
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+
+    # Store nonce so templates can use it
+    request.state.csp_nonce = nonce
+    return response
+
+
 
 ALLOWED_PROXY_ROUTES = {
     "anizenith/chat": ["POST"],

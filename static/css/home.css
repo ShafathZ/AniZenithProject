@@ -23,6 +23,10 @@
     100% { background-position: 0% 50%; }
 }
 
+.fancy-z {
+    font-size: 3rem;
+}
+
 .subtitle {
     display: block;
     text-align: center;
@@ -90,6 +94,10 @@
 
 .mal-button:hover {
     background-color: #3a61c2;
+}
+
+.mal-logout {
+    display: none;
 }
 
 /* ===== MAIN CHAT CONTAINER ===== */
