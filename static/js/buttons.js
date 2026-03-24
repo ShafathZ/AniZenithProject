@@ -1,6 +1,5 @@
 import { setLocalModelStatus, messages, addMessage, deleteMessage, editMessage, sendMessagesToBackend } from "./chat_utils.js"
 import { renderMessages } from "./chat_ui.js"
-import { postErrorMessage } from "./error.js"
 
 export function updateButtons() {
     // Dynamic buttons
@@ -22,12 +21,12 @@ function setupCopyButtons() {
 
             navigator.clipboard.writeText(textDiv)
                 .then(() => {
-                    copyBtn.innerHTML = '✓';
+                    copyBtn.innerHTML = '<span style="font-size: 10px;">✓</span>';
                     setTimeout(() => {
                         copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
                     }, 1000);
                 })
-                .catch(err => postErrorMessage(300, "Copy Failed", "Failed to copy the message."));
+                .catch(err => console.error("Failed to copy:", err));
         };
     });
 }
@@ -45,7 +44,7 @@ function setupShareButtons() {
                 try {
                     await navigator.share({ text: textDiv });
                 } catch (err) {
-                    postErrorMessage(300, "Share Failed", "Failed to share the message.")
+                    console.error("Share canceled or failed:", err);
                 }
             } else {
                 prompt("Web Share not supported. Copy this text to share:", textDiv);
@@ -100,6 +99,7 @@ function setupEditButtons() {
                 textDiv.contentEditable = "false";
                 textDiv.classList.remove("editing");
                 textDiv.removeEventListener("keydown", handleKey);
+                console.log("Set up event handler");
 
                 if (!save) {
                     textDiv.textContent = originalText;
@@ -208,7 +208,8 @@ function setupShareFullChatButton() {
         // Default browser share feature
         if (navigator.share) {
             navigator.share({ text: fullText }).catch(err => {
-                postErrorMessage(300, "Share Failed", "Sharing failed or canceled.")
+                console.error("Share failed:", err);
+                alert("Sharing failed or canceled.");
             });
         } else {
             prompt("Copy the chat text to share:", fullText);
@@ -228,14 +229,15 @@ function setupCopyFullChatButton() {
         navigator.clipboard.writeText(fullText)
             .then(() => {
                 const originalHTML = copyBtn.innerHTML;
-                copyBtn.innerHTML = '✔';
+                copyBtn.innerHTML = '<span style="font-size: 14px;">✔</span>';
 
                 setTimeout(() => {
                     copyBtn.innerHTML = originalHTML;
                 }, 1000);
             })
             .catch(err => {
-                postErrorMessage(300, "Copy Failed", "Failed to copy message to clipboard: "+err)
+                console.error("Copy failed:", err);
+                alert("Copy failed.");
             });
     });
 }
