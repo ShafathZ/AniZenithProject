@@ -10,7 +10,7 @@
 
 <h1 class="page-title">
     <!-- TODO: Add this in CSS to avoid CSRF protect issues -->
-    Ani<span style="font-size: 3rem;">ℤ</span>enith
+    Ani<span class="fancy-z">ℤ</span>enith
 </h1>
 
 <span class="subtitle">
@@ -18,11 +18,16 @@
 </span>
 
 <div class="chat-container">
-
     <!-- ===== Toggle Local Model ===== -->
     <div class="toggle-wrapper">
         <input type="checkbox" id="localModelToggle">
         <label for="localModelToggle" class="no-select">Use Local Model?</label>
+    </div>
+
+    <!-- ===== MAL Login Button ===== -->
+    <div class="mal-login-wrapper">
+        <button type="button" class="mal-button mal-login">Login with MyAnimeList</button>
+        <button type="submit" class="mal-button mal-logout">Logout</button>
     </div>
 
     <!-- ===== Chat Messages ===== -->
@@ -95,6 +100,7 @@
 
 </div>
 <script src="/static/js/home.js"></script>
+<script type="module" src="/static/js/auth.js"></script>
 <script type="module" src="/static/js/chat_ui.js"></script>
 <script type="module" src="/static/js/buttons.js"></script>
 {% endblock %}

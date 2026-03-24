@@ -1,0 +1,95 @@
+/* Container must control layout */
+#error-container {
+    position: fixed;   /* stick to viewport */
+    top: 20px;
+    right: 20px;
+
+    display: flex;
+    flex-direction: column;   /* stack vertically */
+    align-items: flex-end;    /* align to right edge */
+
+    gap: 12px;                /* spacing between toasts */
+    z-index: 9999;
+
+    pointer-events: none;     /* clicks pass through */
+}
+
+/* Each error popup CSS */
+.error-toast {
+    min-width: 260px;
+    max-width: 360px;
+
+    padding: 14px 16px;
+    border-radius: 10px;
+
+    color: var(--text-main);
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(12px);
+
+    border: 1px solid var(--border-soft);
+
+    box-shadow:
+        0 0 10px var(--accent-glow),
+        var(--shadow-soft);
+
+    font-size: 14px;
+    line-height: 1.4;
+
+    opacity: 0;
+    transform: translateX(30px) scale(0.98);
+
+    animation: slideIn 0.3s ease forwards;
+
+    pointer-events: auto;
+}
+
+/* Error color changes based on type */
+.error-toast.error {
+    border-left: 4px solid #ff5c7a;
+    box-shadow:
+        0 0 12px rgba(255, 92, 122, 0.6),
+        var(--shadow-soft);
+}
+
+.error-toast.warning {
+    border-left: 4px solid #ffc857;
+    box-shadow:
+        0 0 12px rgba(255, 200, 87, 0.6),
+        var(--shadow-soft);
+}
+
+.error-toast.info {
+    border-left: 4px solid var(--accent-secondary);
+}
+
+/* Error subtext */
+.error-url {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    word-break: break-all;
+}
+
+/* Slide and fade out animation */
+.error-toast.fade-out {
+    animation: slideOut 0.3s ease forwards;
+}
+
+/* Animations */
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(30px) scale(0.95);
+    }
+}

@@ -1,17 +1,22 @@
+import os
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+
 from backend.AniZenithExchange import AniZenithRequest, AniZenithResponse
 from backend.validation_utils import validate_anizenith_request
 from backend.backend_utils import chat_with_llm
+from backend.auth import router as auth_router
+
+from starlette.middleware.sessions import SessionMiddleware
 import logging
 
+# TODO: Move this to centralized place
 BACKEND_HTTP_PORT = 9002
 
 # Configure logging at Startup
-logging.basicConfig(
-    level = logging.INFO,
-)
+logging.basicConfig(level = logging.INFO)
 
 # Init Logger Instance
 logger = logging.getLogger(__name__)
@@ -19,6 +24,8 @@ logger.setLevel(logging.INFO)
 
 # Create FastAPI app
 app = FastAPI()
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("BACKEND_SECRET"), session_cookie="session", max_age=3600, same_site="lax")
+app.include_router(auth_router)
 
 # ┌───────────────────────────────────────────────┐
 # │              BACKEND API ENDPOINTS            │
@@ -54,7 +61,6 @@ async def handle_chat_request(request: AniZenithRequest):
 
     # Construct an AniZenithResponse and return it
     return AniZenithResponse(messages=response_messages)
-
 
 # ┌───────────────────────────────────────────────┐
 # │                EXCEPTION HANDLERS             │
