@@ -1,3 +1,5 @@
+import { postErrorMessage } from "./error.js"
+
 async function loadAuthStatus() {
     try {
         // Request authentication status independently from backend. Update the page if it is found
@@ -18,7 +20,7 @@ async function loadAuthStatus() {
             if (logoutButton) logoutButton.style.display = "none";
         }
     } catch (err) {
-        console.warn("Could not fetch auth status:", err);
+        postErrorMessage(405, "Could not fetch Auth: MAL", "/proxy/auth");
         // Re-display the login button if failed
         const loginButton = document.querySelector(".mal-login");
         if (loginButton) loginButton.style.display = "block";
@@ -38,15 +40,13 @@ function setupOAuthLoginButton() {
             });
 
             if (!healthCheck.ok) {
-                alert("Login service is unavailable. Please try again later.");
-                return;
+                throw new Error("Auth Server Down");
             }
 
             // 2. Backend active, perform href via proxy redirect
             window.location.href = "/proxy/login/mal";
         } catch (err) {
-            console.error("Backend is down:", err);
-            alert("Login service is unavailable. Please try again later.");
+            postErrorMessage(300, "Auth Server Down", "Login service is unavailable. Please try again later.");
         }
     });
 }

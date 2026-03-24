@@ -1,3 +1,5 @@
+import { postError } from "./error.js"
+
 // Client-side conversation message storage (Chats are only stored on client side for now)
 export let messages = [];
 // JS identifier for Local model toggle
@@ -41,12 +43,14 @@ export async function sendMessagesToBackend() {
             },
             body: JSON.stringify(payload)
         });
-
+        console.log("Response:");
+        console.log(response)
         // Handle non-200 responses
         // TODO: Make the response handling better for non-200 (e.g. 4XX different from 3XX or 5XX)
         if (!response.ok) {
-            //console.log(response);
-            throw new Error("Server error");
+            const err = new Error(response.statusText);
+            err.response = response;
+            throw err;
         }
 
         const data = await response.json();
@@ -57,9 +61,12 @@ export async function sendMessagesToBackend() {
 
     } catch (error) {
         // Fetch throws error during connection failure / bad headers
+        const response = error.response;
         const failed_response = { role: "assistant", content: "Error: Failed to connect to the backend client." };
 
-        //addMessage(failed_response);
+        addMessage(failed_response);
+        postError(error.response);
+
         return failed_response;
     }
 }

@@ -1,5 +1,6 @@
 import { setLocalModelStatus, messages, addMessage, deleteMessage, editMessage, sendMessagesToBackend } from "./chat_utils.js"
 import { renderMessages } from "./chat_ui.js"
+import { postErrorMessage } from "./error.js"
 
 export function updateButtons() {
     // Dynamic buttons
@@ -26,7 +27,7 @@ function setupCopyButtons() {
                         copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
                     }, 1000);
                 })
-                .catch(err => console.error("Failed to copy:", err));
+                .catch(err => postErrorMessage(300, "Copy Failed", "Failed to copy the message."));
         };
     });
 }
@@ -44,7 +45,7 @@ function setupShareButtons() {
                 try {
                     await navigator.share({ text: textDiv });
                 } catch (err) {
-                    console.error("Share canceled or failed:", err);
+                    postErrorMessage(300, "Share Failed", "Failed to share the message.")
                 }
             } else {
                 prompt("Web Share not supported. Copy this text to share:", textDiv);
@@ -99,7 +100,6 @@ function setupEditButtons() {
                 textDiv.contentEditable = "false";
                 textDiv.classList.remove("editing");
                 textDiv.removeEventListener("keydown", handleKey);
-                console.log("Set up event handler");
 
                 if (!save) {
                     textDiv.textContent = originalText;
@@ -208,8 +208,7 @@ function setupShareFullChatButton() {
         // Default browser share feature
         if (navigator.share) {
             navigator.share({ text: fullText }).catch(err => {
-                console.error("Share failed:", err);
-                alert("Sharing failed or canceled.");
+                postErrorMessage(300, "Share Failed", "Sharing failed or canceled.")
             });
         } else {
             prompt("Copy the chat text to share:", fullText);
@@ -236,8 +235,7 @@ function setupCopyFullChatButton() {
                 }, 1000);
             })
             .catch(err => {
-                console.error("Copy failed:", err);
-                alert("Copy failed.");
+                postErrorMessage(300, "Copy Failed", "Failed to copy message to clipboard: "+err)
             });
     });
 }
