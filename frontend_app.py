@@ -101,6 +101,9 @@ async def proxy(path: str, request: Request):
     body = body_bytes.decode("utf-8")
 
     try:
+        # Logging request forwarded to the backend server
+        logger.info(f"Forwarding Request to Backend Server: {backend_url}, body: {body}")
+
         async with httpx.AsyncClient() as client:
             backend_response = await client.request(
                 method=request.method.upper(),
@@ -113,18 +116,6 @@ async def proxy(path: str, request: Request):
         return JSONResponse({"error": "Backend server has timed out. Please try again later."}, status_code=504)
     except httpx.RequestError:
         return JSONResponse({"error": "Internal Server Error."}, status_code=500)
-    # Logging request forwarded to the backend server
-    logger.info(f"Forwarding Request to Backend Server: {backend_url}, body: {body}")
-
-    # Forward request to backend via async http request
-    async with httpx.AsyncClient() as client:
-        backend_response = await client.post(
-            backend_url,
-            content=body,
-            headers=dict(request.headers),
-            params=request.query_params,
-            timeout=httpx.Timeout(180.0)
-        )
 
     return Response(
         content=backend_response.content,
