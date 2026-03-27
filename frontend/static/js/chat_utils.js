@@ -36,10 +36,13 @@ export async function sendMessagesToBackend() {
     }
     //console.log(payload);
     try {
+        // If using local, detect and add additional timeout
+        const timeout = payload.use_local ? 180.0 : 5.0;
         const response = await fetch("/proxy/anizenith/chat", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-Request-Timeout": timeout.toString()
             },
             body: JSON.stringify(payload)
         });
