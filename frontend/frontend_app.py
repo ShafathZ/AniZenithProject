@@ -100,11 +100,18 @@ async def proxy(path: str, request: Request):
     body_bytes = await request.body()
     body = body_bytes.decode("utf-8")
 
+    # Get timeout duration if it exists (or use default)
+    timeout = 5.0
+    try:
+        timeout = float(request.headers.get("X-Request-Timeout", timeout))
+    except ValueError:
+        pass
+
     try:
         # Logging request forwarded to the backend server
-        logger.info(f"Forwarding Request to Backend Server: {backend_url}, body: {body}")
+        logger.info(f"Forwarding Request to Backend Server: {backend_url}, body: {body}, timeout: {timeout}")
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(timeout)) as client:
             backend_response = await client.request(
                 method=request.method.upper(),
                 url=backend_url,
