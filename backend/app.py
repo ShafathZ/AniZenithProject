@@ -25,7 +25,7 @@ logger.setLevel(logging.INFO)
 # Create FastAPI app
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("BACKEND_SECRET"), session_cookie="session", max_age=3600, same_site="lax")
-app.include_router(auth_router)
+#app.include_router(auth_router)
 
 # ┌───────────────────────────────────────────────┐
 # │              BACKEND API ENDPOINTS            │
