@@ -35,8 +35,8 @@ app.add_middleware(
 )
 
 # Set up accessible directories
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+templates = Jinja2Templates(directory="frontend/templates")
 
 # Home page endpoint to get our HTML, CSS, JS
 @app.get("/", response_class=HTMLResponse)
@@ -125,4 +125,4 @@ async def proxy(path: str, request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("frontend_app:app", host="localhost", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
+    uvicorn.run("frontend.frontend_app:app", host="localhost", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
