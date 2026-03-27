@@ -101,4 +101,4 @@ async def validation_exception_handler(request: Request, err: RequestValidationE
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="localhost", port=BACKEND_HTTP_PORT, reload=False, log_level="info")
+    uvicorn.run("backend.app:app", host="localhost", port=BACKEND_HTTP_PORT, reload=False, log_level="info")
