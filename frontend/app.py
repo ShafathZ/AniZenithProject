@@ -131,5 +131,5 @@ async def proxy(path: str, request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-  #  uvicorn.run("frontend.frontend_app:app", host="localhost", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
-    uvicorn.run("frontend.frontend_app:app", host=os.getenv("FRONTEND_HOSTNAME"), port=os.getenv("FRONTEND_PORT"), reload=False, log_level=os.getenv("FRONTEND_LOGLEVEL"))
+    # uvicorn.run("frontend.frontend_app:app", host="localhost", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
+    uvicorn.run("frontend.app:app", host=os.getenv("FRONTEND_HOSTNAME"), port=int(os.getenv("FRONTEND_PORT")), reload=False, log_level=os.getenv("FRONTEND_LOGLEVEL"))

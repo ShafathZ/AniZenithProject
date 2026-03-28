@@ -1,4 +1,4 @@
-docker build -t ebprihar/cookiemancer_backend:latest -f backend.dockerfile ../..
-docker build -t ebprihar/cookiemancer_frontend:latest -f frontend.dockerfile ../..
-docker push ebprihar/cookiemancer_backend:latest
-docker push ebprihar/cookiemancer_frontend:latest
+docker build -t surigo/anizenith_backend:latest -f ./docker/backend.dockerfile --progress=plain --no-cache . 
+docker build -t surigo/anizenith_frontend:latest -f ./docker/frontend.dockerfile --progress=plain --no-cache .
+# docker push surigo/anizenith_backend:latest
+# docker push surigo/anizenith_frontend:latest

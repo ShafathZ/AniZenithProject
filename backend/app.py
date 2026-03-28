@@ -30,7 +30,6 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("BACKEND_SECRET"), se
 # ┌───────────────────────────────────────────────┐
 # │              BACKEND API ENDPOINTS            │
 # └───────────────────────────────────────────────┘
-
 # Chat message handling Endpoint
 @app.post("/anizenith/chat", response_model=AniZenithResponse)
 async def handle_chat_request(request: AniZenithRequest):
@@ -61,6 +60,12 @@ async def handle_chat_request(request: AniZenithRequest):
 
     # Construct an AniZenithResponse and return it
     return AniZenithResponse(messages=response_messages)
+
+
+# Health check endpoint
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
 
 # ┌───────────────────────────────────────────────┐
 # │                EXCEPTION HANDLERS             │
@@ -101,5 +106,9 @@ async def validation_exception_handler(request: Request, err: RequestValidationE
 
 if __name__ == "__main__":
     import uvicorn
-  #  uvicorn.run("backend.app:app", host="localhost", port=BACKEND_HTTP_PORT, reload=False, log_level="info")
-    uvicorn.run("backend.app:app", host=os.getenv("BACKEND_HOSTNAME"), port=os.getenv("BACKEND_PORT"), reload=False, log_level=os.getenv("BACKEND_LOGLEVEL"))
+    # uvicorn.run("backend.app:app", host="localhost", port=BACKEND_HTTP_PORT, reload=False, log_level="info")
+    uvicorn.run("backend.app:app", 
+                host=os.getenv("BACKEND_HOSTNAME"), 
+                port=int(os.getenv("BACKEND_PORT")), 
+                reload=False, 
+                log_level=os.getenv("BACKEND_LOGLEVEL"))

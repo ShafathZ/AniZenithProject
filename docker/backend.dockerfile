@@ -1,19 +1,27 @@
+# Start from the base python:3.12.3-slim which also has debian:12-slim as base layer
 FROM python:3.12.3-slim
 
-# COPY .model /app/.model
-# COPY src/llm.py /app/src/
-# COPY src/backend.py /app/src/
+# Copy backend files and folders
+# This creates a new folder called "/anizenith_backend/backend" and pastes contents of "backend" folder into it
+COPY backend/ /anizenith_backend/backend
 
-COPY backend/ /anizenith_backend/
-COPY data/ /anizenith_backend/
+# Copy data files 
+# This creates a new folder called "/anizenith_backend/data" and pastes contents of "data" folder into it
+COPY data/ /anizenith_backend/data
 
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# TODO: Add COPY for Prometheus Folder
 
-RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
-RUN pip install --no-cache-dir fastapi uvicorn transformers accelerate bitsandbytes prometheus-client
+# Set the working directory to /anizenith_backend folder
+WORKDIR /anizenith_backend
 
-WORKDIR /app
+# Install libraries using requirements.txt
+RUN pip install -r backend/requirements.txt
 
-EXPOSE 8000
+# Expose ports
+# Backend app port
+EXPOSE 9002
 
-CMD ["uvicorn", "src.backend:app", "--host", "0.0.0.0", "--port", "8000"]
+# TODO: Add Prometheus Port for Backend app
+
+# Start the Backend app once the container is running
+CMD ["python", "backend/app.py"]
