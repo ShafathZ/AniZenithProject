@@ -58,6 +58,7 @@ packaging==26.0
 pandas==3.0.1
 pillow==12.1.1
 pluggy==1.6.0
+prometheus-client>=0.24.1
 pycparser==3.0
 pydantic==2.12.5
 pydantic-core==2.41.5
