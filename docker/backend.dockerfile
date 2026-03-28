@@ -1,0 +1,19 @@
+FROM python:3.12.3-slim
+
+# COPY .model /app/.model
+# COPY src/llm.py /app/src/
+# COPY src/backend.py /app/src/
+
+COPY backend/ /anizenith_backend/
+COPY data/ /anizenith_backend/
+
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir fastapi uvicorn transformers accelerate bitsandbytes prometheus-client
+
+WORKDIR /app
+
+EXPOSE 8000
+
+CMD ["uvicorn", "src.backend:app", "--host", "0.0.0.0", "--port", "8000"]

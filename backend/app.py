@@ -11,9 +11,9 @@ from backend.auth import router as auth_router
 
 from starlette.middleware.sessions import SessionMiddleware
 import logging
+from dotenv import load_dotenv
 
-# TODO: Move this to centralized place
-BACKEND_HTTP_PORT = 9002
+load_dotenv("backend/.env")
 
 # Configure logging at Startup
 logging.basicConfig(level = logging.INFO)
@@ -101,4 +101,5 @@ async def validation_exception_handler(request: Request, err: RequestValidationE
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.app:app", host="localhost", port=BACKEND_HTTP_PORT, reload=False, log_level="info")
+  #  uvicorn.run("backend.app:app", host="localhost", port=BACKEND_HTTP_PORT, reload=False, log_level="info")
+    uvicorn.run("backend.app:app", host=os.getenv("BACKEND_HOSTNAME"), port=os.getenv("BACKEND_PORT"), reload=False, log_level=os.getenv("BACKEND_LOGLEVEL"))

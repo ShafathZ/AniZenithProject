@@ -1,4 +1,5 @@
 import fnmatch
+import os
 import posixpath
 
 import httpx
@@ -8,11 +9,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+from dotenv import load_dotenv
 
-FRONTEND_HTTP_PORT = 7002
-#BACKEND_HOST="paffenroth-23.dyn.wpi.edu"
-BACKEND_HOST="localhost"
-BACKEND_HTTP_PORT=9002
+load_dotenv("frontend/.env")
 
 # Configure logging at Startup
 logging.basicConfig(level = logging.INFO)
@@ -25,7 +24,7 @@ logger.setLevel(logging.INFO)
 app = FastAPI()
 
 # Add Middleware security (Only allow requests to specific endpoints to prevent insertion attacks)
-origins = [f"http://localhost:{FRONTEND_HTTP_PORT}"]
+origins = [f"http://localhost:{os.getenv("FRONTEND_PORT")}"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -94,7 +93,7 @@ async def proxy(path: str, request: Request):
     if not is_allowed_route(path, request.method):
         return JSONResponse({"error": "Endpoint not allowed through proxy"}, status_code=403)
 
-    backend_url = f"http://{BACKEND_HOST}:{BACKEND_HTTP_PORT}/{path}"
+    backend_url = f"http://{os.getenv("BACKEND_HOSTNAME")}:{os.getenv("BACKEND_PORT")}/{path}"
 
     # Store and re-send body to backend
     body_bytes = await request.body()
@@ -132,4 +131,5 @@ async def proxy(path: str, request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("frontend.frontend_app:app", host="localhost", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
+  #  uvicorn.run("frontend.frontend_app:app", host="localhost", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
+    uvicorn.run("frontend.frontend_app:app", host=os.getenv("FRONTEND_HOSTNAME"), port=os.getenv("FRONTEND_PORT"), reload=False, log_level=os.getenv("FRONTEND_LOGLEVEL"))
