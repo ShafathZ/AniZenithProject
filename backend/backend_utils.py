@@ -3,6 +3,7 @@ from huggingface_hub import InferenceClient
 from transformers import pipeline
 from backend.retrieval_utils import get_recommendations
 from backend.constants import *
+from backend.prometheusbackend import *
 from dotenv import load_dotenv
 import os
 
@@ -25,19 +26,26 @@ PIPELINE_LOCAL_MODEL = pipeline(task='text-generation',
 
 # TODO: Make this Method Async Later
 def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
-    
-    # Retrieve genres from the user message using naive approach
-    # The Last Message should be user's message
-    genre_list = detect_genres(messages[-1]['content'])
+    model = "local" if use_local_model else "external"
+    with PIPELINE_LATENCY.labels(model=model, stage="full_pipeline").time():
+        # Retrieve genres from the user message using naive approach
+        # The Last Message should be user's message
+        with PIPELINE_LATENCY.labels(model=model, stage="genre_detection").time():
+            genre_list = detect_genres(messages[-1]['content'])
 
-    # 2. Retrieve relevant results from DB if the genre_list is not empty
-    recommendations_string = ""
-    if len(genre_list) > 0:
-        recommendations_string = get_recommendations(genre_list)
+        # 2. Retrieve relevant results from DB if the genre_list is not empty
+        with PIPELINE_LATENCY.labels(model=model, stage="recommendation_retrieval").time():
+            recommendations_string = ""
+            if len(genre_list) > 0:
+                recommendations_string = get_recommendations(genre_list)
 
-    # 3. Query the model
-    for result in query_model(messages, use_local_model, recommendations_string):
-        yield result
+        # 3. Query the model
+        # TODO: Use real Inference Manager / session ID
+        observe_user_message(user_id="0", user_message=messages[-1]['content'], model=model)
+        observe_bot_message(user_id="0", bot_message=messages[-1]['content'], model=model)
+        with PIPELINE_LATENCY.labels(model=model, stage="model_generation").time():
+            for result in query_model(messages, use_local_model, recommendations_string):
+                yield result
 
 
 def detect_genres(message: str) -> List[str]:

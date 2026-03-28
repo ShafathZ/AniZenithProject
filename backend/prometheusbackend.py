@@ -1,4 +1,4 @@
-from prometheus_client import Counter, Histogram, Gauge
+from prometheus_client import Counter, Histogram, Gauge, Summary
 
 # ----- Counters -----
 # Total user messages received (Sum the conversation user messages)
@@ -25,25 +25,11 @@ CHATBOT_QUEUE_LENGTH = Gauge(
 )
 
 # ----- Histograms -----
-# Response latency histogram
-PIPELINE_LATENCY = Histogram(
+# Latency of full pipeline stages
+PIPELINE_LATENCY = Summary(
     "chatbot_pipeline_latency_seconds",
-    "Time taken to process and respond to user messages (full pipeline)",
-    ["model"]
-)
-
-# Retrieval time
-RETRIEVAL_TIME = Histogram(
-    "chatbot_retrieval_time_seconds",
-    "Time taken to process retrieval mechanism",
-["model"]
-)
-
-# Retrieval time
-TOKEN_GENERATION_TIME = Histogram(
-    "chatbot_token_generation_time_seconds",
-    "Time taken for chatbot token generation",
-["model"]
+    "Time taken for different stages of chatbot pipeline",
+    ["model", "stage"]
 )
 
 # User message lengths
@@ -61,22 +47,15 @@ BOT_MESSAGE_LENGTH = Histogram(
 )
 
 # ----- Utility Prometheus Logging Functions -----
-def observe_user_message(user_id: str, message: str, model: str):
+def observe_user_message(user_id: str, user_message: str, model: str):
     """Increment user message count and observe length."""
     USER_MESSAGES.labels(user_id=user_id, model=model).inc()
-    USER_MESSAGE_LENGTH.labels(model=model).observe(len(message))
+    USER_MESSAGE_LENGTH.labels(model=model).observe(len(user_message))
 
-def observe_bot_message(user_id: str, message: str, model: str):
+def observe_bot_message(user_id: str, bot_message: str, model: str):
     """Increment bot message count and observe length."""
     BOT_MESSAGES.labels(user_id=user_id, model=model).inc()
-    BOT_MESSAGE_LENGTH.labels(model=model).observe(len(message))
-
-def observe_pipeline_latency(model: str, pipeline_time: float, retrieval_time: float, token_generation_time: float):
-    """Record response latency for the full pipeline."""
-    # TODO: Make this more dynamic in prometheus so we can add any arbitrary pipeline latency point
-    PIPELINE_LATENCY.labels(model=model).observe(pipeline_time)
-    RETRIEVAL_TIME.labels(model=model).observe(retrieval_time)
-    TOKEN_GENERATION_TIME.labels(model=model).observe(token_generation_time)
+    BOT_MESSAGE_LENGTH.labels(model=model).observe(len(bot_message))
 
 def set_message_queue_length(model: str, length: int):
     """Set current message queue length."""

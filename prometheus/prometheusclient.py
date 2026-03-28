@@ -23,12 +23,11 @@ prometheus_client.start_http_server(9001)
 # Prometheus HTTP Request Middleware
 class PrometheusMiddleware(BaseHTTPMiddleware):
 
+    # Prefix here if the middleware is used to identify a specific FastAPI app on a shared Prometheus server
     def __init__(self, app, prefix="http"):
         super().__init__(app)
 
         # Add Prometheus Client HTTP Client Common Data
-
-
         self.HTTP_REQUESTS_TOTAL = Counter(
             f"{prefix}_requests_total",
             "Total HTTP requests received by the application (w/ response status)",
