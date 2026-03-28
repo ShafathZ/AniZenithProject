@@ -57,7 +57,7 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
         except Exception as exc:
             # Count exceptions as 500
-            endpoint = request.scope.get("route").path if request.scope.get("route") else request.url.path
+            endpoint = request.scope.get("path", request.url.path)
             self.HTTP_REQUESTS_TOTAL.labels(
                 method=request.method,
                 endpoint=endpoint,
@@ -67,7 +67,7 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
 
         # Get how long the request took to process
         latency = time.time() - start_time
-        endpoint = request.scope.get("route").path if request.scope.get("route") else request.url.path
+        endpoint = request.scope.get("path", request.url.path)
 
         self.HTTP_REQUEST_LATENCY.labels(method=request.method, endpoint=endpoint).observe(latency)
         self.HTTP_REQUESTS_TOTAL.labels(
