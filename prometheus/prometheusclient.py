@@ -16,11 +16,11 @@ async def metrics():
         media_type=CONTENT_TYPE_LATEST
     )
 
-# Additional Prometheus Client Server
+# ----- Prometheus Client Server -----
 # TODO: Configure this externally
 prometheus_client.start_http_server(9000)
 
-# Prometheus HTTP Request Middleware
+# ----- Prometheus HTTP Request Middleware -----
 class PrometheusMiddleware(BaseHTTPMiddleware):
 
     # Prefix here if the middleware is used to identify a specific FastAPI app on a shared Prometheus server
