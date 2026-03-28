@@ -40,9 +40,6 @@ def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
                 recommendations_string = get_recommendations(genre_list)
 
         # 3. Query the model
-        # TODO: Use real Inference Manager / session ID
-        observe_user_message(user_id="0", user_message=messages[-1]['content'], model=model)
-        observe_bot_message(user_id="0", bot_message=messages[-1]['content'], model=model)
         with PIPELINE_LATENCY.labels(model=model, stage="model_generation").time():
             for result in query_model(messages, use_local_model, recommendations_string):
                 yield result
@@ -60,42 +57,55 @@ def detect_genres(message: str) -> List[str]:
 
 # TODO: Make this method Async later
 def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommendations_string: str):
-
-    # Determine System Prompt
+    # --- Determine System Prompt ---
     # Start with the Fixed System Prompt
     system_prompt = SYSTEM_PROMPT
 
-    # If the recommendations_string is not None
+    # Append recommendation string data to the System Prompt if it exists
     if recommendations_string:
-
-        # Append its data to the System Prompt
         system_prompt += "\nRECOMMENDATION JSON:" + f"\n{recommendations_string}"
 
     # Add the System Prompt to the Input Messages to the LLM
     input_messages = [{"role": "system", "content": system_prompt}]
-
     # Add the rest of the messages
     input_messages.extend(messages)
 
-    # Determine which model to use (local or external)
+    # --- Determine which model to use (local or external) ---
+    # Constants for logging
+    response = ""
+    input_token_count = 0
+    output_token_count = 0
+
+    # --- Local Model ---
     if use_local_model:
-        # Local Model
         # Uses pipeline from transformers library
-        # Get the response from the local model
         response = PIPELINE_LOCAL_MODEL(input_messages)
-        
-        # Parse the output and yield it
-        yield response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
+
+        # Get the response from the local model, parse it, and yield
+        generated_text = response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
+        yield generated_text
+
+        # Log token counts (there is no clean way to do this besides re-tokenizing)
+        tokenizer = PIPELINE_LOCAL_MODEL.tokenizer
+        formatted_input = tokenizer.apply_chat_template(
+            input_messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        input_tokens = tokenizer.encode(formatted_input)
+        generated_tokens = tokenizer.encode(generated_text)
+        input_token_count = len(input_tokens)
+        output_token_count = len(generated_tokens)
             
-    # Use Inference Client for the default case
+    # --- Non-local Model (Use InferenceClient) ---
     else:
-        # Non-local Model -- Use InferenceClient
         client = InferenceClient(
             token=HF_TOKEN,
             model="openai/gpt-oss-20b",
         )
 
-        response = ""
+        # Stream inference client output and yield the text chunk
+        usage = None
         for chunk in client.chat_completion(
                 messages=input_messages,
                 max_tokens=MAX_NEW_TOKENS,
@@ -107,4 +117,17 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
                 token = chunk.choices[0].delta.content
                 response += token
                 yield response
+            # Add usage data for logging
+            if hasattr(chunk, 'usage') and chunk.usage:
+                usage = chunk.usage
+
+        if usage:
+            input_token_count = usage.prompt_tokens
+            output_token_count = usage.completion_tokens
+
+    # Log the model usage output
+    model = "local" if use_local_model else "external"
+    # TODO: Use real Inference Manager / session ID
+    observe_user_message(user_id="0", user_message=messages[-1]['content'], token_count=input_token_count, model=model)
+    observe_bot_message(user_id="0", bot_message=response, token_count=output_token_count, model=model)
 

@@ -18,7 +18,7 @@ async def metrics():
 
 # Additional Prometheus Client Server
 # TODO: Configure this externally
-prometheus_client.start_http_server(9001)
+prometheus_client.start_http_server(9000)
 
 # Prometheus HTTP Request Middleware
 class PrometheusMiddleware(BaseHTTPMiddleware):
