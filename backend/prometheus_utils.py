@@ -27,7 +27,7 @@ CHATBOT_QUEUE_LENGTH_GAUGE = Gauge(
 
 # ----- Histograms -----
 # Latency of full pipeline stages
-ChATBOT_PIPELINE_LATENCY_SUMMARY = Summary(
+CHATBOT_PIPELINE_LATENCY_SUMMARY = Summary(
     "chatbot_pipeline_latency_seconds",
     "Time taken for different stages of chatbot pipeline",
     ["model", "stage"]

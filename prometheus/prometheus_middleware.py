@@ -1,5 +1,3 @@
-import time
-
 from fastapi import APIRouter, Response, Request
 import prometheus_client
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, Summary
@@ -30,7 +28,7 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
     """
 
     # Prefix here if the middleware is used to identify a specific FastAPI app on a shared Prometheus server
-    def __init__(self, app, prefix="http"):
+    def __init__(self, app, prefix="app"):
         super().__init__(app)
 
         # Init Prometheus metrics stores/counters for HTTP requests
@@ -49,7 +47,7 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
         self.HTTP_RESPONSES_TOTAL = Counter(
             f"{prefix}_responses_total",
             "Total number of responses sent by the application",
-            ["endpoint", "status"]
+            ["method", "endpoint", "status"]
         )
 
 
@@ -57,7 +55,8 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
         """
         Middleware for tracking HTTP requests and latency with Prometheus.
         dispatch is method called through the middleware pipeline in FastAPI to push through requests.
-        (e.g. call_next in here will call dispatch of next middleware)
+        FastAPI handles Middleware by passing every request through here before passing into app,
+        and then returning back here via "await call_next(request)" to handle responses.
         """
 
         # Add the request to counter
@@ -74,12 +73,15 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
             except Exception as exc:
                 # Count exceptions as 500
                 self.HTTP_RESPONSES_TOTAL.labels(
+                    method=request.method,
                     endpoint=endpoint,
                     status="500"
                 ).inc()
                 raise exc
 
             # Get how long the request took to process
-            self.HTTP_RESPONSES_TOTAL.labels(endpoint=endpoint, status=str(response.status_code)).inc()
+            self.HTTP_RESPONSES_TOTAL.labels(method=request.method,
+                                             endpoint=endpoint,
+                                             status=str(response.status_code)).inc()
 
         return response

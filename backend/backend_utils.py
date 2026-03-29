@@ -26,21 +26,22 @@ PIPELINE_LOCAL_MODEL = pipeline(task='text-generation',
 
 # TODO: Make this Method Async Later
 def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
-    model = "local" if use_local_model else "external"
-    with ChATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="full_pipeline").time():
+    # TODO: Replace with actual IDs from config
+    model = "Qwen/Qwen3-0.6B" if use_local_model else "openai/gpt-oss-20b"
+    with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="full_pipeline").time():
         # Retrieve genres from the user message using naive approach
         # The Last Message should be user's message
-        with ChATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="genre_detection").time():
+        with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="genre_detection").time():
             genre_list = detect_genres(messages[-1]['content'])
 
         # 2. Retrieve relevant results from DB if the genre_list is not empty
-        with ChATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="recommendation_retrieval").time():
+        with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="recommendation_retrieval").time():
             recommendations_string = ""
             if len(genre_list) > 0:
                 recommendations_string = get_recommendations(genre_list)
 
         # 3. Query the model
-        with ChATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="model_generation").time():
+        with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="model_generation").time():
             for result in query_model(messages, use_local_model, recommendations_string):
                 yield result
 
@@ -127,7 +128,7 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
 
     # Log the model usage output
     # TODO: Record the specific model ID once the backend is refactored
-    model = "local" if use_local_model else "external"
+    model = "Qwen/Qwen3-0.6B" if use_local_model else "openai/gpt-oss-20b"
     # TODO: Use real Inference Manager / session ID
     observe_user_message(user_id="0", user_message=messages[-1]['content'], token_count=input_token_count, model=model)
     observe_bot_message(user_id="0", bot_message=response, token_count=output_token_count, model=model)
