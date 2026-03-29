@@ -126,6 +126,7 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
             output_token_count = usage.completion_tokens
 
     # Log the model usage output
+    # TODO: Record the specific model ID once the backend is refactored
     model = "local" if use_local_model else "external"
     # TODO: Use real Inference Manager / session ID
     observe_user_message(user_id="0", user_message=messages[-1]['content'], token_count=input_token_count, model=model)
