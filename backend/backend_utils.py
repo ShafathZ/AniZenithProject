@@ -1,26 +1,15 @@
 from typing import List, Dict
 from huggingface_hub import InferenceClient
-from transformers import pipeline
+from transformers import pipeline, GenerationConfig
 from backend.retrieval_utils import get_recommendations
-from backend.constants import *
-from dotenv import load_dotenv
-import os
-
-# Load all Environment Variables
-load_dotenv()
-HF_TOKEN = os.getenv('HF_TOKEN')
+from backend.configs import model_config, backend_app_config
 
 # Load the List of All Supported Genres in Memory, at App Startup
 GENRE_LIST = open("backend/genrelist.txt", "r").read().splitlines()
 
 
 # Load the Local Pipeline Model at App Startup
-PIPELINE_LOCAL_MODEL = pipeline(task='text-generation',
-                                model='Qwen/Qwen3-0.6B',
-                                max_new_tokens=MAX_NEW_TOKENS,
-                                temperature=TEMPERATURE,
-                                do_sample=False,
-                                top_p=TOP_P)
+PIPELINE_LOCAL_MODEL = pipeline(task='text-generation', model=model_config.local_model_id)
 
 
 # TODO: Make this Method Async Later
@@ -55,7 +44,7 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
 
     # Determine System Prompt
     # Start with the Fixed System Prompt
-    system_prompt = SYSTEM_PROMPT
+    system_prompt = model_config.system_prompt
 
     # If the recommendations_string is not None
     if recommendations_string:
@@ -72,9 +61,15 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
     # Determine which model to use (local or external)
     if use_local_model:
         # Local Model
-        # Uses pipeline from transformers library
+        # Uses pipeline from transformers library w/ Generation Config (since old method is now deprecated)
         # Get the response from the local model
-        response = PIPELINE_LOCAL_MODEL(input_messages)
+        generation_config = GenerationConfig(
+            max_new_tokens=model_config.max_new_tokens,
+            temperature=model_config.temperature,
+            top_p=model_config.top_p,
+            do_sample=True
+        )
+        response = PIPELINE_LOCAL_MODEL(input_messages, generation_config=generation_config)
         
         # Parse the output and yield it
         yield response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
@@ -83,17 +78,17 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
     else:
         # Non-local Model -- Use InferenceClient
         client = InferenceClient(
-            token=HF_TOKEN,
-            model="openai/gpt-oss-20b",
+            token=backend_app_config.HF_TOKEN,
+            model=model_config.external_model_id,
         )
 
         response = ""
         for chunk in client.chat_completion(
                 messages=input_messages,
-                max_tokens=MAX_NEW_TOKENS,
+                max_tokens=model_config.max_new_tokens,
                 stream=True,
-                temperature=TEMPERATURE,
-                top_p=TOP_P,
+                temperature=model_config.temperature,
+                top_p=model_config.top_p,
         ):
             if chunk.choices and chunk.choices[0].delta.content:
                 token = chunk.choices[0].delta.content

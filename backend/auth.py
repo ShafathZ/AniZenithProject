@@ -1,4 +1,3 @@
-import os
 import secrets
 from functools import wraps
 import httpx
@@ -6,11 +5,13 @@ from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth
 
+from backend.configs import backend_app_config
+
 # Central configuration for all OAuth authentication
 PROVIDER_CONFIG = {
     "mal": {
-        "client_id": os.getenv("MAL_CLIENT_ID"),
-        "client_secret": os.getenv("MAL_CLIENT_SECRET"),
+        "client_id": backend_app_config.MAL_CLIENT_ID,
+        "client_secret": backend_app_config.MAL_CLIENT_SECRET,
         "access_token_url": "https://myanimelist.net/v1/oauth2/token",
         "authorize_url": "https://myanimelist.net/v1/oauth2/authorize",
         "client_kwargs": {"code_challenge_method": "plain"},

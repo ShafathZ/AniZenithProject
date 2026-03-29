@@ -1,5 +1,3 @@
-import os
-
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -11,9 +9,8 @@ from backend.auth import router as auth_router
 
 from starlette.middleware.sessions import SessionMiddleware
 import logging
-from dotenv import load_dotenv
 
-load_dotenv("backend/.env")
+from backend.configs import backend_container_config, backend_app_config
 
 # Configure logging at Startup
 logging.basicConfig(level = logging.INFO)
@@ -24,7 +21,7 @@ logger.setLevel(logging.INFO)
 
 # Create FastAPI app
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("BACKEND_SECRET"), session_cookie="session", max_age=3600, same_site="lax")
+app.add_middleware(SessionMiddleware, secret_key=backend_app_config.BACKEND_SECRET, session_cookie="session", max_age=3600, same_site="lax")
 #app.include_router(auth_router)
 
 # ┌───────────────────────────────────────────────┐
@@ -106,9 +103,8 @@ async def validation_exception_handler(request: Request, err: RequestValidationE
 
 if __name__ == "__main__":
     import uvicorn
-    # uvicorn.run("backend.app:app", host="localhost", port=BACKEND_HTTP_PORT, reload=False, log_level="info")
     uvicorn.run("backend.app:app", 
-                host=os.getenv("BACKEND_HOSTNAME"), 
-                port=int(os.getenv("BACKEND_PORT")), 
+                host=backend_container_config.hostname,
+                port=backend_container_config.port,
                 reload=False, 
-                log_level=os.getenv("BACKEND_LOGLEVEL"))
+                log_level=backend_app_config.log_level)
