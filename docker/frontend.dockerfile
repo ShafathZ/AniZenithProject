@@ -12,7 +12,7 @@ WORKDIR /anizenith_frontend
 
 
 # Install libraries using requirements.txt
-RUN pip install -r frontend/requirements.txt
+RUN pip install -r frontend/requirements.txt --no-cache-dir
 
 # Expose ports
 # Frontend app port
@@ -21,4 +21,4 @@ EXPOSE 7002
 # TODO: Add Prometheus Port for frontend app
 
 # Start the frontend app once the container is running
-CMD ["python", "frontend/app.py"]
+CMD ["python", "-m" ,"frontend.app"]

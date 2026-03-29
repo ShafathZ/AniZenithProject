@@ -1,5 +1,22 @@
 services:
 
+  # Spin up the backend
+  backend:
+    image: surigo/anizenith_backend:latest
+    container_name: anizenith_backend
+    ports:
+      - '22021:9002'
+    networks:
+      - anizenith_net
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9002/health']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 90s
+    restart: unless-stopped
+
+
   # Spin up the frontend
   frontend:
     image: surigo/anizenith_frontend:latest
@@ -14,21 +31,6 @@ services:
     restart: unless-stopped
 
 
-  # Spin up the backend
-  backend:
-    image: surigo/anizenith_backend:latest
-    container_name: anizenith_backend
-    ports:
-      - '22021:9002'
-    networks:
-      - anizenith_net
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9002/health']
-      interval: 10s
-      timeout: 3s
-      retries: 10
-      start_period: 30s
-    restart: unless-stopped
 
 
 

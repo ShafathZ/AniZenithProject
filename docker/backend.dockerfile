@@ -1,6 +1,9 @@
 # Start from the base python:3.12.3-slim which also has debian:12-slim as base layer
 FROM python:3.12.3-slim
 
+# TODO: Add comment here
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Copy backend files and folders
 # This creates a new folder called "/anizenith_backend/backend" and pastes contents of "backend" folder into it
 COPY backend/ /anizenith_backend/backend
@@ -15,13 +18,15 @@ COPY data/ /anizenith_backend/data
 WORKDIR /anizenith_backend
 
 # Install libraries using requirements.txt
-RUN pip install -r backend/requirements.txt
+RUN pip install --upgrade pip
+RUN pip install -r backend/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir
 
 # Expose ports
 # Backend app port
 EXPOSE 9002
 
 # TODO: Add Prometheus Port for Backend app
+ENV PYTHONPATH=/anizenith_backend
 
 # Start the Backend app once the container is running
-CMD ["python", "backend/app.py"]
+CMD ["python", "-m" ,"backend.app"]
