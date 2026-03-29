@@ -9,6 +9,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
+from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
+
 FRONTEND_HTTP_PORT = 7002
 #BACKEND_HOST="paffenroth-23.dyn.wpi.edu"
 BACKEND_HOST="localhost"
@@ -33,6 +35,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(PrometheusMiddleware, prefix="frontend")
+app.include_router(prometheus_router)
 
 # Set up accessible directories
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
