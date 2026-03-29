@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
 from backend.AniZenithExchange import AniZenithRequest, AniZenithResponse
-from prometheus.prometheusclient import PrometheusMiddleware, prometheus_router
+from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
 from backend.validation_utils import validate_anizenith_request
 from backend.backend_utils import chat_with_llm
 

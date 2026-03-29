@@ -3,7 +3,7 @@ from huggingface_hub import InferenceClient
 from transformers import pipeline
 from backend.retrieval_utils import get_recommendations
 from backend.constants import *
-from backend.prometheusbackend import *
+from backend.prometheus_utils import *
 from dotenv import load_dotenv
 import os
 
@@ -27,20 +27,20 @@ PIPELINE_LOCAL_MODEL = pipeline(task='text-generation',
 # TODO: Make this Method Async Later
 def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
     model = "local" if use_local_model else "external"
-    with PIPELINE_LATENCY.labels(model=model, stage="full_pipeline").time():
+    with ChATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="full_pipeline").time():
         # Retrieve genres from the user message using naive approach
         # The Last Message should be user's message
-        with PIPELINE_LATENCY.labels(model=model, stage="genre_detection").time():
+        with ChATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="genre_detection").time():
             genre_list = detect_genres(messages[-1]['content'])
 
         # 2. Retrieve relevant results from DB if the genre_list is not empty
-        with PIPELINE_LATENCY.labels(model=model, stage="recommendation_retrieval").time():
+        with ChATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="recommendation_retrieval").time():
             recommendations_string = ""
             if len(genre_list) > 0:
                 recommendations_string = get_recommendations(genre_list)
 
         # 3. Query the model
-        with PIPELINE_LATENCY.labels(model=model, stage="model_generation").time():
+        with ChATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="model_generation").time():
             for result in query_model(messages, use_local_model, recommendations_string):
                 yield result
 

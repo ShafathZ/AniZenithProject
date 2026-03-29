@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from prometheus.prometheusclient import PrometheusMiddleware, prometheus_router
+from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
 
 FRONTEND_HTTP_PORT = 7002
 #BACKEND_HOST="paffenroth-23.dyn.wpi.edu"
