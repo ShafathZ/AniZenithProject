@@ -79,25 +79,26 @@ services:
   #     - cookiemancer_net
   #   restart: unless-stopped
 
-  # TODO: Add this later
-  # prometheus:
-  #   image: prom/prometheus:latest
-  #   container_name: prometheus
-  #   command:
-  #     - --config.file=/etc/prometheus/prometheus.yml
-  #   volumes:
-  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-  #     - prometheus_data:/prometheus
-  #   ports:
-  #     - '22004:9090'
-  #   depends_on:
-  #     - frontend
-  #     - backend
-  #     - cadvisor
-  #     - node-exporter
-  #   networks:
-  #     - cookiemancer_net
-  #   restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      # Map a volume from the local (to where compose.yml is run) prometheus.yml file to an internal container volume
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - '22023:9090'
+    depends_on:
+      - frontend
+      - backend
+      # TODO: Uncomment these once services are added
+#      - cadvisor
+#      - node-exporter
+    networks:
+      - anizenith_net
+    restart: unless-stopped
 
   # TODO: Add this later
   # grafana:
@@ -113,13 +114,13 @@ services:
   #     - cookiemancer_net
   #   restart: unless-stopped
 
-
 networks:
   anizenith_net:
     driver: bridge
 
-# volumes:
-#   prometheus_data:
-#     driver: local
+# Maps prometheus data to a volume outside the container (in case container is destroyed)
+volumes:
+   prometheus_data:
+     driver: local
 #   grafana_data:
 #     driver: local
