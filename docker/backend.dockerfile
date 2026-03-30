@@ -12,7 +12,9 @@ COPY backend/ /anizenith_backend/backend
 # This creates a new folder called "/anizenith_backend/data" and pastes contents of "data" folder into it
 COPY data/ /anizenith_backend/data
 
-# TODO: Add COPY for Prometheus Folder
+# Copy prometheus folder
+# This creates a new folder called "/anizenith_backend/prometheus" and pastes contents of "prometheus" folder into it
+COPY prometheus/ /anizenith_backend/prometheus
 
 # Set the working directory to /anizenith_backend folder
 WORKDIR /anizenith_backend
