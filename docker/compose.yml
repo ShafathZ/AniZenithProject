@@ -1,6 +1,8 @@
+# TODO: Add inline comments here
+
 services:
 
-  # Spin up the backend
+  # Spin up the backend service
   backend:
     image: surigo/anizenith_backend:latest
     container_name: anizenith_backend
@@ -17,7 +19,7 @@ services:
     restart: unless-stopped
 
 
-  # Spin up the frontend
+  # Spin up the frontend service
   frontend:
     image: surigo/anizenith_frontend:latest
     container_name: anizenith_frontend
@@ -30,54 +32,35 @@ services:
       - anizenith_net
     restart: unless-stopped
 
+  # TODO: Test This
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    networks:
+      - anizenith_net
+    restart: unless-stopped
 
-
-
-
-  # TODO: Add this later
-  # ngrok:
-  #   image: ngrok/ngrok:latest
-  #   container_name: ngrok
-  #   depends_on:
-  #     - frontend
-  #   command: http frontend:7860
-  #   environment:
-  #     NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
-  #   ports:
-  #   - "22003:4040"
-  #   networks:
-  #     - cookiemancer_net
-  #   restart: unless-stopped
-
-  # TODO: Add this later
-  # cadvisor:
-  #   image: gcr.io/cadvisor/cadvisor:latest
-  #   container_name: cadvisor
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:rw
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker:/var/lib/docker:ro
-  #     - /dev/disk:/dev/disk:ro
-  #   networks:
-  #     - cookiemancer_net
-  #   restart: unless-stopped
-
-  # TODO: Add this later
-  # node-exporter:
-  #   image: quay.io/prometheus/node-exporter:latest
-  #   container_name: node_exporter
-  #   command:
-  #     - --path.rootfs=/host
-  #     - --path.procfs=/host/proc
-  #     - --path.sysfs=/host/sys
-  #     - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
-  #   volumes:
-  #     - /:/host:ro
-  #   pid: host
-  #   networks:
-  #     - cookiemancer_net
-  #   restart: unless-stopped
+  # TODO: Test this
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - --path.rootfs=/host
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+    volumes:
+      - /:/host:ro
+    pid: host
+    networks:
+      - anizenith_net
+    restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:latest
@@ -93,12 +76,28 @@ services:
     depends_on:
       - frontend
       - backend
-      # TODO: Uncomment these once services are added
-#      - cadvisor
-#      - node-exporter
+      - cadvisor
+      - node-exporter
     networks:
       - anizenith_net
     restart: unless-stopped
+
+  # TODO: Test this
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    depends_on:
+      - frontend
+    command: http frontend:7002
+    # environment:
+    #   NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    ports:
+    - "22022:4040"
+    networks:
+      - anizenith_net
+    restart: unless-stopped
+    env_file:
+      - ngrok.env
 
   # TODO: Add this later
   # grafana:

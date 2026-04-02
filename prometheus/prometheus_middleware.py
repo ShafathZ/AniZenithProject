@@ -14,10 +14,6 @@ async def metrics():
         media_type=CONTENT_TYPE_LATEST
     )
 
-# ----- Prometheus Client Server -----
-# TODO: Configure this externally
-prometheus_client.start_http_server(9000)
-
 # ----- Prometheus HTTP Request Middleware -----
 class PrometheusMiddleware(BaseHTTPMiddleware):
     """

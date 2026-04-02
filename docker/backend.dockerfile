@@ -27,7 +27,7 @@ RUN pip install -r backend/requirements.txt --extra-index-url https://download.p
 # Backend app port
 EXPOSE 9002
 
-# TODO: Add Prometheus Port for Backend app
+# Add Environment Variables
 ENV PYTHONPATH=/anizenith_backend
 
 # Start the Backend app once the container is running

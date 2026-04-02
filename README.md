@@ -32,7 +32,22 @@ To add any new dependencies (libraries):
 uv add <library_name>
 ```
 
-## SSH Commands to SSH into VMs for Case Study 2
+## Case Study 3
+### Login to VM
+```bash
+ssh -i ssh_keys/group02_key -p 22000 group02@paffenroth-23.dyn.wpi.edu
+```
+
+### Useful Links
+1. Frontend (ngrok): https://misty-subpalmate-liza.ngrok-free.dev/
+2. Prometheus: 
+3. Grafana (ngrok):
+
+
+<details>
+  <summary>Click to see Case Study 2 related info</summary>
+
+## Case Study 2
 
 ### Login to Frontend VM
 ```bash
@@ -118,3 +133,5 @@ curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
 
 ## Link to access Frontend deployed on VM
 `http://paffenroth-23.dyn.wpi.edu:7002/`
+
+</details>
