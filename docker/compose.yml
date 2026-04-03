@@ -1,4 +1,3 @@
-# Define all services of the project
 services:
 
   # "backend" service
@@ -9,7 +8,13 @@ services:
       - '22021:9002'
     networks:
       - anizenith_net
-
+    env_file:
+      # Tries the deployment location (same folder as compose.yml)
+      - path: backend.env
+        required: false
+      # Tries the local location (relative to compose.yml)
+      - path: ../backend/backend.env
+        required: false
     # Calls the health check endpoint using defined configs before declaring the service as "Healthy"
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9002/health']
@@ -18,7 +23,6 @@ services:
       retries: 3
       start_period: 90s
     restart: unless-stopped
-
 
   # "frontend" service
   frontend:
@@ -34,12 +38,19 @@ services:
     networks:
       - anizenith_net
     restart: unless-stopped
+    env_file:
+      # Tries the deployment location (same folder as compose.yml)
+      - path: frontend.env
+        required: false
+      # Tries the local location (relative to compose.yml)
+      - path: ../frontend/frontend.env
+        required: false
 
   # Spin up "cadvisor" as a service
   # This is responsible for collecting metrics on a container level (CPU / Memory / Network I/O)
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
+    container_name: anizenith_cadvisor
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -54,7 +65,7 @@ services:
   # This is resposible for collecting metrics on a node / hardware device level (Uptime / CPU / Memory / Network I/O)
   node-exporter:
     image: quay.io/prometheus/node-exporter:latest
-    container_name: node_exporter
+    container_name: anizenith_node_exporter
     command:
       - --path.rootfs=/host
       - --path.procfs=/host/proc
@@ -71,7 +82,7 @@ services:
   # This will be scraping metrics from other services and hosting it in a DB
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: anizenith_prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
@@ -93,7 +104,7 @@ services:
   # This will be useful for creating secure tunnels to expose local development servers to the internet
   ngrok:
     image: ngrok/ngrok:latest
-    container_name: ngrok
+    container_name: anizenith_ngrok
 
     # For now we are tunning frontend
     # TODO: Hookup grafana as well (maybe using ngrok.yml)
@@ -112,7 +123,7 @@ services:
   # This will be used to Monitoring Dashboards using metrics data from Prometheus service
   grafana:
     image: grafana/grafana:latest
-    container_name: grafana
+    container_name: anizenith_grafana
     ports:
       - "22025:3000"
     volumes:

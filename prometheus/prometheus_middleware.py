@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Response, Request
-import prometheus_client
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, Summary
 from starlette.middleware.base import BaseHTTPMiddleware
 

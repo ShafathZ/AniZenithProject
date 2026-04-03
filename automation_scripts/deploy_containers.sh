@@ -38,7 +38,7 @@ echo -e '\n=== Setup PROJECT ROOT FOLDER ==='
 
 # SCP files to the VM
 echo -e "\n=== Copying Deployment Files to VM ==="
-"${SCP_BASE[@]}" ./docker/compose.yml ./docker/prometheus.yml ./docker/ngrok.env \
+"${SCP_BASE[@]}" ./docker/compose.yml ./docker/prometheus.yml ./docker/ngrok.env ./backend/backend.env ./frontend/frontend.env \
   "$SSH_USER@$SSH_HOST:~/$PROJECT_ROOT_FOLDER/"
 
 
@@ -47,8 +47,8 @@ echo -e "\n=== Copying Deployment Files to VM ==="
  echo -e '\n=== Pulling Images and Starting up containers ==='
  cd $PROJECT_ROOT_FOLDER
 
- # TODO: Add docker compose pull, once the env variable related issue is fixed with the images
-
+ # Perform docker compose pull, and bring down any existing containers and then spin up all containers again
+ docker compose pull
  docker compose down
  docker compose up -d
 "

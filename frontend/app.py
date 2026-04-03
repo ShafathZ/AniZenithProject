@@ -10,9 +10,6 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
-from dotenv import load_dotenv
-
-load_dotenv("frontend/.env")
 
 # Configure logging at Startup
 logging.basicConfig(level = logging.INFO)
@@ -134,5 +131,8 @@ async def proxy(path: str, request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    # uvicorn.run("frontend.frontend_app:app", host="localhost", port=FRONTEND_HTTP_PORT, reload=False, log_level="info")
-    uvicorn.run("frontend.app:app", host=os.getenv("FRONTEND_HOSTNAME"), port=int(os.getenv("FRONTEND_PORT")), reload=False, log_level=os.getenv("FRONTEND_LOGLEVEL"))
+    uvicorn.run("frontend.app:app", 
+                host=os.getenv("FRONTEND_HOSTNAME"), 
+                port=int(os.getenv("FRONTEND_PORT")), 
+                reload=False, 
+                log_level=os.getenv("FRONTEND_LOGLEVEL"))
