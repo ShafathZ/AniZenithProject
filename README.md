@@ -40,8 +40,7 @@ ssh -i ssh_keys/group02_key -p 22000 group02@paffenroth-23.dyn.wpi.edu
 
 ### Useful Links
 1. Frontend (ngrok): https://misty-subpalmate-liza.ngrok-free.dev/
-2. Prometheus: 
-3. Grafana (ngrok):
+2. Grafana (ngrok): https://misty-subpalmate-liza.ngrok-free.dev/grafana
 
 
 <details>
