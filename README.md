@@ -42,67 +42,11 @@ ssh -i ssh_keys/group02_key -p 22000 group02@paffenroth-23.dyn.wpi.edu
 1. Frontend (ngrok): https://misty-subpalmate-liza.ngrok-free.dev/
 2. Grafana (ngrok): https://misty-subpalmate-liza.ngrok-free.dev/grafana
 
-
-<details>
-  <summary>Click to see Case Study 2 related info</summary>
-
-## Case Study 2
-
-### Login to Frontend VM
-```bash
-ssh -i ssh_keys/group_key -p 22000 group02@paffenroth-23.dyn.wpi.edu
-```
-
-
-### Login to Backend VM
-Login Using Common Key (Shouldn't work now):
-```bash
-ssh -i ssh_keys/group_key -p 22002 group02@paffenroth-23.dyn.wpi.edu
-```
-
-Login using our Group Key (Please email `sgoyal@wpi.edu` to get access to the keys):
-```bash
-ssh -i ssh_keys/group02_key -p 22002 group02@paffenroth-23.dyn.wpi.edu
-```
-
-
 ## cURL commands to Test Backend Chat API
-
-### Locally Hosted Backend
-For Using Online Model:
-```bash
-curl --location 'http://localhost:9002/anizenith/chat' \
---header 'Content-Type: application/json' \
---data '{
-    "messages": [
-        {
-            "role": "user",
-            "content": "Give me action based anime"
-        }
-    ],
-    "use_local": false
-}'
-```
-
-For Using Local Model:
-```bash
-curl --location 'http://localhost:9002/anizenith/chat' \
---header 'Content-Type: application/json' \
---data '{
-    "messages": [
-        {
-            "role": "user",
-            "content": "Give me action based anime"
-        }
-    ],
-    "use_local": true
-}'
-```
-
 ### Remote Hosted Backend (on VMs)
 For Using Online Model:
 ```bash
-curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
+curl --location 'http://paffenroth-23.dyn.wpi.edu:22021/anizenith/chat' \
 --header 'Content-Type: application/json' \
 --data '{
     "messages": [
@@ -117,7 +61,7 @@ curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
 
 For Using Local Model:
 ```bash
-curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
+curl --location 'http://paffenroth-23.dyn.wpi.edu:22021/anizenith/chat' \
 --header 'Content-Type: application/json' \
 --data '{
     "messages": [
@@ -129,8 +73,3 @@ curl --location 'http://paffenroth-23.dyn.wpi.edu:9002/anizenith/chat' \
     "use_local": true
 }'
 ```
-
-## Link to access Frontend deployed on VM
-`http://paffenroth-23.dyn.wpi.edu:7002/`
-
-</details>
