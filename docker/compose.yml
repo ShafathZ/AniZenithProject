@@ -88,7 +88,7 @@ services:
     volumes:
       # Map a volume from the local (to where compose.yml is run) prometheus.yml file to an internal container volume
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus
+      - anizenith_prometheus_data:/prometheus
     ports:
       - '22023:9090'
     depends_on:
@@ -110,7 +110,11 @@ services:
     # TODO: Hookup grafana as well (maybe using ngrok.yml)
     depends_on:
       - frontend
-    command: http frontend:7002
+      - grafana
+    # command: http frontend:7002
+    command: ["start", "--all", "--config", "/etc/ngrok.yml"]
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml:ro
     ports:
       - "22022:4040"
     networks:
@@ -125,9 +129,13 @@ services:
     image: grafana/grafana:latest
     container_name: anizenith_grafana
     ports:
-      - "22025:3000"
+      - "22024:3000"
     volumes:
-      - grafana_data:/var/lib/grafana
+      - anizenith_grafana_data:/var/lib/grafana
+    environment:
+      # Tell Grafana its public facing URL
+      - GF_SERVER_ROOT_URL=https://misty-subpalmate-liza.ngrok-free.dev/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     depends_on:
       - prometheus
     networks:
@@ -141,7 +149,10 @@ networks:
 
 # Maps prometheus and grafana data to a volume outside the container (in case container is destroyed)
 volumes:
-   prometheus_data:
-     driver: local
-   grafana_data:
-     driver: local
+  # Used to persist Prometheus time-series metrics across container restarts
+  anizenith_prometheus_data:
+    driver: local # Use the Docker's built-in volume driver
+
+  # Used to persist Grafana Dashboards and user data across container restarts
+  anizenith_grafana_data:
+    driver: local # Use the Docker's built-in volume driver
