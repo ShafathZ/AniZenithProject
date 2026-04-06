@@ -1,7 +1,7 @@
 # Start from the base python:3.12.3-slim which also has debian:12-slim as base layer
 FROM python:3.12.3-slim
 
-# TODO: Add comment here
+# Install curl for container health checks and service diagnostics
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copy backend files and folders
