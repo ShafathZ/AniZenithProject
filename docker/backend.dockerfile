@@ -20,6 +20,8 @@ COPY prometheus/ /anizenith_backend/prometheus
 WORKDIR /anizenith_backend
 
 # Install libraries using requirements.txt
+# We need --extra-index-url to tell pip to install the cpu variant of the torch library, as our hardward only has CPU
+# --extra-index-url is required as the cpu variant of the torch library is not on the default PyPi artifactory
 RUN pip install --upgrade pip
 RUN pip install -r backend/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir
 

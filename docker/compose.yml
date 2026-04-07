@@ -46,17 +46,35 @@ services:
       - path: ../frontend/frontend.env
         required: false
 
-  # Spin up "cadvisor" as a service
+  # Spin up "cadvisor" (Container Advisor) as a service
   # This is responsible for collecting metrics on a container level (CPU / Memory / Network I/O)
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: anizenith_cadvisor
     volumes:
+      # Maps host machine's root file system (/) to rootfs inside the container
+      # Allows cadvisor to inspect overall filesystem usage and the configuration of the host machine
       - /:/rootfs:ro
+
+      # Maps host's run dir to the container's run dir in read-write (rw) mode.
+      # Allows cadvisor access to the Docker socket (located at /var/run/docker.sock), which allows
+      # communication with the Docker daemon to get a list of running containers (and their metadata).
       - /var/run:/var/run:rw
+
+      # Maps host's sys dir in read-only mode.
+      # Allows cadvisor access to Linux control groups (cgroups), which contain resource usage metrics (CPU,
+      # memory, etc.) for each container process
       - /sys:/sys:ro
+
+      # Maps Docker's main storage dir as read-only
+      # Allows cadvisor to gather info about docker images, container filesystems, overall disk usage by Docker.
       - /var/lib/docker:/var/lib/docker:ro
+
+      # Maps host's disk device as read-only
+      # Allows cadvisor access to block device info to collect disk I/O usage stats per container.
       - /dev/disk:/dev/disk:ro
+
+      # TODO: Figure out why cadvisor is exporting metrics for containers owned by other groups.
     networks:
       - anizenith_net
     restart: unless-stopped
@@ -66,12 +84,27 @@ services:
   node-exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: anizenith_node_exporter
+
+    # Define command line args for spinning up node-exporter service
     command:
+
+      # Set root filesystem path to be /host dir (inside the container)
+      # Matches the volume mapping defined below for /host dir (within the container)
       - --path.rootfs=/host
+
+      # Point to the host's proc dir
+      # proc dir is a virtual filesystem which contains info about running processes, memory usage, sys config, etc.
       - --path.procfs=/host/proc
+
+      # Point to the host's sys dir
+      # sys dir is a virtual filesystem that allows interacting with Linux kernel to get hardware device info
       - --path.sysfs=/host/sys
+
+      # Using a regex to tell filesystem metric collector to ignore specific virtual / duplicate mount points
+      # Prevents node exporter from generating irrelevant / duplicate disk space metrics
       - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
     volumes:
+      # Map host's root dir withe the /host dir inside the container in read-only mode (for reading metrics)
       - /:/host:ro
     pid: host
     networks:
