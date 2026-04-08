@@ -12,9 +12,6 @@ from backend.backend_utils import chat_with_llm
 from starlette.middleware.sessions import SessionMiddleware
 import logging
 
-# TODO: Move this to centralized place
-BACKEND_HTTP_PORT = 9002
-
 # Configure logging at Startup
 logging.basicConfig(level = logging.INFO)
 
@@ -32,7 +29,6 @@ app.include_router(prometheus_router)
 # ┌───────────────────────────────────────────────┐
 # │              BACKEND API ENDPOINTS            │
 # └───────────────────────────────────────────────┘
-
 # Chat message handling Endpoint
 @app.post("/anizenith/chat", response_model=AniZenithResponse)
 async def handle_chat_request(request: AniZenithRequest):
@@ -63,6 +59,12 @@ async def handle_chat_request(request: AniZenithRequest):
 
     # Construct an AniZenithResponse and return it
     return AniZenithResponse(messages=response_messages)
+
+
+# Health check endpoint
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
 
 # ┌───────────────────────────────────────────────┐
 # │                EXCEPTION HANDLERS             │
@@ -103,4 +105,8 @@ async def validation_exception_handler(request: Request, err: RequestValidationE
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.app:app", host="localhost", port=BACKEND_HTTP_PORT, reload=False, log_level="info")
+    uvicorn.run("backend.app:app", 
+                host=os.getenv("BACKEND_HOSTNAME"), 
+                port=int(os.getenv("BACKEND_PORT")), 
+                reload=False, 
+                log_level=os.getenv("BACKEND_LOGLEVEL"))

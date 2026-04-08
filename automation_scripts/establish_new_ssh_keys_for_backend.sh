@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Define constants
 USER="group02"
-PORT="22002"
+PORT="22000"
 SERVER="paffenroth-23.dyn.wpi.edu"
 KEY_DIR="../ssh_keys"
 COMMON_KEY_PATH="../ssh_keys/group_key"

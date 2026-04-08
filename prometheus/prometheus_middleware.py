@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Response, Request
-import prometheus_client
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter, Summary
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -13,10 +12,6 @@ async def metrics():
         content=generate_latest(),
         media_type=CONTENT_TYPE_LATEST
     )
-
-# ----- Prometheus Client Server -----
-# TODO: Configure this externally
-prometheus_client.start_http_server(9000)
 
 # ----- Prometheus HTTP Request Middleware -----
 class PrometheusMiddleware(BaseHTTPMiddleware):
