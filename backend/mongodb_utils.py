@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from pydantic import BaseModel
 from typing import List, Dict
@@ -16,6 +15,10 @@ class AnimeDocument(BaseModel):
 # Class to model Anizenith MongoDB Client related utilities
 class AniZenithMongoClient:
     def __init__(self, conn_string):
+        # Validate connection string 
+        if not isinstance(conn_string, str) or not conn_string.strip():
+            raise ValueError("ATLAS_URI must be set to a non-empty MongoDB connection string")
+        
         self.embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
         self.db_client = MongoClient(conn_string)
         self.anime_collection = self.db_client["anizenith"]["anime"]
@@ -63,7 +66,15 @@ class AniZenithMongoClient:
 
 
     def perform_vector_search(self, user_query: str, limit: int = 5, num_candidates: int = 100) -> List[Dict]:
-         # Embed the search query
+        # Validate limit and num_candidates 
+        if limit <= 0:
+            raise ValueError("limit must be a positive integer")
+        if num_candidates <= 0:
+            raise ValueError("num_candidates must be a positive integer")
+        if num_candidates < limit:
+            raise ValueError("num_candidates should be atleast as much as limit")
+
+        # Embed the search query
         query_vector = self.embedding_model.encode(user_query).tolist()
         
         # Define the $vectorSearch aggregation pipeline

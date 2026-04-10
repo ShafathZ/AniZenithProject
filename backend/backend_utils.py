@@ -15,9 +15,8 @@ HF_TOKEN = os.getenv('HF_TOKEN')
 # Load the List of All Supported Genres in Memory, at App Startup
 GENRE_LIST = open("backend/genrelist.txt", "r").read().splitlines()
 
-# Initialize AniZenithMongoClient
-CONN_STRING = os.getenv("ATLAS_URI")
-DB_CLIENT = AniZenithMongoClient(CONN_STRING)
+# Lazy Initialization for AniZenithMongoClient
+_DB_CLIENT = None
 
 
 # Load the Local Pipeline Model at App Startup
@@ -27,6 +26,17 @@ PIPELINE_LOCAL_MODEL = pipeline(task='text-generation',
                                 temperature=TEMPERATURE,
                                 do_sample=False,
                                 top_p=TOP_P)
+
+
+def get_db_client():
+    """
+    Lazy Init Method for MongoDB Client.
+    """
+    global _DB_CLIENT
+    if _DB_CLIENT is None:
+        conn_string = os.getenv("ATLAS_URI")
+        _DB_CLIENT = AniZenithMongoClient(conn_string)
+    return _DB_CLIENT
 
 
 # TODO: Make this Method Async Later
@@ -42,7 +52,7 @@ def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
         # Retrieve relevant results from DB using vector search
         with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="db_retrieval").time():
             recommendations_string = ""
-            recommendations = DB_CLIENT.perform_vector_search(user_message)
+            recommendations = get_db_client().perform_vector_search(user_message)
             recommendations_string = json.dumps(recommendations, indent = 4)
 
         # Query the model

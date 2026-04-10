@@ -12,19 +12,6 @@ TEST_DB_CLIENT = AniZenithMongoClient(CONN_STRING)
 # │              VECTOR SEARCH TESTS              │
 # └───────────────────────────────────────────────┘
 def test_perform_vector_search_basic_retrieval():
-
-    # Test User Queries
-    test_user_query_1 = "Which anime has the character Saitama?"
-
-    # Test Query 1
-    results_1 = TEST_DB_CLIENT.perform_vector_search(test_user_query_1)
-
-    # Assert on the results
-    assert isinstance(results_1, list)
-    assert len(results_1) == 5
-
-
-def test_perform_vector_search_basic_retrieval():
     """Test that a basic query returns a list with the default limit (5)."""
     results = TEST_DB_CLIENT.perform_vector_search("Which anime has the character Saitama?")
     
