@@ -1,5 +1,5 @@
 import { setLocalModelStatus, messages, addMessage, deleteMessage, editMessage, sendMessagesToBackend } from "./chat_utils.js"
-import { renderMessages } from "./chat_ui.js"
+import { renderMessages, createMessageElement, chatBox } from "./chat_ui.js"
 import { postErrorMessage } from "./error.js"
 
 export function updateButtons() {
@@ -178,11 +178,17 @@ async function sendMessage() {
     input.value = "";
     input.focus();
 
-    addMessage(new_message);
+    const last_idx = addMessage(new_message);
     renderMessages();
 
+    // Add temporary thinking response placeholder
+    const thinking = { role: "assistant", content: "__thinking__" };
+    const thinkingMessageElement = createMessageElement(thinking, last_idx+1);
+    chatBox.appendChild(thinkingMessageElement);
+
     // Get assistant response and add it
-    await sendMessagesToBackend();
+    const response = await sendMessagesToBackend();
+    addMessage(response);
     renderMessages();
 }
 

@@ -1,9 +1,10 @@
 import { messages } from "./chat_utils.js"
 import { updateButtons } from "./buttons.js"
 
+export const chatBox = document.getElementById("chatBox");
+
 // Render function that uses messages list internally to render page messages
 export function renderMessages() {
-    const chatBox = document.getElementById("chatBox");
     chatBox.innerHTML = "";
 
     messages.forEach((msg, index) => {
@@ -15,7 +16,7 @@ export function renderMessages() {
     updateButtons();
 }
 
-function createMessageElement({ role, content }, index) {
+export function createMessageElement({ role, content }, index) {
     const messageUI = document.createElement("div");
     messageUI.classList.add("message", role);
     messageUI.dataset.index = index;
@@ -34,7 +35,16 @@ function createMessageElement({ role, content }, index) {
     textDiv.classList.add("text");
 
     if (role === "assistant") {
-        textDiv.innerHTML = marked.parse(content);
+        // Add UI tag for thinking
+        if (content === "__thinking__") {
+            textDiv.innerHTML = `
+                <span class="thinking-text">
+                    Thinking<span class="dots"></span>
+                </span>
+            `;
+        } else {
+            textDiv.innerHTML = marked.parse(content);
+        }
         row.appendChild(avatar);
         row.appendChild(textDiv);
     } else {

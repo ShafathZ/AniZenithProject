@@ -30,11 +30,12 @@ export function editMessage(index, newContent) {
 }
 
 export async function sendMessagesToBackend() {
+    // Construct payload for frontend service
     const payload = {
         "messages": messages,
         "use_local": useLocalModel
     }
-    //console.log(payload);
+
     try {
         // If using local, detect and add additional timeout
         const timeout = payload.use_local ? 180.0 : 5.0;
@@ -46,10 +47,6 @@ export async function sendMessagesToBackend() {
             },
             body: JSON.stringify(payload)
         });
-        console.log("Response:");
-        console.log(response)
-        // Handle non-200 responses
-        // TODO: Make the response handling better for non-200 (e.g. 4XX different from 3XX or 5XX)
         if (!response.ok) {
             const err = new Error(response.statusText);
             err.response = response;
@@ -58,18 +55,13 @@ export async function sendMessagesToBackend() {
 
         const data = await response.json();
         const assistant_response = { role: "assistant", content: data.messages.at(-1).content };
-
-        addMessage(assistant_response);
         return assistant_response;
 
     } catch (error) {
         // Fetch throws error during connection failure / bad headers
         const response = error.response;
         const failed_response = { role: "assistant", content: "Error: Failed to connect to the backend client." };
-
-        addMessage(failed_response);
         postError(error.response);
-
         return failed_response;
     }
 }
