@@ -42,7 +42,7 @@ class AniZenithMongoClient:
         self.anime_collection.insert_one(anime_document_dict)
 
 
-    def execute_mongo_read_query(self, query, limit = None) -> List[Dict]:
+    def execute_read_query(self, query, limit = None) -> List[Dict]:
         try:
             if isinstance(query, dict):
                 # Execute a standard find operation (e.g., {"score": {"$gt": 8.0}})

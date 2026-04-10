@@ -109,7 +109,7 @@ def test_add_anime():
         
         # Verify it was inserted by fetching it back
         query = {"name": test_anime_name}
-        results = TEST_DB_CLIENT.execute_mongo_read_query(query)
+        results = TEST_DB_CLIENT.execute_read_query(query)
         
         # Assert the document exists
         assert len(results) >= 1
@@ -144,7 +144,7 @@ def test_execute_mongo_read_query_basic():
     query = {}
     test_limit = 3
     
-    results = TEST_DB_CLIENT.execute_mongo_read_query(query, limit=test_limit)
+    results = TEST_DB_CLIENT.execute_read_query(query, limit=test_limit)
     
     # Assert it returns a list of the exact limited size
     assert isinstance(results, list)
@@ -164,7 +164,7 @@ def test_execute_mongo_read_query_invalid_input():
     # which is caught in the try-except block, returning an empty list [].
     invalid_query = ["this", "is", "a", "list", "not", "a", "dict"]
     
-    results = TEST_DB_CLIENT.execute_mongo_read_query(invalid_query)
+    results = TEST_DB_CLIENT.execute_read_query(invalid_query)
     
     assert isinstance(results, list)
     assert len(results) == 0
