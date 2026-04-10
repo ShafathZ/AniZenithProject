@@ -26,7 +26,7 @@ class AniZenithMongoClient:
         text_metadata = f"Synopsis: {anime_document.synopsis}\n\nGenres: {', '.join(anime_document.genres)}\n\nName: {anime_document.name}"
         
         # Create embedding for the text_metadata field
-        text_metadata_embedding = self.embedding_model.encode(text_metadata)
+        text_metadata_embedding = self.embedding_model.encode(text_metadata).tolist()
 
         # Create a new document to be inserted into MongoDB
         anime_document_dict = {
@@ -62,7 +62,7 @@ class AniZenithMongoClient:
             return []
 
 
-    def perform_vector_search(self, user_query: str, limit: int = 5, num_candidates: int = 100):
+    def perform_vector_search(self, user_query: str, limit: int = 5, num_candidates: int = 100) -> List[Dict]:
          # Embed the search query
         query_vector = self.embedding_model.encode(user_query).tolist()
         
@@ -94,6 +94,7 @@ class AniZenithMongoClient:
         ]
         
         # Execute the pipeline
-        results = self.anime_collection.aggregate(pipeline)
+        cursor = self.anime_collection.aggregate(pipeline)
         
-        return results
+        # Convert the cursor to a list of dicts
+        return list(cursor)
