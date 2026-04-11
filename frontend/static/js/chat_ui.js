@@ -1,19 +1,25 @@
 import { messages } from "./chat_utils.js"
 import { updateButtons } from "./buttons.js"
 
-export const chatBox = document.getElementById("chatBox");
+const chatBox = document.getElementById("chatBox");
 
 // Render function that uses messages list internally to render page messages
 export function renderMessages() {
     chatBox.innerHTML = "";
-
-    messages.forEach((msg, index) => {
-        const messageElement = createMessageElement(msg, index);
-        chatBox.appendChild(messageElement);
-    });
-
-    chatBox.scrollTop = chatBox.scrollHeight;
+    // Add all messages from message store
+    messages.forEach((msg, index) => {appendUIMessage(msg, index);});
     updateButtons();
+}
+
+export function appendUIMessage({ role, content }, index) {
+    // Construct the element
+    const messageElement = createMessageElement({ role, content }, index);
+
+    // Add it to UI box
+    chatBox.appendChild(messageElement);
+
+    // Scroll if needed
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 export function createMessageElement({ role, content }, index) {
@@ -75,4 +81,9 @@ export function createMessageElement({ role, content }, index) {
     messageUI.appendChild(actions);
 
     return messageUI;
+}
+
+export function addDefaultMessage() {
+    const defaultMessage = "Hi there! I am a friendly chatbot from Aniℤenith here to help find and recommend any anime you want! Just tell me some of your preferences, and I can help you accordingly!"
+    appendUIMessage({ role: "assistant", content: defaultMessage }, messages.length);
 }

@@ -15,9 +15,11 @@ export function postError(response) {
     let type;
     const status = response.status;
     if (status >= 400) {
-        type = "warning";
-    } else if (status >= 300) {
         type = "error";
+    } else if (status >= 300) {
+        type = "warning";
+    } else if (status >= 200) {
+        type = "success";
     } else {
         type = "info";
     }
