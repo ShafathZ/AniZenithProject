@@ -12,6 +12,9 @@ from backend.backend_utils import chat_with_llm
 from starlette.middleware.sessions import SessionMiddleware
 import logging
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Configure logging at Startup
 logging.basicConfig(level = logging.INFO)
 
