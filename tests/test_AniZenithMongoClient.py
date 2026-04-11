@@ -6,9 +6,6 @@ import pytest
 
 load_dotenv()
 
-# CONN_STRING = os.getenv("ATLAS_URI")
-# TEST_DB_CLIENT = AniZenithMongoClient(CONN_STRING)
-
 @pytest.fixture(scope="module")
 def test_db_client():
     CONN_STRING = os.getenv("ATLAS_URI")
