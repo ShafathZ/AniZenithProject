@@ -4,12 +4,14 @@ import os
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 from pymongo.operations import SearchIndexModel
+from backend.mongo.utils import create_text_metadata_and_embedding
 
 
 # Load all Env variables
 load_dotenv()
 
 # Load Sentence Transformer Model
+# TODO: Move hardcoded configs to a central config object
 embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 # Load the Anime Dataset as a Pandas DataFrame
@@ -40,17 +42,20 @@ anime_df = anime_df.sort_values(by='Score', ascending=False).head(1000)
 # Convert the comma-separated Genres string into a Python list
 anime_df['Genres'] = anime_df['Genres'].apply(lambda x: [g.strip() for g in str(x).split(',')] if pd.notnull(x) else [])
 
-# TODO: Remove extra newlines within synopsis
+# TODO: Remove extra newlines within synopsis later
 
-# Create a new field called text_metadata
-anime_df['text_metadata'] = anime_df.apply(
-    lambda row: f"Synopsis: {row['Synopsis'].replace('\n', '')}\n\nGenres: {', '.join(row['Genres'])}\n\nName: {row['English name']}",
-    axis = 1
+# Create text_metadata and its embedding using the utility function
+print("Generating text metadata and embeddings... this might take a minute...")
+anime_df[['text_metadata', 'text_metadata_embedding']] = anime_df.apply(
+    lambda row: create_text_metadata_and_embedding(
+        embedding_model=embedding_model,
+        anime_name=row['English name'],
+        anime_genres=row['Genres'],
+        anime_synopsis=row['Synopsis']
+    ),
+    axis=1,
+    result_type='expand'
 )
-
-# Embed the text_metadata field
-print("Generating embeddings... this might take a minute...")
-anime_df['text_metadata_embedding'] = anime_df['text_metadata'].apply(lambda x: embedding_model.encode(x).tolist())
 
 # Keep only the columns we need and rename them
 anime_df = anime_df[['English name', 'Score', 'Synopsis', 'Genres', 'text_metadata', 'text_metadata_embedding']]
@@ -73,9 +78,11 @@ client = MongoClient(os.environ["ATLAS_URI"])
 print(f"Successfully connected to MongoDB Atlas")
 
 # Create / Access the "anizenith" DB
+# TODO: Move hardcoded configs to a central config object
 db = client["anizenith"]
 
 # Create / Access the "anime" collection
+# TODO: Move hardcoded configs to a central config object
 collection = db["anime"]
 
 # Clear existing data

@@ -6,17 +6,16 @@ from backend.prometheus_utils import *
 from dotenv import load_dotenv
 import os
 import json
-from backend.mongodb_utils import AniZenithMongoClient
+from backend.mongo.AniZenithMongoClient import AniZenithMongoClient
+from backend.mongo.AniZenithVectorSearchResult import AniZenithVectorSearchResult
 
 # Load all Environment Variables
 load_dotenv()
 HF_TOKEN = os.getenv('HF_TOKEN')
 
-# Load the List of All Supported Genres in Memory, at App Startup
-GENRE_LIST = open("backend/genrelist.txt", "r").read().splitlines()
-
-# Lazy Initialization for AniZenithMongoClient
-_DB_CLIENT = None
+# Init AniZenithMongoClient
+CONN_STRING = os.getenv("ATLAS_URI")
+DB_CLIENT = AniZenithMongoClient(CONN_STRING)
 
 
 # Load the Local Pipeline Model at App Startup
@@ -28,17 +27,6 @@ PIPELINE_LOCAL_MODEL = pipeline(task='text-generation',
                                 top_p=TOP_P)
 
 
-def get_db_client():
-    """
-    Lazy Init Method for MongoDB Client.
-    """
-    global _DB_CLIENT
-    if _DB_CLIENT is None:
-        conn_string = os.getenv("ATLAS_URI")
-        _DB_CLIENT = AniZenithMongoClient(conn_string)
-    return _DB_CLIENT
-
-
 # TODO: Make this Method Async Later
 def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
 
@@ -47,13 +35,21 @@ def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
     with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="full_pipeline").time():
 
         # Use the last message as the user message (it should always be a user message)
-        user_message = messages[-1]['content']
+        user_query = messages[-1]['content']
 
         # Retrieve relevant results from DB using vector search
         with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="db_retrieval").time():
-            recommendations_string = ""
-            recommendations = get_db_client().perform_vector_search(user_message)
-            recommendations_string = json.dumps(recommendations, indent = 4)
+
+            # Perform Vector Search using user query
+            # This method returns a List[AniZenithVectorSearchResult]
+            recommendations: List[AniZenithVectorSearchResult] = DB_CLIENT.perform_vector_search(user_query)
+            
+            # Convert the list of vector search objects into a list of dicts
+            # model_dump() is a special Pydantic method to generate a dict representation of any Pydantic object
+            recommendations_dict = [recommendation.model_dump() for recommendation in recommendations]
+            
+            # Serialize to a JSON string
+            recommendations_string = json.dumps(recommendations_dict, indent = 4)
 
         # Query the model
         with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="model_generation").time():

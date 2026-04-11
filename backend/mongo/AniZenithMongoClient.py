@@ -1,15 +1,9 @@
 from pymongo import MongoClient
 from sentence_transformers import SentenceTransformer
-from pydantic import BaseModel
 from typing import List, Dict
-
-
-# Class to Model a typical Anime Document
-class AnimeDocument(BaseModel):
-    name: str
-    score: float
-    synopsis: str
-    genres: List[str]
+from backend.mongo.AnimeDocument import AnimeDocument
+from backend.mongo.utils import create_text_metadata_and_embedding
+from backend.mongo.AniZenithVectorSearchResult import AniZenithVectorSearchResult
 
 
 # Class to model Anizenith MongoDB Client related utilities
@@ -19,17 +13,56 @@ class AniZenithMongoClient:
         if not isinstance(conn_string, str) or not conn_string.strip():
             raise ValueError("ATLAS_URI must be set to a non-empty MongoDB connection string")
         
-        self.embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-        self.db_client = MongoClient(conn_string)
-        self.anime_collection = self.db_client["anizenith"]["anime"]
+        self.conn_string = conn_string
+
+        # Set internals to None for lazy init
+        self._embedding_model = None
+        self._db_client = None
+        self._anime_collection = None
+
+    @property
+    def embedding_model(self):
+        """
+        Lazily load the SentenceTransformer model. 
+        @property decorator defines this as a property of a class, rather than a class method
+        """
+        if self._embedding_model is None:
+            # TODO: Move this SentenceTransformer id into a central Config object
+            self._embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        return self._embedding_model
+    
+    @property
+    def db_client(self):
+        """
+        Lazily initialize the MongoDB client.
+        @property decorator defines this as a property of a class, rather than a class method
+        """
+        if self._db_client is None:
+            self._db_client = MongoClient(self.conn_string)
+        return self._db_client
+    
+
+    @property
+    def anime_collection(self):
+        """
+        Lazily initialize the anime collection.
+        @property decorator defines this as a property of a class, rather than a class method
+        """
+        if self._anime_collection is None:
+            # TODO: Move the hardcoded DB name and collection name into a central Config object
+            self._anime_collection = self.db_client["anizenith"]["anime"]
+        return self._anime_collection
 
 
     def add_anime(self, anime_document: AnimeDocument) -> None:
-        # Create text_metadata field using synopsis, genres and name
-        text_metadata = f"Synopsis: {anime_document.synopsis}\n\nGenres: {', '.join(anime_document.genres)}\n\nName: {anime_document.name}"
-        
-        # Create embedding for the text_metadata field
-        text_metadata_embedding = self.embedding_model.encode(text_metadata).tolist()
+
+        # Create text metadata and its embedding
+        text_metadata, text_metadata_embedding = create_text_metadata_and_embedding(
+            self.embedding_model,
+            anime_document.name,
+            anime_document.genres,
+            anime_document.synopsis
+        )
 
         # Create a new document to be inserted into MongoDB
         anime_document_dict = {
@@ -49,6 +82,7 @@ class AniZenithMongoClient:
         try:
             if isinstance(query, dict):
                 # Execute a standard find operation (e.g., {"score": {"$gt": 8.0}})
+                # "find()" is a standard read-only MongoDB command
                 cursor = self.anime_collection.find(query)
                 if limit is not None:
                     cursor = cursor.limit(limit)
@@ -65,7 +99,7 @@ class AniZenithMongoClient:
             return []
 
 
-    def perform_vector_search(self, user_query: str, limit: int = 5, num_candidates: int = 100) -> List[Dict]:
+    def perform_vector_search(self, user_query: str, limit: int = 5, num_candidates: int = 100) -> List[AniZenithVectorSearchResult]:
         # Validate limit and num_candidates 
         if limit <= 0:
             raise ValueError("limit must be a positive integer")
@@ -104,8 +138,8 @@ class AniZenithMongoClient:
             },
         ]
         
-        # Execute the pipeline
+        # Execute the pipeline and retrieve the cursor
         cursor = self.anime_collection.aggregate(pipeline)
         
         # Convert the cursor to a list of dicts
-        return list(cursor)
+        return [AniZenithVectorSearchResult(**doc) for doc in cursor]

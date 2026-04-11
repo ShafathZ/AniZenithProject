@@ -1,5 +1,6 @@
 import os
-from backend.mongodb_utils import AniZenithMongoClient, AnimeDocument
+from backend.mongo.AniZenithMongoClient import AniZenithMongoClient, AnimeDocument
+from backend.mongo.AniZenithVectorSearchResult import AniZenithVectorSearchResult
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -37,16 +38,12 @@ def test_perform_vector_search_document_structure():
     assert len(results) > 0
     top_doc = results[0]
     
-    # Check for expected fields
-    expected_keys = {"name", "genres", "score", "synopsis", "similarity_score"}
-    assert set(top_doc.keys()) == expected_keys
+    # Check that it returned the correct object
+    assert isinstance(top_doc, AniZenithVectorSearchResult)
     
-    # Ensure _id is excluded as defined in the projection
-    assert "_id" not in top_doc
-    
-    # Check data types
-    assert isinstance(top_doc["name"], str)
-    assert isinstance(top_doc["similarity_score"], float)
+    # Assert on the fields of the vector search result object
+    assert isinstance(top_doc.name, str)
+    assert isinstance(top_doc.similarity_score, float)
 
 
 def test_perform_vector_search_relevance():
@@ -56,12 +53,13 @@ def test_perform_vector_search_relevance():
     """
     results = TEST_DB_CLIENT.perform_vector_search("Saitama hero for fun")
     
-    # Given the query, "One Punch Man" should ideally be the top result
     top_doc = results[0]
-    assert "one punch man" in top_doc["name"].lower()
+    
+    # Assert that one punch man is present in the name
+    assert "one punch man" in top_doc.name.lower()
     
     # The similarity score should exist and be decently high
-    assert top_doc["similarity_score"] > 0.5 
+    assert top_doc.similarity_score > 0.5 
 
 
 def test_perform_vector_search_empty_query():
@@ -118,7 +116,7 @@ def test_add_anime():
         
     finally:
         # Clean up - delete the test document so it doesn't pollute the DB
-        TEST_DB_CLIENT.anime_collection.delete_many({"name": test_anime_name})
+        TEST_DB_CLIENT.anime_collection.delete_one({"name": test_anime_name})
 
 
 
