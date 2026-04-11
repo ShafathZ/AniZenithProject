@@ -2,19 +2,24 @@ import os
 from backend.mongo.AniZenithMongoClient import AniZenithMongoClient, AnimeDocument
 from backend.mongo.AniZenithVectorSearchResult import AniZenithVectorSearchResult
 from dotenv import load_dotenv
+import pytest
 
 load_dotenv()
 
-CONN_STRING = os.getenv("ATLAS_URI")
-TEST_DB_CLIENT = AniZenithMongoClient(CONN_STRING)
+# CONN_STRING = os.getenv("ATLAS_URI")
+# TEST_DB_CLIENT = AniZenithMongoClient(CONN_STRING)
 
+@pytest.fixture(scope="module")
+def test_db_client():
+    CONN_STRING = os.getenv("ATLAS_URI")
+    return AniZenithMongoClient(CONN_STRING)
 
 # ┌───────────────────────────────────────────────┐
 # │              VECTOR SEARCH TESTS              │
 # └───────────────────────────────────────────────┘
-def test_perform_vector_search_basic_retrieval():
+def test_perform_vector_search_basic_retrieval(test_db_client: AniZenithMongoClient):
     """Test that a basic query returns a list with the default limit (5)."""
-    results = TEST_DB_CLIENT.perform_vector_search("Which anime has the character Saitama?")
+    results = test_db_client.perform_vector_search("Which anime has the character Saitama?")
     
     # Check that it returns a list
     assert isinstance(results, list)
@@ -23,17 +28,17 @@ def test_perform_vector_search_basic_retrieval():
     assert len(results) == 5
 
 
-def test_perform_vector_search_limit_parameter():
+def test_perform_vector_search_limit_parameter(test_db_client: AniZenithMongoClient):
     """Test that the limit parameter is respected."""
     custom_limit = 2
-    results = TEST_DB_CLIENT.perform_vector_search("A dark fantasy anime", limit=custom_limit)
+    results = test_db_client.perform_vector_search("A dark fantasy anime", limit=custom_limit)
     
     assert len(results) == custom_limit
 
 
-def test_perform_vector_search_document_structure():
+def test_perform_vector_search_document_structure(test_db_client: AniZenithMongoClient):
     """Test that the projected fields are correct and _id is excluded."""
-    results = TEST_DB_CLIENT.perform_vector_search("ninja")
+    results = test_db_client.perform_vector_search("ninja")
     
     assert len(results) > 0
     top_doc = results[0]
@@ -46,12 +51,12 @@ def test_perform_vector_search_document_structure():
     assert isinstance(top_doc.similarity_score, float)
 
 
-def test_perform_vector_search_relevance():
+def test_perform_vector_search_relevance(test_db_client: AniZenithMongoClient):
     """
     Test semantic relevance: A specific query should return the target anime 
     with a relatively high similarity score.
     """
-    results = TEST_DB_CLIENT.perform_vector_search("Saitama hero for fun")
+    results = test_db_client.perform_vector_search("Saitama hero for fun")
     
     top_doc = results[0]
     
@@ -62,9 +67,9 @@ def test_perform_vector_search_relevance():
     assert top_doc.similarity_score > 0.5 
 
 
-def test_perform_vector_search_empty_query():
+def test_perform_vector_search_empty_query(test_db_client: AniZenithMongoClient):
     """Test how the system handles an empty query."""
-    results = TEST_DB_CLIENT.perform_vector_search("")
+    results = test_db_client.perform_vector_search("")
     
     # Even empty strings get embedded and matched against DB.
     # It shouldn't crash, but it should return results (though arbitrary).
@@ -76,7 +81,7 @@ def test_perform_vector_search_empty_query():
 # ┌───────────────────────────────────────────────┐
 # │                 ADD ANIME TESTS               │
 # └───────────────────────────────────────────────┘
-def test_add_anime():
+def test_add_anime(test_db_client: AniZenithMongoClient):
     """Test inserting a new anime document, checking its fields, and cleaning up."""
     
     # Create a dummy AnimeDocument
@@ -90,11 +95,11 @@ def test_add_anime():
     
     try:
         # Add the anime to the database
-        TEST_DB_CLIENT.add_anime(test_anime)
+        test_db_client.add_anime(test_anime)
         
         # Verify it was inserted by fetching it back
         query = {"name": test_anime_name}
-        results = TEST_DB_CLIENT.execute_read_query(query)
+        results = test_db_client.execute_read_query(query)
         
         # Assert the document exists
         assert len(results) >= 1
@@ -116,20 +121,20 @@ def test_add_anime():
         
     finally:
         # Clean up - delete the test document so it doesn't pollute the DB
-        TEST_DB_CLIENT.anime_collection.delete_one({"name": test_anime_name})
+        test_db_client.anime_collection.delete_one({"name": test_anime_name})
 
 
 
 # ┌───────────────────────────────────────────────┐
 # │              RUN READ QUERY TESTS             │
 # └───────────────────────────────────────────────┘
-def test_execute_mongo_read_query_basic():
+def test_execute_mongo_read_query_basic(test_db_client: AniZenithMongoClient):
     """Test that a basic find query works and respects the limit."""
     # An empty dictionary matches all documents
     query = {}
     test_limit = 3
     
-    results = TEST_DB_CLIENT.execute_read_query(query, limit=test_limit)
+    results = test_db_client.execute_read_query(query, limit=test_limit)
     
     # Assert it returns a list of the exact limited size
     assert isinstance(results, list)
@@ -143,13 +148,13 @@ def test_execute_mongo_read_query_basic():
     assert "name" in results[0]
 
 
-def test_execute_mongo_read_query_invalid_input():
+def test_execute_mongo_read_query_invalid_input(test_db_client: AniZenithMongoClient):
     """Test that passing an invalid query format safely returns an empty list."""
     # The method expects a dictionary. Passing a list should trigger the ValueError
     # which is caught in the try-except block, returning an empty list [].
     invalid_query = ["this", "is", "a", "list", "not", "a", "dict"]
     
-    results = TEST_DB_CLIENT.execute_read_query(invalid_query)
+    results = test_db_client.execute_read_query(invalid_query)
     
     assert isinstance(results, list)
     assert len(results) == 0
