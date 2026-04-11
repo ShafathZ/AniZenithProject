@@ -3,9 +3,9 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
 from backend.AniZenithExchange import AniZenithRequest, AniZenithResponse
+from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
 from backend.validation_utils import validate_anizenith_request
 from backend.backend_utils import chat_with_llm
-from backend.auth import router as auth_router
 
 from starlette.middleware.sessions import SessionMiddleware
 import logging
@@ -21,7 +21,9 @@ logger.setLevel(logging.INFO)
 
 # Create FastAPI app
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=backend_app_config.BACKEND_SECRET, session_cookie="session", max_age=3600, same_site="lax")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("BACKEND_SECRET"), session_cookie="session", max_age=3600, same_site="lax")
+app.add_middleware(PrometheusMiddleware, prefix="backend")
+app.include_router(prometheus_router)
 #app.include_router(auth_router)
 
 # ┌───────────────────────────────────────────────┐

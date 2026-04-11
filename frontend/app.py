@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
 
 from frontend.configs import frontend_container_config, frontend_app_config
 
@@ -31,6 +32,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(PrometheusMiddleware, prefix="frontend")
+app.include_router(prometheus_router)
 
 # Set up accessible directories
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")

@@ -1,9 +1,35 @@
 services:
 
-  # Spin up the frontend
+  # "backend" service
+  backend:
+    image: surigo/anizenith_backend:latest
+    container_name: anizenith_backend
+    ports:
+      - '22021:9002'
+    networks:
+      - anizenith_net
+    env_file:
+      # Tries the deployment location (same folder as compose.yml)
+      - path: backend.env
+        required: false
+      # Tries the local location (relative to compose.yml)
+      - path: ../backend/backend.env
+        required: false
+    # Calls the health check endpoint using defined configs before declaring the service as "Healthy"
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9002/health']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 90s
+    restart: unless-stopped
+
+  # "frontend" service
   frontend:
     image: surigo/anizenith_frontend:latest
     container_name: anizenith_frontend
+
+    # Waits for the "backend" service to be in the "service_healthy" status before startup
     depends_on:
       backend:
         condition: service_healthy
@@ -12,112 +38,154 @@ services:
     networks:
       - anizenith_net
     restart: unless-stopped
+    env_file:
+      # Tries the deployment location (same folder as compose.yml)
+      - path: frontend.env
+        required: false
+      # Tries the local location (relative to compose.yml)
+      - path: ../frontend/frontend.env
+        required: false
 
+  # Spin up "cadvisor" (Container Advisor) as a service
+  # This is responsible for collecting metrics on a container level (CPU / Memory / Network I/O)
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: anizenith_cadvisor
+    volumes:
+      # Maps host machine's root file system (/) to rootfs inside the container
+      # Allows cadvisor to inspect overall filesystem usage and the configuration of the host machine
+      - /:/rootfs:ro
 
-  # Spin up the backend
-  backend:
-    image: surigo/anizenith_backend:latest
-    container_name: anizenith_backend
-    ports:
-      - '22021:9002'
+      # Maps host's run dir to the container's run dir in read-write (rw) mode.
+      # Allows cadvisor access to the Docker socket (located at /var/run/docker.sock), which allows
+      # communication with the Docker daemon to get a list of running containers (and their metadata).
+      - /var/run:/var/run:rw
+
+      # Maps host's sys dir in read-only mode.
+      # Allows cadvisor access to Linux control groups (cgroups), which contain resource usage metrics (CPU,
+      # memory, etc.) for each container process
+      - /sys:/sys:ro
+
+      # Maps Docker's main storage dir as read-only
+      # Allows cadvisor to gather info about docker images, container filesystems, overall disk usage by Docker.
+      - /var/lib/docker:/var/lib/docker:ro
+
+      # Maps host's disk device as read-only
+      # Allows cadvisor access to block device info to collect disk I/O usage stats per container.
+      - /dev/disk:/dev/disk:ro
+
+      # TODO: Figure out why cadvisor is exporting metrics for containers owned by other groups.
     networks:
       - anizenith_net
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9002/health']
-      interval: 10s
-      timeout: 3s
-      retries: 10
-      start_period: 30s
     restart: unless-stopped
 
+  # Spin up "node-exporter" as a service
+  # This is resposible for collecting metrics on a node / hardware device level (Uptime / CPU / Memory / Network I/O)
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: anizenith_node_exporter
 
+    # Define command line args for spinning up node-exporter service
+    command:
 
-  # TODO: Add this later
-  # ngrok:
-  #   image: ngrok/ngrok:latest
-  #   container_name: ngrok
-  #   depends_on:
-  #     - frontend
-  #   command: http frontend:7860
-  #   environment:
-  #     NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
-  #   ports:
-  #   - "22003:4040"
-  #   networks:
-  #     - cookiemancer_net
-  #   restart: unless-stopped
+      # Set root filesystem path to be /host dir (inside the container)
+      # Matches the volume mapping defined below for /host dir (within the container)
+      - --path.rootfs=/host
 
-  # TODO: Add this later
-  # cadvisor:
-  #   image: gcr.io/cadvisor/cadvisor:latest
-  #   container_name: cadvisor
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:rw
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker:/var/lib/docker:ro
-  #     - /dev/disk:/dev/disk:ro
-  #   networks:
-  #     - cookiemancer_net
-  #   restart: unless-stopped
+      # Point to the host's proc dir
+      # proc dir is a virtual filesystem which contains info about running processes, memory usage, sys config, etc.
+      - --path.procfs=/host/proc
 
-  # TODO: Add this later
-  # node-exporter:
-  #   image: quay.io/prometheus/node-exporter:latest
-  #   container_name: node_exporter
-  #   command:
-  #     - --path.rootfs=/host
-  #     - --path.procfs=/host/proc
-  #     - --path.sysfs=/host/sys
-  #     - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
-  #   volumes:
-  #     - /:/host:ro
-  #   pid: host
-  #   networks:
-  #     - cookiemancer_net
-  #   restart: unless-stopped
+      # Point to the host's sys dir
+      # sys dir is a virtual filesystem that allows interacting with Linux kernel to get hardware device info
+      - --path.sysfs=/host/sys
 
-  # TODO: Add this later
-  # prometheus:
-  #   image: prom/prometheus:latest
-  #   container_name: prometheus
-  #   command:
-  #     - --config.file=/etc/prometheus/prometheus.yml
-  #   volumes:
-  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-  #     - prometheus_data:/prometheus
-  #   ports:
-  #     - '22004:9090'
-  #   depends_on:
-  #     - frontend
-  #     - backend
-  #     - cadvisor
-  #     - node-exporter
-  #   networks:
-  #     - cookiemancer_net
-  #   restart: unless-stopped
+      # Using a regex to tell filesystem metric collector to ignore specific virtual / duplicate mount points
+      # Prevents node exporter from generating irrelevant / duplicate disk space metrics
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+    volumes:
+      # Map host's root dir withe the /host dir inside the container in read-only mode (for reading metrics)
+      - /:/host:ro
+    pid: host
+    networks:
+      - anizenith_net
+    restart: unless-stopped
 
-  # TODO: Add this later
-  # grafana:
-  #   image: grafana/grafana:latest
-  #   container_name: grafana
-  #   ports:
-  #     - "22005:3000"
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana
-  #   depends_on:
-  #     - prometheus
-  #   networks:
-  #     - cookiemancer_net
-  #   restart: unless-stopped
+  # Spin up "prometheus" service
+  # This will be scraping metrics from other services and hosting it in a DB
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: anizenith_prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      # Map a volume from the local (to where compose.yml is run) prometheus.yml file to an internal container volume
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - anizenith_prometheus_data:/prometheus
+    ports:
+      - '22023:9090'
+    depends_on:
+      - frontend
+      - backend
+      - cadvisor
+      - node-exporter
+    networks:
+      - anizenith_net
+    restart: unless-stopped
 
+  # Spin up "ngrok" service
+  # This will be useful for creating secure tunnels to expose local development servers to the internet
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: anizenith_ngrok
 
+    # For now we are tunning frontend
+    # TODO: Hookup grafana as well (maybe using ngrok.yml)
+    depends_on:
+      - frontend
+      - grafana
+    # command: http frontend:7002
+    command: ["start", "--all", "--config", "/etc/ngrok.yml"]
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml:ro
+    ports:
+      - "22022:4040"
+    networks:
+      - anizenith_net
+    restart: unless-stopped
+    env_file:
+      - ngrok.env
+
+  # Spin up "grafana" as a service
+  # This will be used to Monitoring Dashboards using metrics data from Prometheus service
+  grafana:
+    image: grafana/grafana:latest
+    container_name: anizenith_grafana
+    ports:
+      - "22024:3000"
+    volumes:
+      - anizenith_grafana_data:/var/lib/grafana
+    environment:
+      # Tell Grafana its public facing URL
+      - GF_SERVER_ROOT_URL=https://misty-subpalmate-liza.ngrok-free.dev/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    depends_on:
+      - prometheus
+    networks:
+      - anizenith_net
+    restart: unless-stopped
+
+# Define custom bridge network which encapsulates all services defined above
 networks:
   anizenith_net:
     driver: bridge
 
-# volumes:
-#   prometheus_data:
-#     driver: local
-#   grafana_data:
-#     driver: local
+# Maps prometheus and grafana data to a volume outside the container (in case container is destroyed)
+volumes:
+  # Used to persist Prometheus time-series metrics across container restarts
+  anizenith_prometheus_data:
+    driver: local # Use the Docker's built-in volume driver
+
+  # Used to persist Grafana Dashboards and user data across container restarts
+  anizenith_grafana_data:
+    driver: local # Use the Docker's built-in volume driver
