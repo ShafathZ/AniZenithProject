@@ -2,7 +2,7 @@ import json
 import sqlite3
 from pathlib import Path
 import pytest
-import backend as retrieval_utils
+import backend.utils.retrieval_utils as retrieval_utils
 from backend.utils.retrieval_utils import get_recommendations
 
 # Setup Test DB
@@ -79,8 +79,7 @@ def _setup_test_db(db_path: str):
     connection.close()
 
 
-def test_get_recommendations_orders_by_match_count_then_score(tmp_path: Path, 
-                                                              monkeypatch: pytest.MonkeyPatch):
+def test_get_recommendations_orders_by_match_count_then_score(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     # Setup Test Data and Mocks
     # Construct a temporary path for the Test DB
     db_path = tmp_path / "test.db"
@@ -101,8 +100,7 @@ def test_get_recommendations_orders_by_match_count_then_score(tmp_path: Path,
     assert "description" in result[0]
 
 
-def test_get_recommendations_respects_limit(tmp_path: Path, 
-                                            monkeypatch: pytest.MonkeyPatch):
+def test_get_recommendations_respects_limit(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     # Setup Test Data and Mocks
     # Construct a temporary path for the Test DB
     db_path = tmp_path / "test.db"
@@ -122,8 +120,7 @@ def test_get_recommendations_respects_limit(tmp_path: Path,
     assert result[0]["name"] == "Alpha"
 
 
-def test_get_recommendations_single_genre(tmp_path: Path, 
-                                          monkeypatch: pytest.MonkeyPatch):
+def test_get_recommendations_single_genre(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     # Setup Test Data and Mocks
     # Construct a temporary path for the Test DB
     db_path = tmp_path / "test.db"
@@ -143,8 +140,7 @@ def test_get_recommendations_single_genre(tmp_path: Path,
     assert all("description" in item for item in result)
 
 
-def test_get_recommendations_no_genre(tmp_path: Path, 
-                                      monkeypatch: pytest.MonkeyPatch):
+def test_get_recommendations_no_genre(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     # Setup Test Data and Mocks
     # Construct a temporary path for the Test DB
     db_path = tmp_path / "test.db"
