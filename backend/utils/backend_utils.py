@@ -60,7 +60,6 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
     # Add the rest of the messages
     input_messages.extend(messages)
 
-    # --- Determine which model to use (local or external) ---
     # Constants for logging
     response = ""
     input_token_count = 0
@@ -68,9 +67,7 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
 
     # --- Local Model ---
     if use_local_model:
-        # Local Model
         # Uses pipeline from transformers library w/ Generation Config (since old method is now deprecated)
-        # Get the response from the local model
         generation_config = GenerationConfig(
             max_new_tokens=model_config.max_new_tokens,
             temperature=model_config.temperature,
@@ -78,14 +75,8 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
             do_sample=True
         )
         response = PIPELINE_LOCAL_MODEL(input_messages, generation_config=generation_config)
-        
-        # Parse the output and yield it
-        yield response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
-        # Uses pipeline from transformers library
-        response = PIPELINE_LOCAL_MODEL(input_messages)
-
-        # Get the response from the local model, parse it, and yield
         generated_text = response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
+        # Parse the output and yield it
         yield generated_text
 
         # Log token counts (there is no clean way to do this besides re-tokenizing)
