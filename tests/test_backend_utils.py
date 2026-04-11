@@ -1,5 +1,5 @@
 import pytest
-import backend.backend_utils as backend_utils
+import backend as backend_utils
 
 
 def test_one_genre(monkeypatch: pytest.MonkeyPatch):

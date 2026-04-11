@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 
-from config.config_utils import Config
+from shared.config.config_utils import Config
 
 class BackendContainerConfig(Config):
     """

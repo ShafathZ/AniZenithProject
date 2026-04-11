@@ -1,6 +1,6 @@
 import fnmatch
-import os
 import posixpath
+from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, Request
@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
+from shared.prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
 
 from frontend.configs import frontend_container_config, frontend_app_config
 
@@ -36,8 +36,9 @@ app.add_middleware(PrometheusMiddleware, prefix="frontend")
 app.include_router(prometheus_router)
 
 # Set up accessible directories
-app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
-templates = Jinja2Templates(directory="frontend/templates")
+SERVICE_DIR = Path(__file__).resolve().parent
+app.mount("/static", StaticFiles(directory=SERVICE_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=SERVICE_DIR / "templates")
 
 # Home page endpoint to get our HTML, CSS, JS
 @app.get("/", response_class=HTMLResponse)
@@ -133,7 +134,7 @@ async def proxy(path: str, request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("frontend.app:app",
+    uvicorn.run(app,
                 host=frontend_container_config.hostname,
                 port=frontend_container_config.port,
                 reload=False,

@@ -1,10 +1,9 @@
 from typing import List, Dict
 from huggingface_hub import InferenceClient
 from transformers import pipeline, GenerationConfig
-from backend.retrieval_utils import get_recommendations
-from backend.constants import *
-from backend.prometheus_utils import *
-from dotenv import load_dotenv
+
+from backend.utils.prometheus_utils import CHATBOT_PIPELINE_LATENCY_SUMMARY, observe_bot_message, observe_user_message
+from backend.utils.retrieval_utils import get_recommendations
 from backend.configs import model_config, backend_app_config
 
 # Load the List of All Supported Genres in Memory, at App Startup
@@ -14,11 +13,10 @@ GENRE_LIST = open("backend/genrelist.txt", "r").read().splitlines()
 # Load the Local Pipeline Model at App Startup
 PIPELINE_LOCAL_MODEL = pipeline(task='text-generation', model=model_config.local_model_id)
 
-
 # TODO: Make this Method Async Later
 def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
     # TODO: Replace with actual IDs from config
-    model = "Qwen/Qwen3-0.6B" if use_local_model else "openai/gpt-oss-20b"
+    model = model_config.local_model_id if use_local_model else model_config.external_model_id
     with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="full_pipeline").time():
         # Retrieve genres from the user message using naive approach
         # The Last Message should be user's message
@@ -132,7 +130,7 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
 
     # Log the model usage output
     # TODO: Record the specific model ID once the backend is refactored
-    model = "Qwen/Qwen3-0.6B" if use_local_model else "openai/gpt-oss-20b"
+    model = model_config.local_model_id if use_local_model else model_config.external_model_id
     # TODO: Use real Inference Manager / session ID
     observe_user_message(user_id="0", user_message=messages[-1]['content'], token_count=input_token_count, model=model)
     observe_bot_message(user_id="0", bot_message=response, token_count=output_token_count, model=model)
