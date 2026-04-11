@@ -1,18 +1,21 @@
 from typing import List, Dict
 from huggingface_hub import InferenceClient
 from transformers import pipeline
-from backend.retrieval_utils import get_recommendations
 from backend.constants import *
 from backend.prometheus_utils import *
 from dotenv import load_dotenv
 import os
+import json
+from backend.mongo.AniZenithMongoClient import AniZenithMongoClient
+from backend.mongo.AniZenithVectorSearchResult import AniZenithVectorSearchResult
 
 # Load all Environment Variables
 load_dotenv()
 HF_TOKEN = os.getenv('HF_TOKEN')
 
-# Load the List of All Supported Genres in Memory, at App Startup
-GENRE_LIST = open("backend/genrelist.txt", "r").read().splitlines()
+# Init AniZenithMongoClient
+CONN_STRING = os.getenv("ATLAS_URI")
+DB_CLIENT = AniZenithMongoClient(CONN_STRING)
 
 
 # Load the Local Pipeline Model at App Startup
@@ -26,34 +29,32 @@ PIPELINE_LOCAL_MODEL = pipeline(task='text-generation',
 
 # TODO: Make this Method Async Later
 def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
-    # TODO: Replace with actual IDs from config
+
+    # TODO: Replace with actual IDs from a config
     model = "Qwen/Qwen3-0.6B" if use_local_model else "openai/gpt-oss-20b"
     with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="full_pipeline").time():
-        # Retrieve genres from the user message using naive approach
-        # The Last Message should be user's message
-        with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="genre_detection").time():
-            genre_list = detect_genres(messages[-1]['content'])
 
-        # 2. Retrieve relevant results from DB if the genre_list is not empty
-        with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="recommendation_retrieval").time():
-            recommendations_string = ""
-            if len(genre_list) > 0:
-                recommendations_string = get_recommendations(genre_list)
+        # Use the last message as the user message (it should always be a user message)
+        user_query = messages[-1]['content']
 
-        # 3. Query the model
+        # Retrieve relevant results from DB using vector search
+        with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="db_retrieval").time():
+
+            # Perform Vector Search using user query
+            # This method returns a List[AniZenithVectorSearchResult]
+            recommendations: List[AniZenithVectorSearchResult] = DB_CLIENT.perform_vector_search(user_query)
+            
+            # Convert the list of vector search objects into a list of dicts
+            # model_dump() is a special Pydantic method to generate a dict representation of any Pydantic object
+            recommendations_dict = [recommendation.model_dump() for recommendation in recommendations]
+            
+            # Serialize to a JSON string
+            recommendations_string = json.dumps(recommendations_dict, indent = 4)
+
+        # Query the model
         with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="model_generation").time():
             for result in query_model(messages, use_local_model, recommendations_string):
                 yield result
-
-
-def detect_genres(message: str) -> List[str]:
-    requested_genres = []
-    # Simple naive genre check by detecting if any of our system stored genres are within the user query
-    # TODO: Improve genre detection instead to use Retriever and RAG framework in the future
-    for genre in GENRE_LIST:
-        if message.lower().__contains__(genre.lower()):
-            requested_genres.append(genre)
-    return requested_genres
 
 
 # TODO: Make this method Async later
