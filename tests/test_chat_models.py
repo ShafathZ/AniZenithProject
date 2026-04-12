@@ -1,7 +1,7 @@
 import os
 import pytest
 from backend.utils.backend_utils import chat_with_llm
-import backend as backend_utils
+import backend.utils.backend_utils as backend_utils
 
 TEST_SYSTEM_MESSAGE = "You are a friendly chatbot."
 TEST_USER_MESSAGE = "Hello!"
