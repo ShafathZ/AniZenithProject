@@ -100,14 +100,14 @@ class InferenceManager:
                     print(f"Model Error: {e}")
                     # Yield model terminated to user
                     yield "<OUTPUT_TERMINATED>"
-                    # Sets next available time to current time in seconds + downtime
+                    # Sets the model's next available time to current time in seconds + downtime
                     self.model_available_at[self.current_model_idx] = time.time() + MODEL_DOWNTIME_SECONDS
 
         # Record Usage Metrics
         print(f"Streamed output: {output}")
         usage = current_model.get_usage()
-        observe_user_message(user_id, user_query, usage["input_token_count"], current_model.get_name())
-        observe_bot_message(user_id, output, usage["output_token_count"], current_model.get_name())
+        observe_user_message(user_id, user_query, usage.input_token_count, current_model.get_name())
+        observe_bot_message(user_id, output, usage.output_token_count, current_model.get_name())
 
     def _build_system_prompt(self, recommendations: List[AniZenithVectorSearchResult]) -> str:
         lines = []

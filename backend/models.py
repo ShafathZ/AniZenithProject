@@ -6,11 +6,18 @@ from typing import Iterator, Dict, Any, List
 import torch
 from huggingface_hub import InferenceClient
 from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
+from pydantic import BaseModel
 
 from backend.constants import MAX_NEW_TOKENS, TEMPERATURE, TOP_P
 
 # TODO: Move to config management system
 HF_TOKEN = os.getenv('HF_TOKEN')
+
+# Usage statistics class to enforce for logging
+class ModelUsageStatistics(BaseModel):
+    model_name: str
+    input_token_count: int
+    output_token_count: int
 
 class Model(ABC):
     """
@@ -24,11 +31,13 @@ class Model(ABC):
     # Each subclass must implement streaming
     @abstractmethod
     def stream(self, messages: List[Dict[str, str]]) -> Iterator[str]:
+        """Streams model response as a string generator"""
         pass
 
     # Each subclass must define usage stats
     @abstractmethod
-    def get_usage(self) -> Dict[str, Any]:
+    def get_usage(self) -> ModelUsageStatistics:
+        """Returns a ModelUsageStatistics with usage statistics for the model"""
         pass
 
     def get_name(self):
@@ -37,7 +46,8 @@ class Model(ABC):
     # Generate runs stream and accumulates, then returns
     def generate(self, messages: List[Dict[str, str]]) -> Dict[str, Any]:
         """
-        Runs stream(), accumulates output, returns final text + usage.
+        Runs stream() internally and accumulates output
+        Returns final text + usage.
         """
         output = []
 
@@ -47,7 +57,7 @@ class Model(ABC):
         result_text = "".join(output)
 
         return {
-            "text": result_text,
+            "generated_text": result_text,
             "usage": self.get_usage()
         }
 
@@ -117,11 +127,11 @@ class HFLocalModel(Model):
         self._usage_data = {"input_token_count": input_token_count, "output_token_count": output_token_count}
 
     def get_usage(self):
-        return {
-            "model_name": self.get_name(),
-            "input_token_count": self._usage_data["input_token_count"],
-            "output_token_count": self._usage_data["output_token_count"],
-        }
+        return ModelUsageStatistics(
+            model_name=self.get_name(),
+            input_token_count=self._usage_data["input_token_count"],
+            output_token_count=self._usage_data["output_token_count"],
+        )
 
 
 class HFInferenceClientModel(Model):
@@ -154,8 +164,8 @@ class HFInferenceClientModel(Model):
                 self._usage_data = chunk.usage
 
     def get_usage(self):
-        return {
-            "model_name": self.get_name(),
-            "input_token_count": self._usage_data.prompt_tokens,
-            "output_token_count": self._usage_data.completion_tokens,
-        }
+        return ModelUsageStatistics(
+            model_name=self.get_name(),
+            input_token_count=self._usage_data.prompt_tokens,
+            output_token_count=self._usage_data.completion_tokens,
+        )
