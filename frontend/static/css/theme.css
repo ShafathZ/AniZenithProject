@@ -15,7 +15,7 @@
 
     /* Borders and shadows */
     --border-soft: rgba(255, 255, 255, 0.08);
-    --shadow-soft: 0 15px 35px rgba(255, 124, 229, 0.3);
+    --shadow-soft: 0 35px 35px rgba(0, 0, 0, 0.25);
 
     /* Text */
     --text-main: #f0f0ff;

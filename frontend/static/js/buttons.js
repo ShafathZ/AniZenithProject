@@ -1,5 +1,5 @@
 import { setLocalModelStatus, messages, addMessage, deleteMessage, editMessage, sendMessagesToBackend } from "./chat_utils.js"
-import { renderMessages } from "./chat_ui.js"
+import { renderMessages, appendUIMessage, addDefaultMessage } from "./chat_ui.js"
 import { postErrorMessage } from "./error.js"
 
 export function updateButtons() {
@@ -113,8 +113,18 @@ function setupEditButtons() {
                     return;
                 }
 
+                // Edit old message and remove old bot message
                 editMessage(index, newText);
-                await sendMessagesToBackend();
+                deleteMessage(index+1);
+                renderMessages();
+
+                // Add temporary thinking response placeholder
+                const thinking = { role: "assistant", content: "__thinking__" };
+                appendUIMessage(thinking, index+1);
+
+                // Request response from backend
+                const response = await sendMessagesToBackend();
+                addMessage(response);
                 renderMessages();
             };
 
@@ -152,8 +162,17 @@ function setupRefreshButtons() {
             const message = refreshBtn.closest(".message");
             const index = parseInt(message.dataset.index, 10);
 
+            // Remove old response
             deleteMessage(index);
-            await sendMessagesToBackend();
+            renderMessages();
+
+            // Add temporary thinking response placeholder
+            const thinking = { role: "assistant", content: "__thinking__" };
+            appendUIMessage(thinking, index);
+
+            // Request new response from backend
+            const response = await sendMessagesToBackend();
+            addMessage(response);
             renderMessages();
         };
     });
@@ -178,11 +197,16 @@ async function sendMessage() {
     input.value = "";
     input.focus();
 
-    addMessage(new_message);
+    const last_idx = addMessage(new_message);
     renderMessages();
 
+    // Add temporary thinking response placeholder
+    const thinking = { role: "assistant", content: "__thinking__" };
+    appendUIMessage(thinking, last_idx+1);
+
     // Get assistant response and add it
-    await sendMessagesToBackend();
+    const response = await sendMessagesToBackend();
+    addMessage(response);
     renderMessages();
 }
 
@@ -250,6 +274,7 @@ function setupClearFullChatButton() {
 
         deleteMessage(0);
         renderMessages();
+        addDefaultMessage();
     });
 }
 

@@ -58,8 +58,18 @@
         var(--shadow-soft);
 }
 
+.error-toast.success {
+    border-left: 4px solid #22c55e;
+    box-shadow:
+        0 0 12px rgba(34, 197, 94, 0.6),
+        var(--shadow-soft);
+}
+
 .error-toast.info {
-    border-left: 4px solid var(--accent-secondary);
+    border-left: 4px solid #3b82f6;
+    box-shadow:
+        0 0 12px rgba(59, 130, 246, 0.6),
+        var(--shadow-soft);
 }
 
 /* Error subtext */
