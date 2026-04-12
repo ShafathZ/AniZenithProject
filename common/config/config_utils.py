@@ -35,7 +35,7 @@ def _load_yaml_data(path: str | Path, cfg_obj):
             setattr(cfg, key, value)
             set_fields.add(key)
         else:
-            print(f"Warning: Config key {key} in {path} is not registered in configurations.py")
+            print(f"Warning: Config key '{key}' in {path} is not registered in configurations.py")
 
     # 1. Load default section
     for key, value in yaml_cfg.get("default", {}).items():
