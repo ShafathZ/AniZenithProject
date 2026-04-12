@@ -11,16 +11,15 @@ from backend.constants import MAX_NEW_TOKENS, TEMPERATURE, TOP_P
 
 # TODO: Move to config management system
 HF_TOKEN = os.getenv('HF_TOKEN')
-local_model_id = "Qwen/Qwen3-0.6B"
-external_model_id = "openai/gpt-oss-20b"
 
 class Model(ABC):
     """
     Abstract base model.
     Enforces streaming + usage stats.
     """
-    def __init__(self):
+    def __init__(self, name: str):
         self._usage: Dict[str, Any] = {}
+        self.name = name
 
     # Each subclass must implement streaming
     @abstractmethod
@@ -32,9 +31,8 @@ class Model(ABC):
     def get_usage(self) -> Dict[str, Any]:
         pass
 
-    @abstractmethod
-    def get_name(self) -> str:
-        pass
+    def get_name(self):
+        return self.name
 
     # Generate runs stream and accumulates, then returns
     def generate(self, messages: List[Dict[str, str]]) -> Dict[str, Any]:
@@ -54,17 +52,19 @@ class Model(ABC):
         }
 
 class HFLocalModel(Model):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model_id: str):
+        super().__init__(model_id)
 
-        # Load local model and tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(local_model_id)
-        self.model = AutoModelForCausalLM.from_pretrained(local_model_id, device_map="auto", torch_dtype=torch.float16)
+        # Load local model and tokenizer (use efficient model params)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+        self.model = AutoModelForCausalLM.from_pretrained(model_id, dtype=torch.float16)
+        self.model.eval()
 
         self._usage_data = None
 
     def stream(self, messages: List[Dict[str, str]]):
         self._usage_data = None
+        print("Starting tokenize")
         # Apply chat template & tokenize input
         inputs = self.tokenizer.apply_chat_template(
             messages,
@@ -80,47 +80,56 @@ class HFLocalModel(Model):
             skip_special_tokens=True
         )
 
-        # Make generation config
-        gen_kwargs = dict(
-            input_ids=inputs,
-            streamer=streamer,
-            max_new_tokens=MAX_NEW_TOKENS,
-            do_sample=True,
-            temperature=TEMPERATURE,
-            top_p=TOP_P
-        )
+        def generate():
+            # Ensure no gradients
+            with torch.inference_mode():
+                try:
+                    self.model.generate(input_ids=inputs['input_ids'],
+                                        attention_mask=inputs['attention_mask'],
+                                        max_new_tokens=MAX_NEW_TOKENS,
+                                        do_sample=True,
+                                        temperature=TEMPERATURE,
+                                        top_p=TOP_P,
+                                        use_cache=True, # Use KV Cache
+                                        streamer=streamer # Adds the text streamer to capture output callback
+                                        )
+                except Exception as e:
+                    # Stop streamer and propagate error
+                    self._thread_error = e
+                    streamer.end()
 
+        print("Starting stream")
         # Start another thread to run generation for streaming
-        thread = Thread(target=self.model.generate, kwargs=gen_kwargs)
+        thread = Thread(target=generate)
         thread.start()
 
         # Accumulate usage
-        input_tokens = inputs["input_ids"].shape[-1]
-        output_tokens = 0
+        input_token_count = inputs['input_ids'].shape[-1]
+        output_token_count = 0
         for text in streamer:
             yield text
-            output_tokens += 1
+            output_token_count += 1
+
+        # Clean up thread
+        thread.join()
 
         # Add usage data
-        self._usage_data = {"input_tokens": input_tokens, "output_tokens": output_tokens}
+        self._usage_data = {"input_token_count": input_token_count, "output_token_count": output_token_count}
 
     def get_usage(self):
         return {
             "model_name": self.get_name(),
-            "input_tokens": self._usage_data["input_tokens"],
-            "output_tokens": self._usage_data["output_tokens"],
+            "input_token_count": self._usage_data["input_token_count"],
+            "output_token_count": self._usage_data["output_token_count"],
         }
-
-    def get_name(self):
-        return local_model_id
 
 
 class HFInferenceClientModel(Model):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model_id: str):
+        super().__init__(model_id)
 
         self.client = InferenceClient(
-            model=external_model_id,
+            model=model_id,
             token=HF_TOKEN,
         )
 
@@ -137,16 +146,16 @@ class HFInferenceClientModel(Model):
                 temperature=TEMPERATURE,
                 top_p=TOP_P,
         ):
-            yield chunk
+            if chunk.choices and chunk.choices[0].delta.content:
+                token = chunk.choices[0].delta.content
+                yield token
+            # Add usage data for logging
             if hasattr(chunk, 'usage') and chunk.usage:
                 self._usage_data = chunk.usage
-
-    def get_name(self):
-        return external_model_id
 
     def get_usage(self):
         return {
             "model_name": self.get_name(),
-            "input_tokens": self._usage_data.prompt_tokens,
-            "output_tokens": self._usage_data.completion_tokens,
+            "input_token_count": self._usage_data.prompt_tokens,
+            "output_token_count": self._usage_data.completion_tokens,
         }

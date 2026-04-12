@@ -10,4 +10,4 @@ class AniZenithReranker:
 
     def rerank(self, user_query: str, results: List[AniZenithVectorSearchResult], limit=5):
         # TODO: Add to this this framework
-        return results
+        return results[:limit]

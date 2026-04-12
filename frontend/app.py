@@ -10,6 +10,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
+from dotenv import load_dotenv
+
+load_dotenv(".env")
 
 # Configure logging at Startup
 logging.basicConfig(level = logging.INFO)
