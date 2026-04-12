@@ -1,15 +1,15 @@
+import json
 from typing import List, Dict
 from huggingface_hub import InferenceClient
 from transformers import pipeline, GenerationConfig
 
+from backend.mongo.AniZenithMongoClient import AniZenithMongoClient
+from backend.mongo.AniZenithVectorSearchResult import AniZenithVectorSearchResult
 from backend.utils.prometheus_utils import CHATBOT_PIPELINE_LATENCY_SUMMARY, observe_bot_message, observe_user_message
-from backend.utils.retrieval_utils import get_recommendations
 from backend.configs import model_config, backend_app_config
 
 # Init AniZenithMongoClient
-CONN_STRING = os.getenv("ATLAS_URI")
-DB_CLIENT = AniZenithMongoClient(CONN_STRING)
-
+DB_CLIENT = AniZenithMongoClient(backend_app_config.ATLAS_URI)
 
 # Load the Local Pipeline Model at App Startup
 PIPELINE_LOCAL_MODEL = pipeline(task='text-generation', model=model_config.local_model_id)

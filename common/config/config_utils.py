@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
 # Load environment variables
-load_dotenv()
+load_dotenv(".env")
 
 # Base config file (must be included)
 BASE_CONFIG_PATH = Path(__file__).parent / "base_config.yml"
@@ -95,7 +95,8 @@ class Config(BaseSettings):
         # Ignores fields in base config
         all_fields = set(instance.__class__.model_fields)
         base_fields = set(getattr(instance.__class__.__base__, "model_fields", {}))
-        missing = all_fields - set_fields - base_fields
+        # Note: .env variable and Pydantic variable must be identical in name and capitalization
+        missing = all_fields - set_fields - base_fields - os.environ.keys()
         if missing:
             print(f"Warning: Missing fields {missing} in YAML: {config_file_path}.")
 

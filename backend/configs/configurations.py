@@ -23,6 +23,7 @@ class BackendAppConfig(Config):
     MAL_CLIENT_ID: str = os.getenv("MAL_CLIENT_ID", "")
     MAL_CLIENT_SECRET: str = os.getenv("MAL_CLIENT_SECRET", "")
     BACKEND_SECRET: str = os.getenv("BACKEND_SECRET", "")
+    ATLAS_URI: str = os.getenv("ATLAS_URI", "")
 
 class ModelConfig(Config):
     """
