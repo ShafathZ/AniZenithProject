@@ -1,6 +1,6 @@
 from typing import Optional
 
-from shared.config.config_utils import Config
+from common.config.config_utils import Config
 
 class FrontendContainerConfig(Config):
     """

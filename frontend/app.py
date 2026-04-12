@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from shared.prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
+from common.prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
 
 from frontend.configs import frontend_container_config, frontend_app_config
 
