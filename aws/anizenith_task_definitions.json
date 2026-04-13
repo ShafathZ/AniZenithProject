@@ -1,0 +1,142 @@
+{
+  "family": "AniZenith-MultiContainer-Deployment",
+  "revision": 1,
+  "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${TASK_ROLE_NAME}",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${EXECUTION_ROLE_NAME}",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "4096",
+  "memory": "8192",
+  "volumes": [
+    {
+      "name": "AniZenithEFSVolume",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "${EFS_FILESYSTEM_ID}",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "iam": "ENABLED"
+        }
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "anizenith_frontend",
+      "image": "surigo/anizenith_frontend:latest",
+      "cpu": 512,
+      "memory": 1024,
+      "memoryReservation": 512,
+      "portMappings": [
+        {
+          "name": "frontend-http",
+          "containerPort": 7002,
+          "hostPort": 7002,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "BACKEND_HOSTNAME",
+          "value": "localhost"
+        },
+        {
+          "name": "BACKEND_PORT",
+          "value": "9002"
+        },
+        {
+          "name": "FRONTEND_HOSTNAME",
+          "value": "0.0.0.0"
+        },
+        {
+          "name": "FRONTEND_LOGLEVEL",
+          "value": "info"
+        },
+        {
+          "name": "FRONTEND_PORT",
+          "value": "7002"
+        }
+      ],
+      "environmentFiles": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "dependsOn": [
+        {
+          "containerName": "anizenith_backend",
+          "condition": "HEALTHY"
+        }
+      ],
+      "ulimits": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/AniZenith-MultiContainer-Deployment",
+          "awslogs-create-group": "true",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        },
+        "secretOptions": []
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:7002/ || exit 1"
+        ],
+        "interval": 15,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 30
+      },
+      "systemControls": []
+    },
+    {
+      "name": "backend",
+      "image": "surigo/anizenith_backend:latest",
+      "cpu": 2048,
+      "memory": 8192,
+      "memoryReservation": 6144,
+      "essential": true,
+      "portMappings": [
+        {
+          "name": "backend-http",
+          "containerPort": 9002,
+          "hostPort": 9002,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "environment": [
+        {
+          "name": "BACKEND_LOGLEVEL",
+          "value": "info"
+        },
+        {
+          "name": "BACKEND_PORT",
+          "value": "9002"
+        },
+        {
+          "name": "BACKEND_HOSTNAME",
+          "value": "0.0.0.0"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "BACKEND_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:${BACKEND_SECRET_NAME}"
+        },
+        {
+          "name": "HF_TOKEN",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:${HF_TOKEN_SECRET_NAME}"
+        }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:9002/health || exit 1"],
+        "interval": 15,
+        "timeout": 3,
+        "retries": 3,
+        "startPeriod": 90
+      }
+    }
+  ]
+}
