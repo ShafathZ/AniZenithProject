@@ -50,6 +50,7 @@ async def handle_chat_request(request: AniZenithRequest):
 
     # Chat with LLM using the messages in the request
     assistant_message = ""
+    # TODO: Replace null user with real user / session ID
     for streamed_response in inference_manager.chat(request.messages, "null-user"):
         assistant_message += streamed_response
 

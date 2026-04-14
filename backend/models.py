@@ -71,7 +71,6 @@ class HFLocalModel(Model):
         self.model.eval()
 
         self._usage_data = None
-        self._thread_error = None
 
     def stream(self, messages: List[Dict[str, str]]):
         self._usage_data = None
@@ -90,9 +89,11 @@ class HFLocalModel(Model):
             skip_special_tokens=True
         )
 
+        generation_err = None
         def generate():
             # Ensure no gradients
             with torch.no_grad():
+                nonlocal generation_err
                 try:
                     self.model.generate(input_ids=inputs['input_ids'],
                                         attention_mask=inputs['attention_mask'],
@@ -105,7 +106,7 @@ class HFLocalModel(Model):
                                         )
                 except Exception as e:
                     # Stop streamer and propagate error
-                    self._thread_error = e
+                    generation_err = e
                     streamer.end()
 
         # Start another thread to run generation for streaming
@@ -126,8 +127,8 @@ class HFLocalModel(Model):
         thread.join()
 
         # Handle error after joining if it exists
-        if self._thread_error is not None:
-            raise self._thread_error
+        if generation_err is not None:
+            raise generation_err
 
         # Add usage data
         self._usage_data = {"input_token_count": input_token_count, "output_token_count": output_token_count}
