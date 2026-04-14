@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from backend.AniZenithExchange import AniZenithRequest, AniZenithResponse
 from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
 from backend.validation_utils import validate_anizenith_request
-from backend.backend_utils import chat_with_llm
+from backend.inference_manager import InferenceManager
 
 from starlette.middleware.sessions import SessionMiddleware
 import logging
@@ -29,6 +29,9 @@ app.add_middleware(PrometheusMiddleware, prefix="backend")
 app.include_router(prometheus_router)
 #app.include_router(auth_router)
 
+# Initialize Backend Inference Manager
+inference_manager = InferenceManager()
+
 # ┌───────────────────────────────────────────────┐
 # │              BACKEND API ENDPOINTS            │
 # └───────────────────────────────────────────────┘
@@ -47,8 +50,9 @@ async def handle_chat_request(request: AniZenithRequest):
 
     # Chat with LLM using the messages in the request
     assistant_message = ""
-    for streamed_response in chat_with_llm(request.messages, request.use_local):
-        assistant_message = streamed_response
+    # TODO: Replace null user with real user / session ID
+    for streamed_response in inference_manager.chat(request.messages, "null-user"):
+        assistant_message += streamed_response
 
     # Construct an AniZenithResponse based on Assistant Message
     # Copy the old set of messages
