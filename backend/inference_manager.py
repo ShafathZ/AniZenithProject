@@ -13,12 +13,10 @@ from backend.reranker import AniZenithReranker
 from constants import *
 
 load_dotenv(".env")
-# TODO: Move to config management system
+# TODO: Move these to config management system
 MONGO_CONN_STRING = os.getenv("ATLAS_URI")
-
 VECTOR_SEARCH_LIMIT = 20
 RERANK_LIMIT = 5
-
 MODEL_DOWNTIME_SECONDS = 120
 
 local_model_id = "Qwen/Qwen3-0.6B"
@@ -73,15 +71,15 @@ class InferenceManager:
                 # Use the last message as the user message (it should always be a user message)
                 user_query = messages[-1]['content']
                 retrieved_docs: List[AniZenithVectorSearchResult] = self.db_client.perform_vector_search(user_query, limit=VECTOR_SEARCH_LIMIT)
-                print(f"Retrieved Docs: ({len(retrieved_docs)})")
+                print(f"Retrieved Docs: ({len(retrieved_docs)}) relevant docs")
 
             # 2) Rerank results using the reranker based on document info and user query
-            with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=current_model.get_name(), stage="reranker").time():
-                recommended_docs: List[AniZenithVectorSearchResult] = self.reranker.rerank(user_query, retrieved_docs, limit=RERANK_LIMIT)
-                print(f"Reranked Docs: ({len(recommended_docs)})")
+            with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=current_model.get_name(), stage="reranking").time():
+                reranked_docs: List[AniZenithVectorSearchResult] = self.reranker.rerank(user_query, retrieved_docs, limit=RERANK_LIMIT)
+                print(f"Reranked Docs: ({len(reranked_docs)})")
 
             # 3) Construct system prompt with recommended docs
-            system_prompt = self._build_system_prompt(recommended_docs)
+            system_prompt = self._build_system_prompt(reranked_docs)
 
             # 4) Insert system prompt into messages
             messages.insert(0, {"role": "system", "content": system_prompt})
@@ -114,7 +112,7 @@ class InferenceManager:
 
         # Add base system prompt
         lines.append(SYSTEM_PROMPT)
-        lines.append("Here are the recommendation system's top shows:\n")
+        lines.append(RECOMMENDED_DOCS_PREAMBLE)
 
         # Add recommendation docs
         # model_dump() is a special Pydantic method to generate a dict representation of any Pydantic object

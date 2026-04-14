@@ -71,10 +71,10 @@ class HFLocalModel(Model):
         self.model.eval()
 
         self._usage_data = None
+        self._thread_error = None
 
     def stream(self, messages: List[Dict[str, str]]):
         self._usage_data = None
-        print("Starting tokenize")
         # Apply chat template & tokenize input
         inputs = self.tokenizer.apply_chat_template(
             messages,
@@ -92,7 +92,7 @@ class HFLocalModel(Model):
 
         def generate():
             # Ensure no gradients
-            with torch.inference_mode():
+            with torch.no_grad():
                 try:
                     self.model.generate(input_ids=inputs['input_ids'],
                                         attention_mask=inputs['attention_mask'],
@@ -108,20 +108,26 @@ class HFLocalModel(Model):
                     self._thread_error = e
                     streamer.end()
 
-        print("Starting stream")
         # Start another thread to run generation for streaming
         thread = Thread(target=generate)
         thread.start()
 
         # Accumulate usage
-        input_token_count = inputs['input_ids'].shape[-1]
+        input_token_count = inputs['input_ids'].shape[-1] # (B x input_tokens_len)
         output_token_count = 0
+
+        # Streamer obtains values sequentially by injecting into generate function in new thread
+        # Streamer outputs values as Generator for text here
         for text in streamer:
             yield text
-            output_token_count += 1
+            output_token_count += 1 # Streamer executes every token event received
 
         # Clean up thread
         thread.join()
+
+        # Handle error after joining if it exists
+        if self._thread_error is not None:
+            raise self._thread_error
 
         # Add usage data
         self._usage_data = {"input_token_count": input_token_count, "output_token_count": output_token_count}
