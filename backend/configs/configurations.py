@@ -19,6 +19,10 @@ class BackendAppConfig(Config):
     config_file: str = "app_config.yml"
 
     log_level: Optional[str] = None
+    session_cookie_name: Optional[str] = None
+    max_session_cookie_age: Optional[int] = None
+    same_site_protection: Optional[str] = None
+
     HF_TOKEN: str = os.getenv("HF_TOKEN", "")
     MAL_CLIENT_ID: str = os.getenv("MAL_CLIENT_ID", "")
     MAL_CLIENT_SECRET: str = os.getenv("MAL_CLIENT_SECRET", "")

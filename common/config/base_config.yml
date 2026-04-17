@@ -1,7 +1,1 @@
 default:
-  # Data Directories
-  data_dir: ./data
-  log_dir: ./data/logs
-
-  # Base Logger Format
-  log_format: "%Y-%m-%d_%H%M%S"

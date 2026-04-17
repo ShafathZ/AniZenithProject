@@ -12,9 +12,9 @@ COPY backend/ /anizenith_backend/backend
 # This creates a new folder called "/anizenith_backend/data" and pastes contents of "data" folder into it
 COPY data/ /anizenith_backend/data
 
-# Copy shared folder
-# This creates a new folder called "/anizenith_backend/shared" and pastes contents of "shared" folder into it
-COPY shared/ /anizenith_backend/shared
+# Copy common folder
+# This creates a new folder called "/anizenith_backend/common" and pastes contents of "common" folder into it
+COPY common/ /anizenith_backend/common
 
 # Set the working directory to /anizenith_backend folder
 WORKDIR /anizenith_backend

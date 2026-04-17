@@ -13,6 +13,13 @@ DB_CLIENT = AniZenithMongoClient(backend_app_config.ATLAS_URI)
 
 # Load the Local Pipeline Model at App Startup
 PIPELINE_LOCAL_MODEL = pipeline(task='text-generation', model=model_config.local_model_id)
+# Local generation config to use in this file
+LOCAL_GENERATION_CONFIG = GenerationConfig(
+                            max_new_tokens=model_config.max_new_tokens,
+                            temperature=model_config.temperature,
+                            top_p=model_config.top_p,
+                            do_sample=True
+                        )
 
 # TODO: Make this Method Async Later
 def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
@@ -66,13 +73,7 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
     # --- Local Model ---
     if use_local_model:
         # Uses pipeline from transformers library w/ Generation Config (since old method is now deprecated)
-        generation_config = GenerationConfig(
-            max_new_tokens=model_config.max_new_tokens,
-            temperature=model_config.temperature,
-            top_p=model_config.top_p,
-            do_sample=True
-        )
-        response = PIPELINE_LOCAL_MODEL(input_messages, generation_config=generation_config)
+        response = PIPELINE_LOCAL_MODEL(input_messages, generation_config=LOCAL_GENERATION_CONFIG)
         generated_text = response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
         # Parse the output and yield it
         yield generated_text

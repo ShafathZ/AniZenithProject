@@ -133,6 +133,7 @@ services:
       - anizenith_net
     restart: unless-stopped
 
+# -- Code used for Case Study 3 for tunneling. Not needed anymore --
   # Spin up "ngrok" service
   # This will be useful for creating secure tunnels to expose local development servers to the internet
 #  ngrok:

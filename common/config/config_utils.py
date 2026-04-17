@@ -36,6 +36,9 @@ def _load_yaml_data(path: str | Path, cfg_obj):
             set_fields.add(key)
         else:
             print(f"Warning: Config key '{key}' in {path} is not registered in configurations.py")
+    # Return if empty config
+    if not yaml_cfg.get("default", {}):
+        return cfg_obj, set_fields
 
     # 1. Load default section
     for key, value in yaml_cfg.get("default", {}).items():
@@ -57,10 +60,6 @@ class Config(BaseSettings):
     Shared defaults are loaded from base_config.yaml.
     Mode-specific overrides are applied based on 'mode'.
     """
-    data_dir: str = "data"
-    log_dir: str = "data/logs"
-    log_format: str = "%Y-%m-%d_%H%M%S"
-
     # Force subclasses to define a config file
     config_file: str | Path = None
     mode: str = os.getenv("APP_ENV", "PRODUCTION")
