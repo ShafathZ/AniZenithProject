@@ -37,7 +37,7 @@ class Config(BaseModel):
 
         # Throw error if config file not set (Forces subclasses to define a config file)
         if cfg_instance.config_file is None:
-            raise NotImplementedError(f"{cfg_instance.__class__.__name__} must define 'config_file' in *_config.py")
+            raise NotImplementedError(f"{cfg_instance.__class__.__name__} must define 'config_file' variable in {cfg_instance.__module__}.py")
 
         # 3. Load subclass-specific config
         # Assumes the config path is relative to the file where the path is written
