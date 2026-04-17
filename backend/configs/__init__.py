@@ -1,4 +1,4 @@
-from .configurations import BackendAppConfig, BackendContainerConfig, ModelConfig
+from .backend_config import BackendAppConfig, BackendContainerConfig, ModelConfig
 
 # Python context manager global variable
 backend_app_config: BackendAppConfig = BackendAppConfig.load()
