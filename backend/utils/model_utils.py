@@ -1,37 +1,30 @@
+import json
 from typing import List, Dict
 from huggingface_hub import InferenceClient
-from transformers import pipeline
-from backend.constants import *
-from backend.prometheus_utils import *
-from dotenv import load_dotenv
-import os
-import json
+from transformers import pipeline, GenerationConfig
+
 from backend.mongo.AniZenithMongoClient import AniZenithMongoClient
 from backend.mongo.AniZenithVectorSearchResult import AniZenithVectorSearchResult
-
-# Load all Environment Variables
-load_dotenv()
-HF_TOKEN = os.getenv('HF_TOKEN')
+from backend.utils.prometheus_utils import CHATBOT_PIPELINE_LATENCY_SUMMARY, observe_bot_message, observe_user_message
+from backend.configs import model_config, backend_app_config
 
 # Init AniZenithMongoClient
-CONN_STRING = os.getenv("ATLAS_URI")
-DB_CLIENT = AniZenithMongoClient(CONN_STRING)
-
+DB_CLIENT = AniZenithMongoClient(backend_app_config.ATLAS_URI)
 
 # Load the Local Pipeline Model at App Startup
-PIPELINE_LOCAL_MODEL = pipeline(task='text-generation',
-                                model='Qwen/Qwen3-0.6B',
-                                max_new_tokens=MAX_NEW_TOKENS,
-                                temperature=TEMPERATURE,
-                                do_sample=False,
-                                top_p=TOP_P)
-
+PIPELINE_LOCAL_MODEL = pipeline(task='text-generation', model=model_config.local_model_id)
+# Local generation config to use in this file
+LOCAL_GENERATION_CONFIG = GenerationConfig(
+                            max_new_tokens=model_config.max_new_tokens,
+                            temperature=model_config.temperature,
+                            top_p=model_config.top_p,
+                            do_sample=True
+                        )
 
 # TODO: Make this Method Async Later
 def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
-
-    # TODO: Replace with actual IDs from a config
-    model = "Qwen/Qwen3-0.6B" if use_local_model else "openai/gpt-oss-20b"
+    # TODO: Replace with actual IDs from config
+    model = model_config.local_model_id if use_local_model else model_config.external_model_id
     with CHATBOT_PIPELINE_LATENCY_SUMMARY.labels(model=model, stage="full_pipeline").time():
 
         # Use the last message as the user message (it should always be a user message)
@@ -43,11 +36,11 @@ def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
             # Perform Vector Search using user query
             # This method returns a List[AniZenithVectorSearchResult]
             recommendations: List[AniZenithVectorSearchResult] = DB_CLIENT.perform_vector_search(user_query)
-            
+
             # Convert the list of vector search objects into a list of dicts
             # model_dump() is a special Pydantic method to generate a dict representation of any Pydantic object
             recommendations_dict = [recommendation.model_dump() for recommendation in recommendations]
-            
+
             # Serialize to a JSON string
             recommendations_string = json.dumps(recommendations_dict, indent = 4)
 
@@ -61,7 +54,7 @@ def chat_with_llm(messages: List[Dict[str, str]], use_local_model: bool):
 def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommendations_string: str):
     # --- Determine System Prompt ---
     # Start with the Fixed System Prompt
-    system_prompt = SYSTEM_PROMPT
+    system_prompt = model_config.system_prompt
 
     # Append recommendation string data to the System Prompt if it exists
     if recommendations_string:
@@ -72,7 +65,6 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
     # Add the rest of the messages
     input_messages.extend(messages)
 
-    # --- Determine which model to use (local or external) ---
     # Constants for logging
     response = ""
     input_token_count = 0
@@ -80,11 +72,10 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
 
     # --- Local Model ---
     if use_local_model:
-        # Uses pipeline from transformers library
-        response = PIPELINE_LOCAL_MODEL(input_messages)
-
-        # Get the response from the local model, parse it, and yield
+        # Uses pipeline from transformers library w/ Generation Config (since old method is now deprecated)
+        response = PIPELINE_LOCAL_MODEL(input_messages, generation_config=LOCAL_GENERATION_CONFIG)
         generated_text = response[0]['generated_text'][-1]['content'].split('</think>')[-1].strip()
+        # Parse the output and yield it
         yield generated_text
 
         # Log token counts (there is no clean way to do this besides re-tokenizing)
@@ -98,22 +89,22 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
         generated_tokens = tokenizer.encode(generated_text)
         input_token_count = len(input_tokens)
         output_token_count = len(generated_tokens)
-            
+
     # --- Non-local Model (Use InferenceClient) ---
     else:
         client = InferenceClient(
-            token=HF_TOKEN,
-            model="openai/gpt-oss-20b",
+            token=backend_app_config.HF_TOKEN,
+            model=model_config.external_model_id,
         )
 
         # Stream inference client output and yield the text chunk
         usage = None
         for chunk in client.chat_completion(
                 messages=input_messages,
-                max_tokens=MAX_NEW_TOKENS,
+                max_tokens=model_config.max_new_tokens,
                 stream=True,
-                temperature=TEMPERATURE,
-                top_p=TOP_P,
+                temperature=model_config.temperature,
+                top_p=model_config.top_p,
         ):
             if chunk.choices and chunk.choices[0].delta.content:
                 token = chunk.choices[0].delta.content
@@ -129,7 +120,7 @@ def query_model(messages: List[Dict[str, str]], use_local_model: bool, recommend
 
     # Log the model usage output
     # TODO: Record the specific model ID once the backend is refactored
-    model = "Qwen/Qwen3-0.6B" if use_local_model else "openai/gpt-oss-20b"
+    model = model_config.local_model_id if use_local_model else model_config.external_model_id
     # TODO: Use real Inference Manager / session ID
     observe_user_message(user_id="0", user_message=messages[-1]['content'], token_count=input_token_count, model=model)
     observe_bot_message(user_id="0", bot_message=response, token_count=output_token_count, model=model)

@@ -5,9 +5,9 @@ FROM python:3.12.3-slim
 # This creates a new folder called "/anizenith_frontend/frontend" and pastes contents of "frontend" folder into it
 COPY frontend/ /anizenith_frontend/frontend
 
-# Copy prometheus folder
-# This creates a new folder called "/anizenith_frontend/prometheus" and pastes contents of "prometheus" folder into it
-COPY prometheus/ /anizenith_frontend/prometheus
+# Copy common folder
+# This creates a new folder called "/anizenith_frontend/common" and pastes contents of "common" folder into it
+COPY common/ /anizenith_frontend/common
 
 # Set the working directory to /anizenith_frontend folder
 WORKDIR /anizenith_frontend

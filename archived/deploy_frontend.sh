@@ -26,9 +26,9 @@ while getopts ":b" opt; do
   case "$opt" in
 
     # If option '-b' is provided, detect the current git branch
-    b) 
+    b)
       PRODUCTION_BRANCH=$(git branch --show-current)
-      
+
       # Safety check in case the command fails (e.g., empty repository or detached HEAD)
       if [[ -z "$PRODUCTION_BRANCH" ]]; then
           echo "Error: Could not detect current git branch. Are you in a valid git repository?" >&2
@@ -85,7 +85,7 @@ git checkout $PRODUCTION_BRANCH && git pull || \
 echo -e '\n=== Setting up Python 3.12 ==='
 
 # If the command python3.12 is not found, then install it
-if ! command -v python3.12 &>/dev/null; then 
+if ! command -v python3.12 &>/dev/null; then
   sudo apt update
   sudo add-apt-repository ppa:deadsnakes/ppa -y
   sudo apt install python3.12 python3.12-venv -y

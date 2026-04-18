@@ -1,19 +1,16 @@
-import os
-
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
 from backend.AniZenithExchange import AniZenithRequest, AniZenithResponse
-from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
-from backend.validation_utils import validate_anizenith_request
-from backend.backend_utils import chat_with_llm
+from common.prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
+from backend.utils.validation_utils import validate_anizenith_request
+from backend.utils.model_utils import chat_with_llm
 
 from starlette.middleware.sessions import SessionMiddleware
 import logging
 
-from dotenv import load_dotenv
-load_dotenv()
+from backend.configs import backend_container_config, backend_app_config
 
 # Configure logging at Startup
 logging.basicConfig(level = logging.INFO)
@@ -24,7 +21,11 @@ logger.setLevel(logging.INFO)
 
 # Create FastAPI app
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("BACKEND_SECRET"), session_cookie="session", max_age=3600, same_site="lax")
+app.add_middleware(SessionMiddleware,
+                   secret_key=backend_app_config.BACKEND_SECRET,
+                   session_cookie=backend_app_config.session_cookie_name,
+                   max_age=backend_app_config.max_session_cookie_age,
+                   same_site=backend_app_config.same_site_protection)
 app.add_middleware(PrometheusMiddleware, prefix="backend")
 app.include_router(prometheus_router)
 #app.include_router(auth_router)
@@ -108,8 +109,8 @@ async def validation_exception_handler(request: Request, err: RequestValidationE
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.app:app", 
-                host=os.getenv("BACKEND_HOSTNAME"), 
-                port=int(os.getenv("BACKEND_PORT")), 
+    uvicorn.run(app,
+                host=backend_container_config.hostname,
+                port=backend_container_config.port,
                 reload=False, 
-                log_level=os.getenv("BACKEND_LOGLEVEL"))
+                log_level=backend_app_config.log_level)

@@ -1,6 +1,6 @@
 import fnmatch
-import os
 import posixpath
+from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, Request
@@ -9,7 +9,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
+from common.prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
+
+from frontend.configs import frontend_container_config, frontend_app_config
 
 # Configure logging at Startup
 logging.basicConfig(level = logging.INFO)
@@ -22,7 +24,7 @@ logger.setLevel(logging.INFO)
 app = FastAPI()
 
 # Add Middleware security (Only allow requests to specific endpoints to prevent insertion attacks)
-origins = [f"http://localhost:{os.getenv("FRONTEND_PORT")}"]
+origins = [f"http://{frontend_container_config.hostname}:{frontend_container_config.port}"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -34,8 +36,9 @@ app.add_middleware(PrometheusMiddleware, prefix="frontend")
 app.include_router(prometheus_router)
 
 # Set up accessible directories
-app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
-templates = Jinja2Templates(directory="frontend/templates")
+SERVICE_DIR = Path(__file__).resolve().parent
+app.mount("/static", StaticFiles(directory=SERVICE_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=SERVICE_DIR / "templates")
 
 # Home page endpoint to get our HTML, CSS, JS
 @app.get("/", response_class=HTMLResponse)
@@ -93,7 +96,7 @@ async def proxy(path: str, request: Request):
     if not is_allowed_route(path, request.method):
         return JSONResponse({"error": "Endpoint not allowed through proxy"}, status_code=403)
 
-    backend_url = f"http://{os.getenv("BACKEND_HOSTNAME")}:{os.getenv("BACKEND_PORT")}/{path}"
+    backend_url = f"http://{frontend_app_config.proxy_hostname}:{frontend_app_config.proxy_port}/{path}"
 
     # Store and re-send body to backend
     body_bytes = await request.body()
@@ -131,8 +134,8 @@ async def proxy(path: str, request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("frontend.app:app", 
-                host=os.getenv("FRONTEND_HOSTNAME"), 
-                port=int(os.getenv("FRONTEND_PORT")), 
-                reload=False, 
-                log_level=os.getenv("FRONTEND_LOGLEVEL"))
+    uvicorn.run(app,
+                host=frontend_container_config.hostname,
+                port=frontend_container_config.port,
+                reload=False,
+                log_level=frontend_app_config.log_level)

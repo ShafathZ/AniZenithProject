@@ -13,7 +13,7 @@ services:
       - path: backend.env
         required: false
       # Tries the local location (relative to compose.yml)
-      - path: ../backend/backend.env
+      - path: ../../backend/.env
         required: false
     # Calls the health check endpoint using defined configs before declaring the service as "Healthy"
     healthcheck:
@@ -43,7 +43,7 @@ services:
       - path: frontend.env
         required: false
       # Tries the local location (relative to compose.yml)
-      - path: ../frontend/frontend.env
+      - path: ../../frontend/.env
         required: false
 
   # Spin up "cadvisor" (Container Advisor) as a service
@@ -120,7 +120,7 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
       # Map a volume from the local (to where compose.yml is run) prometheus.yml file to an internal container volume
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - anizenith_prometheus_data:/prometheus
     ports:
       - '22023:9090'
@@ -133,28 +133,29 @@ services:
       - anizenith_net
     restart: unless-stopped
 
+# -- Code used for Case Study 3 for tunneling. Not needed anymore --
   # Spin up "ngrok" service
   # This will be useful for creating secure tunnels to expose local development servers to the internet
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: anizenith_ngrok
-
-    # For now we are tunning frontend
-    # TODO: Hookup grafana as well (maybe using ngrok.yml)
-    depends_on:
-      - frontend
-      - grafana
-    # command: http frontend:7002
-    command: ["start", "--all", "--config", "/etc/ngrok.yml"]
-    volumes:
-      - ./ngrok.yml:/etc/ngrok.yml:ro
-    ports:
-      - "22022:4040"
-    networks:
-      - anizenith_net
-    restart: unless-stopped
-    env_file:
-      - ngrok.env
+#  ngrok:
+#    image: ngrok/ngrok:latest
+#    container_name: anizenith_ngrok
+#
+#    # For now we are tunning frontend
+#    # TODO: Hookup grafana as well (maybe using ngrok.yml)
+#    depends_on:
+#      - frontend
+#      - grafana
+#    # command: http frontend:7002
+#    command: ["start", "--all", "--config", "/etc/ngrok.yml"]
+#    volumes:
+#      - ../ngrok/ngrok.yml:/etc/ngrok.yml:ro
+#    ports:
+#      - "22022:4040"
+#    networks:
+#      - anizenith_net
+#    restart: unless-stopped
+#    env_file:
+#      - ngrok.env
 
   # Spin up "grafana" as a service
   # This will be used to Monitoring Dashboards using metrics data from Prometheus service
