@@ -3,5 +3,5 @@ default:
   proxy_hostname: "localhost"
   proxy_port: 9002
 production:
-  proxy_hostname: "backend"
+  proxy_hostname: "localhost"
   proxy_port: 9002
