@@ -57,6 +57,11 @@ async def search(request: Request):
     # Return template for search page
     return templates.TemplateResponse("search.html", {"request": request})
 
+@app.get("/about", response_class=HTMLResponse)
+async def about(request: Request):
+    # Return template for About Us page
+    return templates.TemplateResponse("about.html", {"request": request})
+
 # Security middleware endpoint
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):

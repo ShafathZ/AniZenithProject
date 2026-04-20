@@ -1,46 +1,5 @@
 @import url('./chat.css');
 
-/* ===== PAGE TITLE & SUBTITLE ===== */
-.page-title {
-    text-align: center;
-    font-size: 2.5rem;
-    margin: 1rem 0 0.5rem 0;
-    font-weight: 700;
-    line-height: 1.2;
-    color: var(--text-main);
-
-    /* Fancy animation thing I found */
-    background: linear-gradient(270deg, var(--accent-primary), var(--accent-secondary), white);
-    background-size: 600% 600%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradientShift 8s ease infinite;
-}
-
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-.fancy-z {
-    font-size: 3rem;
-}
-
-.subtitle {
-    display: block;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    line-height: 1.4;
-    letter-spacing: 0.2px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 1rem;
-}
-
 /* ===== LOCAL MODEL BUTTON ===== */
 .toggle-wrapper {
     text-align: center;

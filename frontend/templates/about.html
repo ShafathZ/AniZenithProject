@@ -1,0 +1,67 @@
+{% extends "main.html" %}
+
+{% block title %}About Us - Aniℤenith{% endblock %}
+
+{% block imports %}
+<link rel="stylesheet" href="/static/css/main.css">
+<link rel="stylesheet" href="/static/css/about/about.css">
+{% endblock %}
+
+{% block content %}
+<div class="about-container">
+  <!-- Title -->
+  <h1 class="page-title">
+      About Ani<span class="fancy-z">ℤ</span>enith
+  </h1>
+  <!-- Mission & Vision -->
+  <h2 class="section-title"> About our Dream</h2>
+  <div class="mission-grid">
+    <div class="mission-card">
+      <div class="mission-icon"><i class="fa-regular fa-star"></i></div>
+      <h3>Our Mission</h3>
+      <p>To connect anime fans through a vibrant community, delivering personalized recommendations that make discovering new shows effortless and enjoyable.</p>
+    </div>
+    <div class="mission-card">
+      <div class="mission-icon"><i class="fa-solid fa-rocket"></i></div>
+      <h3>Our Vision</h3>
+      <p>To build a seamless, intelligent platform where fans everywhere can explore anime together, find what they love faster, and share in the joy of discovery.</p>
+    </div>
+    <div class="mission-card">
+      <div class="mission-icon"><i class="fa-solid fa-gem"></i></div>
+      <h3>Our Values</h3>
+      <p>We believe in community-driven experiences, joyful discovery, and efficient access to anime. We honor the creators by helping fans connect with their work more easily and meaningfully.</p>
+    </div>
+  </div>
+  <!-- Team Section -->
+  <h2 class="section-title"> Meet the AniZenith Crew</h2>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar"><img src="/static/images/user.jpg" alt="Shafath Zaman"></div>
+      <div class="team-name">Shafath Zaman</div>
+      <div class="team-role">Team Lead and Lead Frontend Developer</div>
+      <div class="team-bio">Endlessly searching for the Steins;Gate in the lab.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar"><img src="/static/images/user.jpg" alt="Suryansh Goyal"></i></div>
+      <div class="team-name">Suryansh Goyal</div>
+      <div class="team-role">Lead Backend, DevOps, and ML Engineer</div>
+      <div class="team-bio">Working out daily at the gym like Saitama.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar"><img src="/static/images/user.jpg" alt="Amaan Shirwani"></div>
+      <div class="team-name">Amaan Shirwani</div>
+      <div class="team-role">DevOps and ML Engineer, QA Analyst</div>
+      <div class="team-bio">Shadow clone jutsu to get work done faster.</div>
+    </div>
+  </div>
+
+  <!-- Donation Section -->
+  <div class="donate-section">
+    <h2> Support Us!</h2>
+    <p>Your donations help us maintain servers, add new features, and keep AniZenith ad-free for all anime-lovers and otaku. Every contribution fuels our passion!</p>
+    <a href="#" class="donate-btn" id="donateButton">
+      <i class="fa-regular fa-heart"></i> Donate Now
+    </a>
+  </div>
+</div>
+{% endblock %}
