@@ -20,7 +20,6 @@
     transition: 0.2s ease;
 
     background: var(--btn-bg);
-    color: white;
 }
 
 .toggle-wrapper label:hover {
@@ -62,7 +61,7 @@
     border-radius: 999px;
     border: none;
     background: var(--btn-bg);
-    color: white;
+    color: var(--text-main);
     font-weight: 300;
     cursor: pointer;
     white-space: nowrap;
@@ -120,7 +119,7 @@
     cursor: pointer;
     font-weight: 600;
     background: var(--btn-bg);
-    color: white;
+    color: var(--text-main);
     display: flex;
     justify-content: center;
     align-items: center;

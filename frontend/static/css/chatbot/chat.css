@@ -50,7 +50,7 @@
     background: var(--btn-bg);
     border: none;
     border-radius: 8px;
-    color: white;
+    color: var(--text-main);
     width: 36px;
     height: 36px;
     display: flex;
@@ -183,7 +183,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--text-main);
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
