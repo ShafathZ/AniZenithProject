@@ -1,16 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="/static/css/main.css">
-{% block imports %}{% endblock%}
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="/static/js/main.js"></script>
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Aniℤenith{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="/static/css/main.css">
+    {% block imports %}{% endblock %}
 </head>
-
 <body class="main-background">
+
+    <!-- ===== TOP BAR ===== -->
+    <header class="top-bar">
+        <button class="hamburger" id="sidebarToggle" aria-label="Toggle sidebar">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="logo-area">
+            <i class="fa-solid fa-dragon"></i>
+            <h1 class="page-title">
+              Ani<span class="fancy-z">ℤ</span>enith
+            </h1>
+        </div>
+
+        <div class="search-pill">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search anime..." aria-label="Search">
+        </div>
+
+        <button class="random-btn" id="randomAnimeBtn">
+            <i class="fa-solid fa-shuffle"></i>
+            <span>Random</span>
+        </button>
+
+        <div class="lang-toggle" id="langToggle">
+            <button class="lang-option active" data-lang="en">EN</button>
+            <button class="lang-option" data-lang="jp">JP</button>
+        </div>
+
+        <!-- MAL Login Button -->
+        <button class="mal-login" id="malLoginBtn">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>MAL Login</span>
+        </button>
+    </header>
+
+    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar no-select collapsed" id="sidebar">
         <h2>Features</h2>
         <ul>
@@ -22,10 +57,13 @@
         </ul>
     </aside>
 
+    <!-- ===== MAIN CONTENT ===== -->
     <div id="main-container" class="main-container">
         <div id="error-container"></div>
         {% block content %}
         {% endblock %}
     </div>
+
+    <script type="module" src="/static/js/main.js"></script>
 </body>
 </html>
