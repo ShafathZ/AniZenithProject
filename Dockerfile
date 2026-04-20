@@ -2,7 +2,8 @@
 FROM python:3.12.3-slim
 
 # Install curl for container health checks and service diagnostics
-RUN apt-get update && apt-get install -y curl
+# Cleaning up /var/lib/apt/lists/* removes the apt cache, which helps reduce the final Docker image size
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copy backend files and folders
 # This creates a new folder called "/anizenith/backend" and pastes contents of "backend" folder into it
@@ -27,7 +28,7 @@ COPY integrated-requirements.txt /anizenith
 WORKDIR /anizenith
 
 # Install libraries using requirements.txt
-# We need --extra-index-url to tell pip to install the cpu variant of the torch library, as our hardward only has CPU
+# We need --extra-index-url to tell pip to install the cpu variant of the torch library, as our hardware only has CPU
 # --extra-index-url is required as the cpu variant of the torch library is not on the default PyPi artifactory
 RUN pip install --upgrade pip
 RUN pip install -r integrated-requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir
