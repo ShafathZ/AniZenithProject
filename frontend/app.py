@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+
 from common.prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
 
 from frontend.configs import frontend_container_config, frontend_app_config
@@ -45,11 +46,16 @@ templates = Jinja2Templates(directory=SERVICE_DIR / "templates")
 async def home(request: Request):
     # Collect Auth Status from backend
     return templates.TemplateResponse(
-        "home.html",
+        "chatbot.html",
         {
             "request": request,
         }
     )
+
+@app.get("/search", response_class=HTMLResponse)
+async def search(request: Request):
+    # Return template for search page
+    return templates.TemplateResponse("search.html", {"request": request})
 
 # Security middleware endpoint
 @app.middleware("http")
@@ -59,7 +65,7 @@ async def add_security_headers(request: Request, call_next):
 
     CSP = (
         f"default-src 'self'; "
-        f"script-src 'self' https://cdn.jsdelivr.net; "
+        f"script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
         f"style-src 'self' https://cdnjs.cloudflare.com; "
         f"img-src 'self' data:; "
         f"font-src 'self' https://cdnjs.cloudflare.com; "
@@ -73,6 +79,7 @@ async def add_security_headers(request: Request, call_next):
 # --------- PROXY ENDPOINT ----------
 ALLOWED_PROXY_ROUTES = {
     "anizenith/chat": ["POST"],
+    "anizenith/search": ["GET"],
     "login/*": ["GET", "HEAD"],
     "logout/*": ["POST"],
     "auth/status": ["GET"],

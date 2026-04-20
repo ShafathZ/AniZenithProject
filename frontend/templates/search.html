@@ -1,0 +1,160 @@
+{% extends "main.html" %}
+
+{% block title %}Search Anime - Aniℤenith{% endblock %}
+
+{% block imports %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+<link rel="stylesheet" href="/static/css/search/search.css">
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <div class="search-section">
+      <form id="search-form" class="search-form">
+        <div class="search-bar-wrapper">
+          <input type="text" name="q" id="search-query" class="search-input" placeholder="Search anime titles in our database...">
+
+          <button type="button" class="filter-toggle-btn" id="filterToggleBtn">
+            <i class="fa-solid fa-chevron-down" id="toggleIcon"></i> Filters
+          </button>
+
+          <button type="submit" class="search-btn">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+          </button>
+        </div>
+
+        <div class="filter-panel" id="filterPanel">
+          <div class="filter-grid">
+            <!-- Genres Section -->
+            <div class="filter-section">
+              <h3 class="filter-section-title">Genres</h3>
+              <div class="genre-checkboxes">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="genre" value="action"> Action
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="genre" value="comedy"> Comedy
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="genre" value="drama"> Drama
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="genre" value="fantasy"> Fantasy
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="genre" value="romance"> Romance
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="genre" value="sci-fi"> Sci-Fi
+                </label>
+              </div>
+            </div>
+
+            <!-- Year Range Section -->
+            <div class="filter-section">
+              <h3 class="filter-section-title">Year Range</h3>
+              <div class="range-slider-container">
+                <div class="range-values range-inputs">
+                  <input type="number" id="year-min-input" class="range-input" min="1960" max="2026" value="1960" step="1">
+                  <span class="range-separator">–</span>
+                  <input type="number" id="year-max-input" class="range-input" min="1960" max="2026" value="2026" step="1">
+                </div>
+                <div id="year-slider" class="nouislider"></div>
+              </div>
+            </div>
+
+            <!-- Score Range Section -->
+            <div class="filter-section">
+              <h3 class="filter-section-title">Score</h3>
+              <div class="range-slider-container">
+                <div class="range-values range-inputs">
+                  <input type="number" id="score-min-input" class="range-input" min="0" max="10" value="0" step="0.1">
+                  <span class="range-separator">–</span>
+                  <input type="number" id="score-max-input" class="range-input" min="0" max="10" value="10" step="0.1">
+                </div>
+                <div id="score-slider" class="nouislider"></div>
+              </div>
+            </div>
+
+            <!-- Status Section -->
+            <div class="filter-section">
+              <h3 class="filter-section-title">Status</h3>
+              <select name="status" id="filter-status" class="status-select">
+                <option value="">Any</option>
+                <option value="airing">Currently Airing</option>
+                <option value="completed">Completed</option>
+                <option value="upcoming">Upcoming</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-actions">
+            <button type="button" class="clear-filters-btn" id="clear-filters-btn">
+              <i class="fa-solid fa-rotate-left"></i> Clear
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Templates -->
+    <template id="tmpl-result-row">
+      <div class="result-row">
+        <div class="col-cover cover-art no-select">
+          <img alt="" loading="lazy">
+        </div>
+        <div class="col-title"></div>
+        <div class="col-genres"></div>
+        <div class="col-desc"></div>
+      </div>
+    </template>
+
+    <template id="tmpl-no-results">
+      <div class="no-results">
+        <i class="fa-regular fa-face-frown"></i>
+        No anime found matching your criteria.
+      </div>
+    </template>
+
+    <template id="tmpl-error">
+      <div class="no-results">
+        <i class="fa-regular fa-face-frown"></i>
+        Failed to load results. Please try again.
+      </div>
+    </template>
+
+    <template id="tmpl-results-header">
+      <div class="results-table">
+        <div class="results-header">
+          <span class="col-cover">Cover</span>
+          <span class="col-title">Title</span>
+          <span class="col-genres">Genres</span>
+          <span class="col-desc">Description</span>
+        </div>
+      </div>
+    </template>
+
+    <template id="tmpl-pagination">
+      <div class="pagination-container">
+        <button class="page-btn" data-action="prev">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <span class="page-indicator no-select"></span>
+        <button class="page-btn" data-action="next">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </template>
+
+    <div id="search-results-container" class="results-container">
+      <!-- Results populate here via JavaScript -->
+    </div>
+
+    <div id="pagination-wrapper" class="pagination-wrapper">
+      <!-- Pagination controls will be inserted here -->
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
+<script type="module" src="/static/js/search/search.js"></script>
+{% endblock %}

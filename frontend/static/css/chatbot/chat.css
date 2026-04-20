@@ -1,3 +1,5 @@
+@import url("../theme.css");
+
 /* ===== CHAT BOX ===== */
 .chatbot-area {
     position: relative;

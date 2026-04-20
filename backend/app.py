@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
 from backend.AniZenithExchange import AniZenithRequest, AniZenithResponse
+from backend.search import search_router
 from common.prometheus.prometheus_middleware import PrometheusMiddleware, prometheus_router
 from backend.utils.validation_utils import validate_anizenith_request
 from backend.utils.model_utils import chat_with_llm
@@ -28,6 +29,7 @@ app.add_middleware(SessionMiddleware,
                    same_site=backend_app_config.same_site_protection)
 app.add_middleware(PrometheusMiddleware, prefix="backend")
 app.include_router(prometheus_router)
+app.include_router(search_router)
 #app.include_router(auth_router)
 
 # ┌───────────────────────────────────────────────┐
