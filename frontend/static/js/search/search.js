@@ -27,6 +27,8 @@ let sliders = {};
 document.addEventListener('DOMContentLoaded', () => {
   setupFilterToggle();
   initSliders();
+
+  loadStateFromURL();
   performSearch();
 
   searchForm.addEventListener('submit', e => {
@@ -168,8 +170,9 @@ function buildQueryString(params) {
 }
 
 async function performSearch() {
-  const url = `${API_SEARCH_URL}?${buildQueryString(getCurrentFilters())}`;
-
+  const params = buildQueryString(getCurrentFilters());
+  const url = `${API_SEARCH_URL}?${params}`;
+  history.replaceState(null, '', `?${params}`);
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -229,27 +232,34 @@ function renderResults({ shows = [] }) {
 }
 
 function updatePagination() {
+  const c = document.getElementById('tmpl-pagination').content.cloneNode(true).querySelector('.pagination-container');
+
+  c.querySelector('.page-indicator').textContent = `${currentPage} / ${totalPages}`;
+
+  const first = c.querySelector('[data-action="first"]');
+  const prev  = c.querySelector('[data-action="prev"]');
+  const next  = c.querySelector('[data-action="next"]');
+  const last  = c.querySelector('[data-action="last"]');
+
   const hasPrev = currentPage > 1;
   const hasNext = currentPage < totalPages;
 
-  const template = document.getElementById('tmpl-pagination');
-  const paginationNode = template.content.cloneNode(true);
-  const container = paginationNode.querySelector('.pagination-container');
+  first.classList.toggle('disabled', !hasPrev);
+  prev.classList.toggle('disabled', !hasPrev);
+  next.classList.toggle('disabled', !hasNext);
+  last.classList.toggle('disabled', !hasNext);
 
-  const pageSpan = container.querySelector('.page-indicator');
-  pageSpan.textContent = `${currentPage} / ${totalPages}`;
+  if (hasPrev) {
+    first.onclick = () => { currentPage = 1; performSearch(); };
+    prev.onclick  = () => { currentPage--; performSearch(); };
+  }
 
-  const prevBtn = container.querySelector('[data-action="prev"]');
-  const nextBtn = container.querySelector('[data-action="next"]');
+  if (hasNext) {
+    next.onclick = () => { currentPage++; performSearch(); };
+    last.onclick = () => { currentPage = totalPages; performSearch(); };
+  }
 
-  if (!hasPrev) prevBtn.classList.add('disabled');
-  if (!hasNext) nextBtn.classList.add('disabled');
-
-  paginationWrapper.innerHTML = '';
-  paginationWrapper.appendChild(container);
-
-  if (hasPrev) prevBtn.addEventListener('click', () => changePage(-1));
-  if (hasNext) nextBtn.addEventListener('click', () => changePage(1));
+  paginationWrapper.replaceChildren(c);
 }
 
 function changePage(delta) {
@@ -264,4 +274,39 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+function loadStateFromURL() {
+  const params = new URLSearchParams(window.location.search);
+
+  // Search query
+  if (params.has('q')) {
+    searchQuery.value = params.get('q');
+  }
+
+  // Status
+  if (params.has('status')) {
+    statusSelect.value = params.get('status');
+  }
+
+  // Sliders
+  const yearMin = params.get('year_min');
+  const yearMax = params.get('year_max');
+  if (yearMin && yearMax) {
+    sliders.yearSlider.noUiSlider.set([yearMin, yearMax]);
+  }
+
+  const scoreMin = params.get('score_min');
+  const scoreMax = params.get('score_max');
+  if (scoreMin && scoreMax) {
+    sliders.scoreSlider.noUiSlider.set([scoreMin, scoreMax]);
+  }
+
+  // Genres
+  const genres = params.getAll('genre');
+  if (genres.length) {
+    document.querySelectorAll('input[name="genre"]').forEach(cb => {
+      cb.checked = genres.includes(cb.value);
+    });
+  }
 }

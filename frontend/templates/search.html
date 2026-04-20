@@ -8,6 +8,9 @@
 {% endblock %}
 
 {% block content %}
+<h1 class="page-title">
+    Ani<span class="fancy-z">ℤ</span>enith Anime Search
+</h1>
 <div class="search-container">
     <div class="search-section">
       <form id="search-form" class="search-form">
@@ -119,7 +122,7 @@
     <template id="tmpl-error">
       <div class="no-results">
         <i class="fa-regular fa-face-frown"></i>
-        Failed to load results. Please try again.
+        Failed to load results. Please try again later.
       </div>
     </template>
 
@@ -136,12 +139,18 @@
 
     <template id="tmpl-pagination">
       <div class="pagination-container">
+        <button class="page-btn" data-action="first">
+          <i class="fa-solid fa-angles-left"></i>
+        </button>
         <button class="page-btn" data-action="prev">
           <i class="fa-solid fa-chevron-left"></i>
         </button>
         <span class="page-indicator no-select"></span>
         <button class="page-btn" data-action="next">
           <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <button class="page-btn" data-action="last">
+          <i class="fa-solid fa-angles-right"></i>
         </button>
       </div>
     </template>

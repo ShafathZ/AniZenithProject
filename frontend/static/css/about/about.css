@@ -1,11 +1,12 @@
 .about-container {
   max-width: 1200px;
-  margin: 2rem auto;
+  margin: 0 auto;
 }
 
 /* Section titles */
 .section-title {
   font-size: 2rem;
+  margin-top: 0rem;
   margin-bottom: 1.5rem;
   position: relative;
   display: inline-block;
@@ -31,6 +32,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.8rem;
+  margin-bottom: 0.5rem;
 }
 
 .mission-card {
@@ -175,6 +177,7 @@
   border: 1px solid var(--border-soft);
   position: relative;
   overflow: hidden;
+  margin-bottom: 2rem;
 }
 
 .donate-section h2 {
@@ -208,28 +211,4 @@
 .donate-btn:hover {
   background: var(--btn-bg-hover);
   box-shadow: var(--btn-glow);
-}
-
-/* Fact About Us */
-.anime-fact {
-  background: var(--bg-glass);
-  border-radius: 1rem;
-  padding: 1rem 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 1rem;
-  border-left: 3px solid var(--accent-primary);
-}
-
-.anime-fact i {
-  font-size: 1.8rem;
-  color: var(--accent-primary);
-}
-
-.fact-text {
-  color: var(--text-muted);
-  font-size: 0.9rem;
 }
