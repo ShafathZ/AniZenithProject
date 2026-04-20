@@ -5,7 +5,7 @@
   max-width: 900px;
   height: 70vh;
   margin: 0 auto 1rem;
-  background: var(--bg-main);
+  background: var(--bg-glass-strong);
   border-radius: 22px;
   padding: 25px;
   border: 1px solid var(--border-soft);
