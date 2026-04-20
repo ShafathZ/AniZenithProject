@@ -17,19 +17,23 @@
         </button>
 
         <!-- Logo -->
-        <div class="logo-area">
-            <i class="fa-solid fa-dragon"></i>
-            <h1 class="page-title">
-              Ani<span class="fancy-z">ℤ</span>enith
-            </h1>
-        </div>
+        <a href="/" class="logo-link">
+            <div class="logo-area">
+                <i class="fa-solid fa-dragon"></i>
+                <h1 class="page-title">
+                  Ani<span class="fancy-z">ℤ</span>enith
+                </h1>
+            </div>
+        </a>
 
         <!-- Search box -->
         <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <button class="search-icon-btn" aria-label="Search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
             <div class="search-input-wrapper">
-                <input type="text" placeholder="Search anime..." aria-label="Search">
-                <a href="/search" class="filter-redirect-btn">Filters</a>
+                <input type="text" id="search-input" placeholder="Search anime..." aria-label="Search">
+                <a class="filter-redirect-btn">Filters</a>
             </div>
         </div>
 

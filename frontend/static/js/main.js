@@ -33,6 +33,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // ===== SEARCH BAR =====
+    const searchInput = document.querySelector('#search-input');
+    const searchIconBtn = document.querySelector('.search-icon-btn');
+    const filterBtn = document.querySelector('.filter-redirect-btn');
+
+    // Function to redirect with query
+    function performSearch() {
+        const query = searchInput.value.trim();
+        window.location.href = query ? `/search?q=${encodeURIComponent(query)}` : '/search';
+    }
+    searchIconBtn.addEventListener('click', performSearch);
+    filterBtn.addEventListener('click', performSearch);
+
+    // Enter redirects to /search endpoint
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
+    });
+
     // ===== LANGUAGE =====
     const langToggle = document.getElementById('langToggle');
     const langOptions = document.querySelectorAll('#langToggle .lang-option');
