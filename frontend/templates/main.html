@@ -9,13 +9,14 @@
     {% block imports %}{% endblock %}
 </head>
 <body class="main-background">
-
     <!-- ===== TOP BAR ===== -->
     <header class="top-bar">
+        <!-- Sidebar Toggle Hamburger -->
         <button class="hamburger" id="sidebarToggle" aria-label="Toggle sidebar">
             <i class="fa-solid fa-bars"></i>
         </button>
 
+        <!-- Logo -->
         <div class="logo-area">
             <i class="fa-solid fa-dragon"></i>
             <h1 class="page-title">
@@ -23,16 +24,22 @@
             </h1>
         </div>
 
-        <div class="search-pill">
+        <!-- Search box -->
+        <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search anime..." aria-label="Search">
+            <div class="search-input-wrapper">
+                <input type="text" placeholder="Search anime..." aria-label="Search">
+                <a href="/search" class="filter-redirect-btn">Filters</a>
+            </div>
         </div>
 
+        <!-- Random anime search button -->
         <button class="random-btn" id="randomAnimeBtn">
             <i class="fa-solid fa-shuffle"></i>
             <span>Random</span>
         </button>
 
+        <!-- Language toggle -->
         <div class="lang-toggle" id="langToggle">
             <button class="lang-option active" data-lang="en">EN</button>
             <button class="lang-option" data-lang="jp">JP</button>
