@@ -93,6 +93,13 @@
 }
 
 /* ===== Favorites Grid Section ===== */
+.favorites-bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
 .favorites-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
