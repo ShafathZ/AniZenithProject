@@ -2,7 +2,8 @@
 FROM python:3.12.3-slim
 
 # Install curl for container health checks and service diagnostics
-RUN apt-get update && apt-get install -y curl
+# Cleaning up /var/lib/apt/lists/* removes the apt cache, which helps reduce the final Docker image size
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copy backend files and folders
 # This creates a new folder called "/anizenith/backend" and pastes contents of "backend" folder into it
@@ -26,11 +27,8 @@ COPY integrated-requirements.txt /anizenith
 # Set the working directory to /anizenith_backend folder
 WORKDIR /anizenith
 
-# TODO: Remove this after double checking whether necessary files got copied or not
-RUN ls backend
-
 # Install libraries using requirements.txt
-# We need --extra-index-url to tell pip to install the cpu variant of the torch library, as our hardward only has CPU
+# We need --extra-index-url to tell pip to install the cpu variant of the torch library, as our hardware only has CPU
 # --extra-index-url is required as the cpu variant of the torch library is not on the default PyPi artifactory
 RUN pip install --upgrade pip
 RUN pip install -r integrated-requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir
@@ -40,7 +38,13 @@ RUN pip install -r integrated-requirements.txt --extra-index-url https://downloa
 EXPOSE 7002
 
 # Start the Backend app and the Frontend app once the container is running
-# Redirect their logs to a separate file
-# And tail the logs of both files simultaneously
-# CMD python -m backend.app > backend.log 2>&1 & python -m frontend.app > frontend.log 2>&1 & tail -f backend.log frontend.log
+# Breakdown of the command:
+# CMD ["sh","-c", "..."] executes the string as a command in the 'sh' shell.
+# python -u -m [app] 2>&1 runs the app with unbuffered output (-u) and redirects stderr to stdout (2>&1).
+# | sed -u 's/^/[app] /' pipes the log output into sed (stream editor, unbuffered with -u).
+#   - The pattern s/^/[app] / acts as a substitute command (s).
+#   - ^ is a regex anchor that matches the beginning of each log line.
+#   - This effectively inserts the tag [app] at the start of every line for easy identification.
+# & runs each app's command block in the background.
+# wait pauses the shell script, keeping the container alive until all background jobs finish.
 CMD ["sh","-c", "( python -u -m frontend.app 2>&1 | sed -u 's/^/[frontend] /' ) & ( python -u -m backend.app 2>&1 | sed -u 's/^/[backend] /' ) & wait" ]
