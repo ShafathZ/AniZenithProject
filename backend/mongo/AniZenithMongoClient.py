@@ -13,23 +13,12 @@ class AniZenithMongoClient:
         if not isinstance(conn_string, str) or not conn_string.strip():
             raise ValueError("ATLAS_URI must be set to a non-empty MongoDB connection string")
         
-        self.conn_string = conn_string
+        self.conn_string = conn_string        
+        self.embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
         # Set internals to None for lazy init
-        self._embedding_model = None
         self._db_client = None
         self._anime_collection = None
-
-    @property
-    def embedding_model(self):
-        """
-        Lazily load the SentenceTransformer model. 
-        @property decorator defines this as a property of a class, rather than a class method
-        """
-        if self._embedding_model is None:
-            # TODO: Move this SentenceTransformer id into a central Config object
-            self._embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-        return self._embedding_model
     
     @property
     def db_client(self):
