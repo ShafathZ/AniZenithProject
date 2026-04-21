@@ -1,7 +1,7 @@
 {% extends "main.html" %}
 
 {% block imports %}
-<link rel="stylesheet" href="/static/css/chatbot/chatbot_page.css">
+<link rel="stylesheet" href="/static/css/chatbot/chatbot.css">
 {% endblock %}
 
 {% block title %}Chat - Aniℤenith{% endblock %}
@@ -86,6 +86,9 @@
     </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
 <script type="module" src="/static/js/chatbot/chatbot_page.js"></script>
 <script type="module" src="/static/js/chatbot/chat_ui.js"></script>
 <script type="module" src="/static/js/chatbot/chatbot_buttons.js"></script>

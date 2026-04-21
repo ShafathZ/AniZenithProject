@@ -1,3 +1,6 @@
+import { renderPagination } from '../pagination.js';
+import { postErrorMessage } from '../error.js';
+
 // ===== Configuration & State =====
 const API_SEARCH_URL = '/proxy/anizenith/search';
 const ITEMS_PER_PAGE = 5;
@@ -20,6 +23,7 @@ const scoreMinInput = $('score-min-input');
 const scoreMaxInput = $('score-max-input');
 const statusSelect = $('filter-status');
 const clearFiltersBtn = $('clear-filters-btn');
+const loadingEl = $('search-loading');
 
 let sliders = {};
 
@@ -173,9 +177,10 @@ async function performSearch() {
   const params = buildQueryString(getCurrentFilters());
   const url = `${API_SEARCH_URL}?${params}`;
   history.replaceState(null, '', `?${params}`);
+
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) postErrorMessage(res.status, "Backend Search Error", API_SEARCH_URL);
     const data = await res.json();
     totalCount = data.total_count || 0;
     totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
@@ -183,10 +188,11 @@ async function performSearch() {
     updatePagination();
   } catch (err) {
     console.error('Search failed:', err);
-    resultsContainer.innerHTML = '';
     const errorTemplate = document.getElementById('tmpl-error').content.cloneNode(true);
     resultsContainer.appendChild(errorTemplate);
     paginationWrapper.innerHTML = '';
+  } finally {
+    loadingEl.style.display = 'none';
   }
 }
 
@@ -195,7 +201,7 @@ function renderShowRow(show) {
   const row = template.content.cloneNode(true);
 
   const img = row.querySelector('img');
-  img.src = show.cover_image_uri || '';
+  img.src = show.cover_image_url || '';
   img.alt = escapeHtml(show.title);
 
   const titleEl = row.querySelector('.col-title');
@@ -209,6 +215,14 @@ function renderShowRow(show) {
 
   const descEl = row.querySelector('.col-desc');
   descEl.textContent = show.short_description || '';
+
+  const rowElement = row.querySelector('.result-row')
+  rowElement.style.cursor = 'pointer';
+  rowElement.addEventListener('click', () => {
+    window.location.href = `/anime/${show.id}`;
+  });
+
+  return row;
 
   return row;
 }
@@ -232,34 +246,15 @@ function renderResults({ shows = [] }) {
 }
 
 function updatePagination() {
-  const c = document.getElementById('tmpl-pagination').content.cloneNode(true).querySelector('.pagination-container');
-
-  c.querySelector('.page-indicator').textContent = `${currentPage} / ${totalPages}`;
-
-  const first = c.querySelector('[data-action="first"]');
-  const prev  = c.querySelector('[data-action="prev"]');
-  const next  = c.querySelector('[data-action="next"]');
-  const last  = c.querySelector('[data-action="last"]');
-
-  const hasPrev = currentPage > 1;
-  const hasNext = currentPage < totalPages;
-
-  first.classList.toggle('disabled', !hasPrev);
-  prev.classList.toggle('disabled', !hasPrev);
-  next.classList.toggle('disabled', !hasNext);
-  last.classList.toggle('disabled', !hasNext);
-
-  if (hasPrev) {
-    first.onclick = () => { currentPage = 1; performSearch(); };
-    prev.onclick  = () => { currentPage--; performSearch(); };
-  }
-
-  if (hasNext) {
-    next.onclick = () => { currentPage++; performSearch(); };
-    last.onclick = () => { currentPage = totalPages; performSearch(); };
-  }
-
-  paginationWrapper.replaceChildren(c);
+    renderPagination(paginationWrapper, {
+        currentPage,
+        totalPages,
+        onPageChange: (newPage) => {
+            currentPage = newPage;
+            performSearch();
+            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
 }
 
 function changePage(delta) {

@@ -1,0 +1,81 @@
+{% extends "main.html" %}
+
+{% block title %}My Favorites • Aniℤenith{% endblock %}
+
+{% block imports %}
+<link rel="stylesheet" href="/static/css/favorites/favorites.css">
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">
+  Favorite Anime
+</h1>
+<div class="favorites-container">
+    <div class="favorites-options">
+        <!-- Search bar of favorites -->
+        <div class="search-favorites-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchFavoritesInput" placeholder="Filter favorites..." class="search-favorites-input">
+            <button class="clear-search-btn" id="clearSearchBtn" aria-label="Clear search">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <!-- Sort dropdown -->
+        <div class="sort-wrapper">
+            <label for="sortSelect" class="sort-label"><i class="fa-solid fa-arrow-down-wide-short"></i></label>
+            <select id="sortSelect" class="sort-select">
+                <option value="dateAdded" selected>Recently added</option>
+                <option value="titleAsc">Title (A-Z)</option>
+                <option value="titleDesc">Title (Z-A)</option>
+                <option value="score">Highest rated</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="favoritesLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading your favorites...</p>
+    </div>
+
+    <!-- Grid container -->
+    <div id="favoritesGrid" class="favorites-grid"></div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="empty-state">
+        <div class="empty-illustration">
+            <i class="fa-regular fa-heart"></i>
+        </div>
+        <h2>Your favorites list is empty</h2>
+        <p>Start adding anime you love and they'll appear here.</p>
+        <a href="/search" class="browse-btn">
+            <i class="fa-solid fa-compass"></i>
+            Browse Anime
+        </a>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="pagination-container"></div>
+</div>
+<!-- Anime Card Template -->
+<template id="anime-card-template">
+    <div class="anime-card">
+        <div class="card-cover">
+            <img src="" alt="" loading="lazy">
+            <div class="favorite-heart" title="Remove from favorites">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <div class="card-overlay">
+                <div class="card-title"></div>
+                <div class="card-meta">
+                    <span class="card-rating"><i class="fa-solid fa-star"></i> <span class="rating-value"></span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/favorites/favorites.js"></script>
+{% endblock %}

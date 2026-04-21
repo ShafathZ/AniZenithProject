@@ -62,6 +62,11 @@ async def about(request: Request):
     # Return template for About Us page
     return templates.TemplateResponse("about.html", {"request": request})
 
+@app.get("/favorites", response_class=HTMLResponse)
+async def favorites(request: Request):
+    # Return template for About Us page
+    return templates.TemplateResponse("favorites.html", {"request": request})
+
 # Security middleware endpoint
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
@@ -72,7 +77,7 @@ async def add_security_headers(request: Request, call_next):
         f"default-src 'self'; "
         f"script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
         f"style-src 'self' https://cdnjs.cloudflare.com; "
-        f"img-src 'self' data:; "
+        f"img-src 'self' https://cdn.myanimelist.net data:; "
         f"font-src 'self' https://cdnjs.cloudflare.com; "
         f"frame-ancestors 'none';"
     )

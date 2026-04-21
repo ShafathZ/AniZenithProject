@@ -155,15 +155,23 @@
       </div>
     </template>
 
-    <div id="search-results-container" class="results-container">
-      <!-- Results populate here via JavaScript -->
-    </div>
+    <div id="search-results-wrapper" class="results-wrapper">
+      <div id="search-loading" class="loading-container">
+          <div class="spinner"></div>
+          <p>Searching anime...</p>
+      </div>
 
+      <div id="search-results-container" class="results-container">
+        <!-- Results populate here via JavaScript -->
+      </div>
+    </div>
     <div id="pagination-wrapper" class="pagination-wrapper">
       <!-- Pagination controls will be inserted here -->
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
 <script type="module" src="/static/js/search/search.js"></script>
 {% endblock %}

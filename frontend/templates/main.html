@@ -63,7 +63,7 @@
             <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
             <li><a href="/"><i class="fa-regular fa-comment-dots"></i> Recommendation Bot</a></li>
             <li><a href="/search"><i class="fa-solid fa-magnifying-glass"></i> Search Anime</a></li>
-            <li><a href="#"><i class="fa-solid fa-heart"></i> Favorites</a></li>
+            <li><a href="/favorites"><i class="fa-solid fa-heart"></i> Favorites</a></li>
             <li><a href="/about"><i class="fa-solid fa-circle-info"></i> About Us</a></li>
             <li><a href="#"><i class="fa-solid fa-cog"></i> Settings</a></li>
         </ul>
@@ -76,6 +76,7 @@
         {% endblock %}
     </div>
 
+    {% block scripts %}{% endblock %}
     <script type="module" src="/static/js/main.js"></script>
     <script type="module" src="/static/js/auth.js"></script>
 </body>
