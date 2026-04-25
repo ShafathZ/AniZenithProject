@@ -194,9 +194,7 @@
 
 .favorite-heart.holding::before,
 .favorite-heart.holding::after {
-    animation-duration: 1.8s;
     animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    animation-fill-mode: forwards;
 }
 
 @keyframes leftHalfBreak {

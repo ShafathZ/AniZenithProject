@@ -44,20 +44,21 @@ export function createPagination({ currentPage, totalPages, onPageChange }) {
 
     // Update function to refresh state
     const update = (newCurrentPage, newTotalPages) => {
+        // Update page info
         currentPage = newCurrentPage;
         totalPages = newTotalPages;
         indicator.textContent = `${currentPage} / ${totalPages}`;
 
+        // Disable buttons when necessary
         const hasPrev = currentPage > 1;
         const hasNext = currentPage < totalPages;
-
         firstBtn.classList.toggle('disabled', !hasPrev);
         prevBtn.classList.toggle('disabled', !hasPrev);
         nextBtn.classList.toggle('disabled', !hasNext);
         lastBtn.classList.toggle('disabled', !hasNext);
     };
 
-    // Event listeners
+    // Event listener for when a button is clicked
     const handleClick = (action) => {
         let newPage = currentPage;
         if (action === 'first' && currentPage > 1) newPage = 1;
@@ -66,6 +67,7 @@ export function createPagination({ currentPage, totalPages, onPageChange }) {
         else if (action === 'last' && currentPage < totalPages) newPage = totalPages;
         else return;
 
+        // Run page change lambda logic
         onPageChange(newPage);
     };
 
@@ -74,16 +76,12 @@ export function createPagination({ currentPage, totalPages, onPageChange }) {
     nextBtn.addEventListener('click', () => handleClick('next'));
     lastBtn.addEventListener('click', () => handleClick('last'));
 
-    // Initial update
+    // Initial update (sets to first page)
     update(currentPage, totalPages);
-
-    // Attach update method to the container for external use
-    container.update = update;
-
     return container;
 }
 
-// Renders pagination upon change
+// Attach a pagination logic to a container input in `wrapper`
 export function renderPagination(wrapper, options) {
     wrapper.innerHTML = '';
     const paginationEl = createPagination(options);

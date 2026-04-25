@@ -19,10 +19,6 @@
 /* ===== Search Section ===== */
 .search-section {
   padding: 0 0 1.2rem 0;
-  background: transparent;
-  border-radius: 0;
-  box-shadow: none;
-  border: none;
   flex-shrink: 0;
 }
 

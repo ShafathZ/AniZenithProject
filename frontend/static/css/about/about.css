@@ -27,7 +27,7 @@
   border-radius: 3px;
 }
 
-/* Mission & Vision Cards */
+/* Mission Cards */
 .mission-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
