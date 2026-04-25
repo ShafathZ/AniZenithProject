@@ -1,0 +1,97 @@
+@import url("theme.css");
+@import url("error.css");
+
+/* ===== BODY, HEADER, and CONTAINER ===== */
+html {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    background: linear-gradient(rgba(12,13,35,0.45), rgba(12,13,35,0.9)),
+                url('/static/images/background.png');
+    background-size: cover;
+    background-attachment: fixed;
+    color: var(--text-main);
+}
+
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 240px;
+
+    background-image:
+        linear-gradient(rgba(28, 20, 55, 0.7), rgba(28, 20, 55, 0.25)),
+        url('/static/images/sidebar.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-blend-mode: hard-light;
+
+    backdrop-filter: blur(12px);
+    border-right: 2px solid black;
+    padding: 20px;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    z-index: 10;
+}
+
+/* The idea of this code is to keep sidebar mostly hidden, then make it more visible on hover, and fully expanded when toggled */
+.sidebar.collapsed {
+    transform: translateX(-240px);
+}
+
+.sidebar.collapsed:hover {
+    transform: translateX(-200px);
+}
+
+.sidebar.expanded {
+    transform: translateX(0) !important;
+}
+
+/* ===== SIDEBAR CONTENT ===== */
+.sidebar h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    border-radius: 999px;
+    background: rgba(122, 92, 255, 0.5);
+    color: var(--text-main);
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease, background 0.3s ease;
+}
+
+.sidebar ul li a:hover {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: white;
+}

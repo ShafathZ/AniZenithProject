@@ -28,12 +28,13 @@ jobs:
       # Install all required python libraries
       - name: Install Required Libraries
         run: |
-          pip install -r requirements.txt
+          pip install -r backend/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir
       
       # Run all the unit tests quietly
       - name: Run all Unit Tests (Quietly)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          ATLAS_URI: ${{ secrets.ATLAS_URI }}
           PYTHONPATH: ${{ github.workspace }}
         run: |
           pytest -q --ignore=tests/test_chat_models.py
