@@ -22,6 +22,11 @@ def clean_data():
     # Exclude Adult Rated Content
     anime_df = anime_df[anime_df["age_rating"] != "rx"]
 
+    # Exclude specific genres and empty genre lists
+    # Using rating + genre exclusion since sometimes rating or genre alone do not capture all non-friendly show content
+    EXCLUDED_GENRES = {"Hentai", "Erotica", "Unknown"}      # If there exist genres     # None of the genres are excluded
+    anime_df = anime_df[anime_df["genres"].apply(lambda g: bool(g) and not any(genre in EXCLUDED_GENRES for genre in g))]
+
     # Project current title as its own node_name column (since they may not be english, but useful data)
     anime_df["node_name"] = anime_df["title"]
 
@@ -29,7 +34,7 @@ def clean_data():
     anime_df = anime_df[anime_df["alt_titles"].apply(lambda x: "en" in x and x["en"] != "")]
 
     # Project en titles as new title column
-    anime_df["title"] = anime_df["alt_titles"].apply(lambda x: x.pop("en"))
+    anime_df["title"] = anime_df["alt_titles"].apply(lambda x: x.pop("en")) # Pop en out of alt_titles since now it is the primary title
 
     # Filter out animes without scores
     anime_df = anime_df[anime_df["score"].notna()]
@@ -104,9 +109,9 @@ if __name__ == "__main__":
     # Clean data if not already existing
     if not os.path.exists("./data/anime_cleaned.json"):
         output_df = clean_data()
-        print(f"Built new records:\n{output_df.head(10)}")
+        print(f"Built ({len(output_df)}) new records:\n{output_df.head(10)}")
         # Save temporarily in case of failure
-        output_df.to_json("./data/anime_cleaned.json", orient="records")
+        output_df.to_json("./data/anime_cleaned.json", orient="records", force_ascii=False)
 
     # TODO: Output to MongoDB Client
 
