@@ -109,9 +109,12 @@ if __name__ == "__main__":
     # Clean data if not already existing
     if not os.path.exists("./data/anime_cleaned.json"):
         output_df = clean_data()
-        print(f"Built ({len(output_df)}) new records:\n{output_df.head(10)}")
         # Save temporarily in case of failure
         output_df.to_json("./data/anime_cleaned.json", orient="records", force_ascii=False)
+    else:
+        output_df = pd.read_json('./data/anime_cleaned.json')
+
+    print(f"Collected ({len(output_df)}) records:\n{output_df.head(3)}")
 
     # TODO: Output to MongoDB Client
 
