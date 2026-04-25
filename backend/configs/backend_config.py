@@ -38,6 +38,7 @@ class ModelConfig(Config):
     # Chatbot parameters
     local_model_id: Optional[str] = None
     external_model_id: Optional[str] = None
+    embedding_model_id: Optional[str] = None
     max_new_tokens: Optional[int] = None
     temperature: Optional[float] = None
     top_p: Optional[float] = None

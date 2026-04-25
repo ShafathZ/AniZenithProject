@@ -87,7 +87,7 @@ CREATE INDEX IF NOT EXISTS idx_anime_id ON AnimeGenre(anime_id);
 CREATE INDEX IF NOT EXISTS idx_genre_id ON AnimeGenre(genre_id);
 '''
 
-with sqlite3.connect('anime.db') as conn:
+with sqlite3.connect('../data/anime.db') as conn:
     conn.executescript(SCHEMA_SQL)
     anime_df.to_sql('Anime', conn, if_exists='delete_rows', index=False, method='multi')
     genres_df.to_sql('Genre', conn, if_exists='delete_rows', index=False, method='multi')
