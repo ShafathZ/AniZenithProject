@@ -58,7 +58,7 @@ def test_perform_vector_search_relevance(test_db_client: AniZenithMongoClient):
     top_doc = results[0]
     
     # Assert that one punch man is present in the name
-    assert "one punch man" in top_doc.title.lower()
+    assert "one-punch man" in top_doc.title.lower()
     
     # The similarity score should exist and be decently high
     assert top_doc.similarity_score > 0.5 
