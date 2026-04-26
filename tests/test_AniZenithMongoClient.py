@@ -91,7 +91,7 @@ def test_add_anime(test_db_client: AniZenithMongoClient):
             "en": test_anime_title,
         },
         score=9.9,
-        synopsis="A completely unique and fake anime created for testing purposes.",
+        synopsis="A completely unique and fake anime created for Testing purposes.",
         genres=[],
         demographic="Shounen",
         age_rating="pg-13",
