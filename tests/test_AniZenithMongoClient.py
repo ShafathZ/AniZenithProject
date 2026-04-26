@@ -44,7 +44,7 @@ def test_perform_vector_search_document_structure(test_db_client: AniZenithMongo
     assert isinstance(top_doc, AniZenithVectorSearchResult)
     
     # Assert on the fields of the vector search result object
-    assert isinstance(top_doc.title, str)
+    assert isinstance(top_doc.name, str)
     assert isinstance(top_doc.similarity_score, float)
 
 
@@ -58,7 +58,7 @@ def test_perform_vector_search_relevance(test_db_client: AniZenithMongoClient):
     top_doc = results[0]
     
     # Assert that one punch man is present in the name
-    assert "one-punch man" in top_doc.title.lower()
+    assert "one-punch man" in top_doc.name.lower()
     
     # The similarity score should exist and be decently high
     assert top_doc.similarity_score > 0.5 
@@ -82,13 +82,13 @@ def test_add_anime(test_db_client: AniZenithMongoClient):
     """Test inserting a new anime document, checking its fields, and cleaning up."""
     
     # Create a dummy AnimeDocument
-    test_anime_title = "Test Anime: Super Adventure"
+    test_anime_name = "Test Anime: Super Adventure"
 
     test_anime = AnimeDocument(
         mal_id=999999,
-        title=test_anime_title,
+        name=test_anime_name,
         alt_titles={
-            "en": test_anime_title,
+            "en": test_anime_name,
         },
         score=9.9,
         synopsis="A completely unique and fake anime created for Testing purposes.",
@@ -102,7 +102,7 @@ def test_add_anime(test_db_client: AniZenithMongoClient):
         avg_episode_len_mins=1,
         publishing_company="Test Studio",
         recommendations={},
-        node_name=test_anime_title
+        node_name=test_anime_name
     )
     
     try:
@@ -110,7 +110,7 @@ def test_add_anime(test_db_client: AniZenithMongoClient):
         test_db_client.add_anime(test_anime)
         
         # Verify it was inserted by fetching it back
-        query = {"title": test_anime_title}
+        query = {"name": test_anime_name}
         results = test_db_client.execute_read_query(query)
         
         # Assert the document exists
@@ -118,7 +118,7 @@ def test_add_anime(test_db_client: AniZenithMongoClient):
         inserted_doc = results[0]
         
         # Assert the basic fields match
-        assert inserted_doc["title"] == test_anime.title
+        assert inserted_doc["name"] == test_anime.name
         assert inserted_doc["score"] == test_anime.score
         assert inserted_doc["synopsis"] == test_anime.synopsis
         assert inserted_doc["genres"] == test_anime.genres
@@ -133,7 +133,7 @@ def test_add_anime(test_db_client: AniZenithMongoClient):
         
     finally:
         # Clean up - delete the test document so it doesn't pollute the DB
-        test_db_client.anime_collection.delete_many({"title": test_anime_title})
+        test_db_client.anime_collection.delete_many({"name": test_anime_name})
 
 
 
@@ -157,7 +157,7 @@ def test_execute_mongo_read_query_basic(test_db_client: AniZenithMongoClient):
     
     # Assert standard MongoDB fields exist
     assert "_id" in results[0]
-    assert "title" in results[0]
+    assert "name" in results[0]
 
 
 def test_execute_mongo_read_query_invalid_input(test_db_client: AniZenithMongoClient):

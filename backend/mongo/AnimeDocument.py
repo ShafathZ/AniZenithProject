@@ -4,7 +4,7 @@ from typing import List, Dict
 # Class to Model a typical Anime Document
 class AnimeDocument(BaseModel):
     mal_id: int                     # ID of anime on MyAnimeList
-    title: str                      # English title of anime
+    name: str                      # English title of anime
     alt_titles: Dict[str, str]      # { "en": ENGLISH_TITLE, "jp": JAPANESE_TITLE, ...}
     score: float                    # MAL User Mean Score -- Typically 6-10
     synopsis: str                   # Short synopsis of shows, does not contain spoilers beyond first episode

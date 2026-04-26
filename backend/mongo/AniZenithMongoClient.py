@@ -48,7 +48,7 @@ class AniZenithMongoClient:
         # Create text metadata and its embedding
         text_metadata, text_metadata_embedding = create_text_metadata_and_embedding(
             self.embedding_model,
-            anime_document.title,
+            anime_document.name,
             anime_document.genres,
             anime_document.synopsis
         )
@@ -115,7 +115,7 @@ class AniZenithMongoClient:
                 # Project only the fields we want to see, plus the search score
                 "$project": {
                     "_id": 0,
-                    "title": 1,
+                    "name": 1,
                     "genres": 1,
                     "score": 1,
                     "synopsis": 1,

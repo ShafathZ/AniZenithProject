@@ -27,14 +27,14 @@ def clean_data():
     EXCLUDED_GENRES = {"Hentai", "Erotica", "Unknown"}      # If there exist genres     # None of the genres are excluded
     anime_df = anime_df[anime_df["genres"].apply(lambda g: bool(g) and not any(genre in EXCLUDED_GENRES for genre in g))]
 
-    # Project current title as its own node_name column (since they may not be english, but useful data)
-    anime_df["node_name"] = anime_df["title"]
+    # Project current name as its own node_name column (since they may not be english, but useful data)
+    anime_df["node_name"] = anime_df["name"]
 
     # Filter out animes without English Names (check alt_titles dict for "en" key, and ensure it is not empty value)
     anime_df = anime_df[anime_df["alt_titles"].apply(lambda x: "en" in x and x["en"] != "")]
 
-    # Project en titles as new title column
-    anime_df["title"] = anime_df["alt_titles"].apply(lambda x: x.pop("en")) # Pop en out of alt_titles since now it is the primary title
+    # Project en titles as new name column
+    anime_df["name"] = anime_df["alt_titles"].apply(lambda x: x.pop("en")) # Pop en out of alt_titles since now it is the primary title
 
     # Filter out animes without scores
     anime_df = anime_df[anime_df["score"].notna()]
@@ -48,7 +48,7 @@ def clean_data():
     anime_df[['text_metadata', 'text_metadata_embedding']] = anime_df.apply(
         lambda row: create_text_metadata_and_embedding(
             embedding_model=embedding_model,
-            anime_name=row['title'],
+            anime_name=row['name'],
             anime_genres=row['genres'],
             anime_synopsis=row['synopsis']
         ),
