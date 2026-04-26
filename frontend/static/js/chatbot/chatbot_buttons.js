@@ -1,6 +1,6 @@
 import { setLocalModelStatus, messages, addMessage, deleteMessage, editMessage, sendMessagesToBackend } from "./chat_utils.js"
 import { renderMessages, appendUIMessage, addDefaultMessage } from "./chat_ui.js"
-import { postErrorMessage } from "./error.js"
+import { postErrorMessage } from "../error.js"
 
 export function updateButtons() {
     // Dynamic buttons

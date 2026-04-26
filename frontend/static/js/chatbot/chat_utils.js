@@ -1,4 +1,4 @@
-import { postError, postErrorMessage } from "./error.js"
+import { postError, postErrorMessage } from "../error.js"
 import { pushMessages, pullMessages } from "./chat_history_db.js";
 
 // Client-side conversation message storage (Chats are only stored on client side for now)
@@ -96,7 +96,7 @@ export async function sendMessagesToBackend() {
 
     try {
         // If using local, detect and add additional timeout
-        const timeout = payload.use_local ? 180.0 : 30.0;
+        const timeout = payload.use_local ? 600.0 : 60.0;
         const response = await fetch("/proxy/anizenith/chat", {
             method: "POST",
             headers: {

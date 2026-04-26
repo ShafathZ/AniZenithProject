@@ -1,44 +1,17 @@
-@import url('chat.css');
+@import url('./chat.css');
 
-/* ===== PAGE TITLE & SUBTITLE ===== */
-.page-title {
-    text-align: center;
-    font-size: 2.5rem;
-    margin: 1rem 0 0.5rem 0;
-    font-weight: 700;
-    line-height: 1.2;
-    color: var(--text-main);
-
-    /* Fancy animation thing I found */
-    background: linear-gradient(270deg, var(--accent-primary), var(--accent-secondary), white);
-    background-size: 600% 600%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradientShift 8s ease infinite;
-}
-
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-.fancy-z {
-    font-size: 3rem;
-}
-
-.subtitle {
-    display: block;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    line-height: 1.4;
-    letter-spacing: 0.2px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 1rem;
+/* ===== MAIN CHAT CONTAINER ===== */
+.chat-container {
+    max-width: 900px;
+    margin: auto;
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(5px);
+    border-radius: 22px;
+    padding: 25px;
+    border: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
 }
 
 /* ===== LOCAL MODEL BUTTON ===== */
@@ -61,7 +34,6 @@
     transition: 0.2s ease;
 
     background: var(--btn-bg);
-    color: white;
 }
 
 .toggle-wrapper label:hover {
@@ -74,44 +46,6 @@
     color: #4cffc3;
     font-weight: 700;
     margin-left: 6px;
-}
-
-/* ===== MAL OAUTH LOGIN ===== */
-.mal-button {
-    display: block;
-    margin: 15px auto 10px auto;
-    background-color: #2E51A2;
-    color: var(--text-main);
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.2s ease;
-    text-align: center;
-}
-
-.mal-button:hover {
-    background-color: #3a61c2;
-}
-
-.mal-logout {
-    display: none;
-}
-
-/* ===== MAIN CHAT CONTAINER ===== */
-.chat-container {
-    max-width: 900px;
-    margin: auto;
-    background: var(--bg-glass);
-    backdrop-filter: blur(5px);
-    border-radius: 22px;
-    padding: 25px;
-    border: 1px solid var(--border-soft);
-    display: flex;
-    flex-direction: column;
-    height: 75vh;
 }
 
 /* ===== QUICK SUGGESTIONS ===== */
@@ -127,7 +61,7 @@
     border-radius: 999px;
     border: none;
     background: var(--btn-bg);
-    color: white;
+    color: var(--text-main);
     font-weight: 300;
     cursor: pointer;
     white-space: nowrap;
@@ -185,7 +119,7 @@
     cursor: pointer;
     font-weight: 600;
     background: var(--btn-bg);
-    color: white;
+    color: var(--text-main);
     display: flex;
     justify-content: center;
     align-items: center;

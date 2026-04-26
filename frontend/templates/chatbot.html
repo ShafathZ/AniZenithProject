@@ -1,0 +1,95 @@
+{% extends "main.html" %}
+
+{% block imports %}
+<link rel="stylesheet" href="/static/css/chatbot/chatbot.css">
+{% endblock %}
+
+{% block title %}Chat - Aniℤenith{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">
+    Ani<span class="fancy-z">ℤ</span>enith Recommender
+</h1>
+
+<div class="chat-container">
+    <!-- ===== Toggle Local Model ===== -->
+    <div class="toggle-wrapper">
+        <input type="checkbox" id="localModelToggle">
+        <label for="localModelToggle" class="no-select">Use Local Model?</label>
+    </div>
+
+    <!-- ===== Chat Messages ===== -->
+    <div class="chatbot-area">
+        <!-- Templates for chat messages -->
+        <template id="tmpl-assistant-message">
+          <div class="message assistant">
+            <div class="message-row">
+              <img src="/static/images/assistant.jpg" alt="Assistant" class="avatar no-select">
+              <div class="text"></div>
+            </div>
+            <div class="actions">
+              <span class="action-btn refresh" title="Refresh"><i class="fas fa-sync-alt"></i></span>
+              <span class="action-btn copy" title="Copy"><i class="fas fa-copy"></i></span>
+              <span class="action-btn share" title="Share"><i class="fas fa-share-alt"></i></span>
+            </div>
+          </div>
+        </template>
+
+        <template id="tmpl-user-message">
+          <div class="message user">
+            <div class="message-row">
+              <div class="text"></div>
+              <img src="/static/images/user.jpg" alt="User" class="avatar no-select">
+            </div>
+            <div class="actions">
+              <span class="action-btn edit" title="Edit"><i class="fas fa-pen"></i></span>
+              <span class="action-btn copy" title="Copy"><i class="fas fa-copy"></i></span>
+              <span class="action-btn trash" title="Delete"><i class="fas fa-trash-alt"></i></span>
+            </div>
+          </div>
+        </template>
+        <div class="chat-box" id="chatBox">
+            <!-- Dynamically add messages via JS -->
+        </div>
+        <div class="top-buttons">
+            <button class="full-chat-button share-button">
+                <i class="fas fa-share-alt"></i>
+            </button>
+            <button class="full-chat-button copy-button">
+                <i class="fas fa-copy"></i>
+            </button>
+            <button class="full-chat-button reset-button">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ===== Quick Suggestions ===== -->
+    <div class="quick-suggestions no-select">
+        <button>Action</button>
+        <button>Romance</button>
+        <button>Drama</button>
+    </div>
+
+
+    <!-- ===== Input Row ===== -->
+    <div class="input-row">
+        <textarea id="userInput"
+                  class="chat-input"
+                  placeholder="Ask for anime recommendations..."></textarea>
+
+        <button class="submit-button">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/chatbot/chatbot_page.js"></script>
+<script type="module" src="/static/js/chatbot/chat_ui.js"></script>
+<script type="module" src="/static/js/chatbot/chatbot_buttons.js"></script>
+{% endblock %}
