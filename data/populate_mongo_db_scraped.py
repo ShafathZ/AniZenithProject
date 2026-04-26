@@ -7,7 +7,7 @@ from pymongo.operations import SearchIndexModel
 
 from backend.mongo.utils import create_text_metadata_and_embedding
 
-from backend.configs import model_config
+from backend.configs import model_config, backend_app_config
 
 # Load all Env variables
 load_dotenv()
@@ -68,12 +68,10 @@ def create_mongodb_and_indexes(df):
     print(f"Successfully connected to MongoDB Atlas")
 
     # Create / Access the "anizenith" DB
-    # TODO: Move hardcoded configs to a central config object
-    db = client["anizenith"]
+    db = client[backend_app_config.mongo_anime_db_name]
 
-    # Create / Access the "anime" collection
-    # TODO: Move hardcoded configs to a central config object
-    collection = db["anime_enriched"]
+    # Create / Access the "anime_enriched" collection
+    collection = db[backend_app_config.mongo_anime_collection_name]
 
     # Clear existing data
     collection.delete_many({})
