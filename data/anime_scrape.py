@@ -92,6 +92,7 @@ def _build_documents(mal_items: List[Dict], search_recommended: bool = False) ->
             results.append(
                 AnimeDocument(
                     mal_id=entry["mal_id"],
+                    node_name=entry["title"],
                     title=entry["title"],
                     alt_titles=entry["alt_titles"],
                     score=entry["score"],

@@ -101,7 +101,8 @@ def test_add_anime(test_db_client: AniZenithMongoClient):
         episode_count=1,
         avg_episode_len_mins=1,
         publishing_company="Test Studio",
-        recommendations={}
+        recommendations={},
+        node_name=test_anime_title
     )
     
     try:
@@ -132,7 +133,7 @@ def test_add_anime(test_db_client: AniZenithMongoClient):
         
     finally:
         # Clean up - delete the test document so it doesn't pollute the DB
-        test_db_client.anime_collection.delete_one({"title": test_anime_title})
+        test_db_client.anime_collection.delete_many({"title": test_anime_title})
 
 
 
