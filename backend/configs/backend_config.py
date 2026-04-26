@@ -27,7 +27,11 @@ class BackendAppConfig(Config):
     MAL_CLIENT_ID: str = os.getenv("MAL_CLIENT_ID", "")
     MAL_CLIENT_SECRET: str = os.getenv("MAL_CLIENT_SECRET", "")
     BACKEND_SECRET: str = os.getenv("BACKEND_SECRET", "")
+
+    # MongoDB params
     ATLAS_URI: str = os.getenv("ATLAS_URI", "")
+    mongo_anime_collection_name: Optional[str] = None
+    mongo_anime_db_name: Optional[str] = None
 
 class ModelConfig(Config):
     """

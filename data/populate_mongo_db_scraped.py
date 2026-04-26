@@ -73,7 +73,7 @@ def create_mongodb_and_indexes(df):
 
     # Create / Access the "anime" collection
     # TODO: Move hardcoded configs to a central config object
-    collection = db["anime"]
+    collection = db["anime_enriched"]
 
     # Clear existing data
     collection.delete_many({})
@@ -116,5 +116,6 @@ if __name__ == "__main__":
 
     print(f"Collected ({len(output_df)}) records:\n{output_df.head(3)}")
 
-    # TODO: Output to MongoDB Client
+    # Store into MongoDB
+    create_mongodb_and_indexes(output_df)
 
