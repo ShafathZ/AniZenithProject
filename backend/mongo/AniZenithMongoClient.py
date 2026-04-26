@@ -48,17 +48,14 @@ class AniZenithMongoClient:
         # Create text metadata and its embedding
         text_metadata, text_metadata_embedding = create_text_metadata_and_embedding(
             self.embedding_model,
-            anime_document.name,
+            anime_document.title,
             anime_document.genres,
             anime_document.synopsis
         )
 
         # Create a new document to be inserted into MongoDB
         anime_document_dict = {
-            "name": anime_document.name,
-            "score": anime_document.score,
-            "synopsis": anime_document.synopsis,
-            "genres": anime_document.genres,
+            **anime_document.model_dump(),
             "text_metadata": text_metadata,
             "text_metadata_embedding": text_metadata_embedding
         }
