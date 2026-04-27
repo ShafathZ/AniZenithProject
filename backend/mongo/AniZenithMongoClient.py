@@ -5,6 +5,7 @@ from backend.mongo.AnimeDocument import AnimeDocument
 from backend.mongo.utils import create_text_metadata_and_embedding
 from backend.mongo.AniZenithVectorSearchResult import AniZenithVectorSearchResult
 
+from backend.configs import backend_app_config, model_config
 
 # Class to model Anizenith MongoDB Client related utilities
 class AniZenithMongoClient:
@@ -14,7 +15,7 @@ class AniZenithMongoClient:
             raise ValueError("ATLAS_URI must be set to a non-empty MongoDB connection string")
         
         self.conn_string = conn_string        
-        self.embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        self.embedding_model = SentenceTransformer(model_config.embedding_model_id)
 
         # Set internals to None for lazy init
         self._db_client = None
@@ -38,8 +39,7 @@ class AniZenithMongoClient:
         @property decorator defines this as a property of a class, rather than a class method
         """
         if self._anime_collection is None:
-            # TODO: Move the hardcoded DB name and collection name into a central Config object
-            self._anime_collection = self.db_client["anizenith"]["anime"]
+            self._anime_collection = self.db_client[backend_app_config.mongo_anime_db_name][backend_app_config.mongo_anime_collection_name]
         return self._anime_collection
 
 
@@ -55,10 +55,7 @@ class AniZenithMongoClient:
 
         # Create a new document to be inserted into MongoDB
         anime_document_dict = {
-            "name": anime_document.name,
-            "score": anime_document.score,
-            "synopsis": anime_document.synopsis,
-            "genres": anime_document.genres,
+            **anime_document.model_dump(),
             "text_metadata": text_metadata,
             "text_metadata_embedding": text_metadata_embedding
         }

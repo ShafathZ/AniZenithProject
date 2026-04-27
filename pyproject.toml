@@ -15,6 +15,7 @@ dependencies = [
     "pandas>=3.0.2",
     "pymongo>=4.16.0",
     "sentence-transformers>=5.4.0",
+    "requests>=2.33.1",
 ]
 
 [tool.uv.sources]

@@ -27,7 +27,11 @@ class BackendAppConfig(Config):
     MAL_CLIENT_ID: str = os.getenv("MAL_CLIENT_ID", "")
     MAL_CLIENT_SECRET: str = os.getenv("MAL_CLIENT_SECRET", "")
     BACKEND_SECRET: str = os.getenv("BACKEND_SECRET", "")
+
+    # MongoDB params
     ATLAS_URI: str = os.getenv("ATLAS_URI", "")
+    mongo_anime_collection_name: Optional[str] = None
+    mongo_anime_db_name: Optional[str] = None
 
 class ModelConfig(Config):
     """
@@ -38,6 +42,7 @@ class ModelConfig(Config):
     # Chatbot parameters
     local_model_id: Optional[str] = None
     external_model_id: Optional[str] = None
+    embedding_model_id: Optional[str] = None
     max_new_tokens: Optional[int] = None
     temperature: Optional[float] = None
     top_p: Optional[float] = None
