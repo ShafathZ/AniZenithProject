@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 from typing import List, Dict
 
 # Class to Model a typical Anime Document
@@ -12,7 +13,7 @@ class AnimeDocument(BaseModel):
     demographic: str                # Primary demographic
     age_rating: str                 # g | pg | pg-13 | r | r+ | rx
     cover_image_url: str            # link to MAL image (not CDN)
-    date_aired: str                 # date aired in YYYY-MM-DD
+    date_aired: datetime            # date aired as datetime (YYYY-MM-DD stored, not hr/mins/secs/ms)
     status: str                     # finished_airing | currently_airing | not_aired
     episode_count: int              # number of episodes in the anime
     avg_episode_len_mins: int       # average duration per episode in mins

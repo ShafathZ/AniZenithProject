@@ -30,6 +30,9 @@ def clean_data():
     # Project current name as its own node_name column (since they may not be english, but useful data)
     anime_df["node_name"] = anime_df["name"]
 
+    # Convert date_aired to datetime
+    anime_df["date_aired"] = pd.to_datetime(anime_df["date_aired"], format="mixed")
+
     # Filter out animes without English Names (check alt_titles dict for "en" key, and ensure it is not empty value)
     anime_df = anime_df[anime_df["alt_titles"].apply(lambda x: "en" in x and x["en"] != "")]
 

@@ -1,5 +1,6 @@
 import json
 import time
+from datetime import datetime
 from typing import List, Dict
 
 import pandas as pd
@@ -48,6 +49,7 @@ def _normalize_from_mal(item: Dict) -> Dict:
     studios = node.get("studios", [])
     publishing_company = studios[0].get("name", "Unknown") if studios else "Unknown"
     synopsis = node.get("synopsis").replace("[Written by MAL Rewrite]", "").strip()
+    date_aired = (datetime.strptime(node.get("start_date"), "%Y-%m-%d"))
 
     # Alt titles (in case main is not en)
     alt_titles = node.get("alternative_titles")
@@ -67,7 +69,7 @@ def _normalize_from_mal(item: Dict) -> Dict:
         "genres": genres,
         "demographic": demographic,
         "cover_image_url": node.get("main_picture").get("medium", ""),
-        "date_aired": node.get("start_date"),
+        "date_aired": date_aired,
         "status": node.get("status", "not_aired"),
         "episode_count": node.get("num_episodes", 0),
         "publishing_company": publishing_company,
