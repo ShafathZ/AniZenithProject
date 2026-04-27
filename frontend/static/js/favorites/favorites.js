@@ -25,7 +25,7 @@ const cardTemplate = $('anime-card-template');
 async function fetchFavorites() {
     try {
         // TODO: Remove this and rely solely on browser loading, this is purely for testing
-        const params = new URLSearchParams({ idx_from: '0', idx_to: '999' });
+        const params = new URLSearchParams({ idx_from: '0', idx_to: '25' });
         const response = await fetch(`${FAVORITES_RETRIEVE_POINT}?${params}`);
 
         if (!response.ok) {
@@ -60,7 +60,7 @@ function saveFavorites(favs) {
 async function removeFavorite(animeId) {
     const index = favorites.findIndex(a => a.id === animeId);
     if (index !== -1) {
-        const animeTitle = favorites[index].title;
+        const animeTitle = favorites[index].name;
         favorites.splice(index, 1);
         saveFavorites(favorites);
 
@@ -73,8 +73,8 @@ async function removeFavorite(animeId) {
 
 // Lambda expressions for comparing anime favorites stored on browser
 const sortFunctions = {
-    titleAsc:  (a, b) => a.title.localeCompare(b.title),
-    titleDesc: (a, b) => b.title.localeCompare(a.title),
+    titleAsc:  (a, b) => a.name.localeCompare(b.name),
+    titleDesc: (a, b) => b.name.localeCompare(a.name),
     score:     (a, b) => (b.score || 0) - (a.score || 0),
     dateAdded: (a, b) => (b.date_added || 0) - (a.date_added || 0)
 };
@@ -86,7 +86,7 @@ function applyFilters() {
     // Filter by search term
     if (searchTerm.trim()) {
         const term = searchTerm.toLowerCase();
-        result = result.filter(anime => anime.title.toLowerCase().includes(term));
+        result = result.filter(anime => anime.name.toLowerCase().includes(term));
     }
 
     // Sort using the appropriate function, falling back to dateAdded
@@ -106,19 +106,19 @@ function createAnimeCard(anime) {
     const ratingSpan = clone.querySelector('.rating-value');
 
     // Populate the card with anime data
-    card.dataset.animeId = anime.id;
+    card.dataset.animeId = anime.mal_id;
     img.src = anime.cover_image_url;
-    img.alt = anime.title;
-    heartBtn.dataset.id = anime.id;
-    titleEl.textContent = anime.title;
-    titleEl.title = anime.title;
+    img.alt = anime.name;
+    heartBtn.dataset.id = anime.mal_id;
+    titleEl.textContent = anime.name;
+    titleEl.title = anime.name;
     ratingSpan.textContent = anime.score?.toFixed(1) ?? 'N/A';
 
     // Hold to remove feature: A long press (800ms) triggers removal, a short press does nothing.
     const handlePointerDown = (e) => {
         e.preventDefault(); // prevent selecting the text or area behind
         heartBtn.classList.add('holding');
-        heartBtn.holdTimer = setTimeout(() => removeFavorite(anime.id), 800);
+        heartBtn.holdTimer = setTimeout(() => removeFavorite(anime.mal_id), 800);
     };
 
     const handlePointerUp = () => {
@@ -138,7 +138,7 @@ function createAnimeCard(anime) {
     // Clicking anywhere on the card (except the heart) navigates to the anime's page
     card.addEventListener('click', (e) => {
         if (!e.target.closest('.favorite-heart')) {
-            window.location.href = `/anime/${anime.id}`;
+            window.location.href = `/anime/${anime.mal_id}`;
         }
     });
 

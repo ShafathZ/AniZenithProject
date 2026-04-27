@@ -1,122 +1,74 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple, Dict, Any
 
 from fastapi import Query, APIRouter
 from pydantic import BaseModel
 from starlette.requests import Request
 
-search_router = APIRouter()
+from backend.mongo.AnimeDocument import AnimeDocument
+from backend.utils.model_utils import DB_CLIENT
 
-class Anime(BaseModel):
-    id: int
-    cover_image_url: str
-    title: str
-    genres: List[str]
-    short_description: str
-    score: float
-    date_added: int
+search_router = APIRouter()
 
 class SearchResponse(BaseModel):
     total_count: int
-    shows: List[Anime]
+    shows: List[AnimeDocument]
 
-def date_to_millis(date_str: str) -> int:
-    dt = datetime.strptime(date_str, "%b %d, %Y")
-    return int(dt.timestamp() * 1000)
+def get_mongo_query(
+    q: Optional[str] = None,
+    genre: Optional[List[str]] = None,
+    year_min: Optional[int] = None,
+    year_max: Optional[int] = None,
+    score_min: Optional[float] = None,
+    score_max: Optional[float] = None,
+    status: Optional[str] = None,
+    idx_from: int = 0,
+    idx_to: int = 19,
+) -> Tuple[Dict[str, Any], int, int]:
+    query: Dict[str, Any] = {}
 
-# TODO: Remove this and hook up to real database
-MOCK_ANIME_LIST = [
-    Anime(
-        id=1,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/1223/96541.jpg",
-        title="Fullmetal Alchemist: Brotherhood",
-        genres=["Action", "Adventure", "Drama", "Fantasy"],
-        short_description="Two brothers search for the Philosopher's Stone to restore their bodies after a failed alchemy experiment.",
-        date_added=date_to_millis("Apr 5, 2009"),
-        score=9.09
-    ),
-    Anime(
-        id=2,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/1935/127974.jpg",
-        title="Steins;Gate",
-        genres=["Sci-Fi", "Thriller", "Drama"],
-        short_description="A group of friends accidentally invent a method of sending messages to the past, altering the present.",
-        date_added=date_to_millis("Apr 6, 2011"),
-        score=9.07
-    ),
-    Anime(
-        id=3,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/1337/99013.jpg",
-        title="Hunter x Hunter (2011)",
-        genres=["Action", "Adventure", "Fantasy"],
-        short_description="Gon Freecss aspires to become a Hunter to find his father, meeting friends and facing deadly challenges.",
-        date_added=date_to_millis("Oct 2, 2011"),
-        score=9.03
-    ),
-    Anime(
-        id=4,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/10/73274.jpg",
-        title="Gintama",
-        genres=["Action", "Comedy", "Sci-Fi"],
-        short_description="In an alternate Edo period invaded by aliens, a samurai freelancer takes odd jobs to make ends meet.",
-        date_added=date_to_millis("Apr 4, 2006"),
-        score=8.94
-    ),
-    Anime(
-        id=5,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/1000/110531.jpg",
-        title="Attack on Titan Final Season",
-        genres=["Action", "Drama", "Fantasy"],
-        short_description="The epic conclusion of humanity's battle against the Titans and the truth behind their existence.",
-        date_added=date_to_millis("Dec 7, 2020"),
-        score=8.79
-    ),
-    Anime(
-        id=6,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/1295/106551.jpg",
-        title="Kaguya-sama: Love is War",
-        genres=["Comedy", "Romance", "School"],
-        short_description="Two geniuses at a prestigious academy engage in psychological warfare to make the other confess love first.",
-        date_added=date_to_millis("Apr 11, 2020"),
-        score=8.41
-    ),
-    Anime(
-        id=7,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/1500/103005.jpg",
-        title="Vinland Saga",
-        genres=["Action", "Adventure", "Drama", "Historical"],
-        short_description="A young Viking seeks revenge against his father's killer while navigating a world of war and slavery.",
-        date_added=date_to_millis("Jul 7, 2019"),
-        score=8.75
-    ),
-    Anime(
-        id=8,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/6/86733.jpg",
-        title="Made in Abyss",
-        genres=["Adventure", "Drama", "Fantasy", "Mystery"],
-        short_description="An orphan girl and a robot boy descend into a mysterious, perilous chasm to find her mother.",
-        date_added=date_to_millis("Jul 7, 2017"),
-        score=8.65
-    ),
-    Anime(
-        id=9,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/5/87048.jpg",
-        title="Your Name.",
-        genres=["Drama", "Romance", "Supernatural"],
-        short_description="Two teenagers swap bodies across time and space, leading to a race against fate.",
-        date_added=date_to_millis("Aug 26, 2016"),
-        score=8.84
-    ),
-    Anime(
-        id=10,
-        cover_image_url="https://cdn.myanimelist.net/images/anime/6/79597.jpg",
-        title="Spirited Away",
-        genres=["Adventure", "Fantasy", "Supernatural"],
-        short_description="A young girl becomes trapped in a spirit world and must work in a bathhouse to free herself and her parents.",
-        date_added=date_to_millis("Jul 20, 2001"),
-        score=8.77
-    ),
-]
+    # Text search
+    if q:
+        regex = {"$regex": q, "$options": "i"}
+        query["$or"] = [
+            {"title": regex},
+            {"synopsis": regex},
+        ]
+
+    # Genre filter
+    if genre:
+        query["genres"] = {"$in": genre}
+
+    # Year range
+    if year_min is not None or year_max is not None:
+        year_filter: Dict[str, Any] = {}
+        if year_min is not None:
+            year_filter["$gte"] = datetime(year_min, 1, 1)
+        if year_max is not None:
+            year_filter["$lt"] = datetime(year_max + 1, 1, 1)
+
+        if year_filter:
+            query["date_aired"] = year_filter
+
+    # Score range
+    if score_min is not None or score_max is not None:
+        score_filter: Dict[str, Any] = {}
+        if score_min is not None:
+            score_filter["$gte"] = score_min
+        if score_max is not None:
+            score_filter["$lte"] = score_max
+        if score_filter:
+            query["score"] = score_filter
+
+    # Exact status match
+    if status:
+        query["status"] = status
+
+    # Convert idx_from / idx_to to skip + limit
+    skip = idx_from
+    limit = max(0, idx_to - idx_from + 1)
+
+    return query, skip, limit
 
 @search_router.get("/anizenith/search")
 async def search(
@@ -133,19 +85,29 @@ async def search(
 ) -> SearchResponse:
     """
     Search endpoint that returns paginated results.
-    TODO: Integrate with real backend DB queries
     """
     # Calculate how many items to return in this page
-    total_results = len(MOCK_ANIME_LIST)
-    start = idx_from
-    end = min(idx_to + 1, total_results)
+    filter_query, skip, limit = get_mongo_query(
+        q=q,
+        genre=genre,
+        year_min=year_min,
+        year_max=year_max,
+        score_min=score_min,
+        score_max=score_max,
+        status=status,
+        idx_from=idx_from,
+        idx_to=idx_to,
+    )
 
-    shows = []
-    for i in range(start, end):
-        show = MOCK_ANIME_LIST[i].model_copy()
-        shows.append(show)
+    # TODO: Remove count documents as it is expensive
+    total_count = DB_CLIENT.anime_collection.count_documents(filter_query)
+
+    # TODO: Convert skip and limit to cursor-based search with $gt
+    docs = DB_CLIENT.execute_read_query(query=filter_query, skip=skip, limit=limit)
+    shows = [AnimeDocument(**doc) for doc in docs]
+
 
     return SearchResponse(
-        total_count=total_results,
+        total_count=total_count,
         shows=shows
     )

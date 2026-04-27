@@ -25,6 +25,14 @@ body {
     -ms-user-select: none;
 }
 
+.truncate {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+
+  overflow: hidden;
+}
+
 /* ===== TOP BAR ===== */
 .top-bar {
     position: fixed;

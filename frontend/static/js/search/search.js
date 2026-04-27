@@ -167,9 +167,11 @@ async function performSearch() {
 
     try {
         // TODO: Modify fetch url to include pagination params
-        const res = await fetch(url);
+        const timeout = 60.0
+        const res = await fetch(url, { "X-Request-Timeout": timeout.toString() });
         if (!res.ok) postErrorMessage(res.status, "Backend Search Error", API_SEARCH_URL);
         const data = await res.json();
+        console.log(data);
         totalCount = data.total_count || 0;
         totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
         renderResults(data);
@@ -194,12 +196,12 @@ function renderShowRow(show) {
     // Cover image of anime
     const img = row.querySelector('img');
     img.src = show.cover_image_url || '';
-    img.alt = escapeHtml(show.title);
+    img.alt = escapeHtml(show.name);
 
     // Anime title
     const titleEl = row.querySelector('.col-title');
-    titleEl.textContent = show.title;
-    titleEl.title = show.title;
+    titleEl.textContent = show.name;
+    titleEl.title = show.name;
 
     // Anime genre
     const genres = Array.isArray(show.genres) ? show.genres.join(', ') : show.genres || '';
@@ -209,7 +211,7 @@ function renderShowRow(show) {
 
     // Anime short description
     const descEl = row.querySelector('.col-desc');
-    descEl.textContent = show.short_description || '';
+    descEl.textContent = show.synopsis || '';
 
     // Adds row where clicking opens the anime's page
     const rowElement = row.querySelector('.result-row')

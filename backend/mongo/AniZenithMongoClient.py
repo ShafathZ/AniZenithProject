@@ -39,7 +39,7 @@ class AniZenithMongoClient:
         """
         if self._anime_collection is None:
             # TODO: Move the hardcoded DB name and collection name into a central Config object
-            self._anime_collection = self.db_client["anizenith"]["anime"]
+            self._anime_collection = self.db_client["anizenith"]["anime_enriched"]
         return self._anime_collection
 
 
@@ -67,12 +67,14 @@ class AniZenithMongoClient:
         self.anime_collection.insert_one(anime_document_dict)
 
 
-    def execute_read_query(self, query, limit = None) -> List[Dict]:
+    def execute_read_query(self, query, skip = None, limit = None) -> List[Dict]:
         try:
             if isinstance(query, dict):
                 # Execute a standard find operation (e.g., {"score": {"$gt": 8.0}})
                 # "find()" is a standard read-only MongoDB command
                 cursor = self.anime_collection.find(query)
+                if skip is not None:
+                    cursor = cursor.skip(skip)
                 if limit is not None:
                     cursor = cursor.limit(limit)
 
