@@ -7,6 +7,7 @@ def create_text_metadata_and_embedding(
         anime_genres: List[str],
         anime_synopsis: str
     ) -> Tuple[str, List]:
+    # TODO: Make this metadata better for retrieval
     # Create text_metadata field using synopsis, genres and name
     text_metadata = f"Synopsis: {anime_synopsis}\n\nGenres: {', '.join(anime_genres)}\n\nName: {anime_name}"
     

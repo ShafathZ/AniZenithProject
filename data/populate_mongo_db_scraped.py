@@ -24,7 +24,7 @@ def clean_data():
 
     # Exclude specific genres and empty genre lists
     # Using rating + genre exclusion since sometimes rating or genre alone do not capture all non-friendly show content
-    EXCLUDED_GENRES = {"Hentai", "Erotica", "Unknown"}      # If there exist genres     # None of the genres are excluded
+    EXCLUDED_GENRES = {"Hentai", "Erotica", "Unknown"}      # If there exist genres     # Remove if any of the genres are in excluded
     anime_df = anime_df[anime_df["genres"].apply(lambda g: bool(g) and not any(genre in EXCLUDED_GENRES for genre in g))]
 
     # Project current name as its own node_name column (since they may not be english, but useful data)
@@ -46,7 +46,6 @@ def clean_data():
     anime_df = anime_df[anime_df["synopsis"].notna() & (anime_df["synopsis"] != "")]
 
     # Generate text metadata
-    # TODO: Make this metadata better for retrieval
     print("Generating text metadata and embeddings... this might take a minute...")
     anime_df[['text_metadata', 'text_metadata_embedding']] = anime_df.apply(
         lambda row: create_text_metadata_and_embedding(

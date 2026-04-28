@@ -14,7 +14,8 @@ JIKAN_ENDPOINT = "https://api.jikan.moe/v4/anime"
 
 # MyAnimeList (MAL) is an anime database access REST API service with limited features
 MAL_ENDPOINT = "https://api.myanimelist.net/v2/anime/ranking"
-MAL_CLIENT_ID = backend_app_config.MAL_CLIENT_ID
+MAL_CLIENT_HEADER = {"X-MAL-CLIENT-ID": backend_app_config.MAL_CLIENT_ID}
+MAL_FIELDS = "id,title,alternative_titles,mean,synopsis,genres,main_picture,start_date,status,studios,num_episodes,average_episode_duration,rating"
 
 # API limits
 ANIME_PER_PAGE = 25
@@ -118,14 +119,13 @@ def _build_documents(mal_items: List[Dict], search_recommended: bool = False) ->
 
 # Fetch data from MAL
 def _fetch_mal_page(ranking_type: str, page: int, limit: int) -> List[Dict]:
-    headers = {"X-MAL-CLIENT-ID": MAL_CLIENT_ID}
     params = {
         "ranking_type": ranking_type,
         "limit": limit,
         "offset": (page - 1) * limit,
-        "fields": "id,title,alternative_titles,mean,synopsis,genres,main_picture,start_date,status,studios,num_episodes,average_episode_duration,rating",
+        "fields": MAL_FIELDS,
     }
-    resp = requests.get(MAL_ENDPOINT, headers=headers, params=params, timeout=15)
+    resp = requests.get(MAL_ENDPOINT, headers=MAL_CLIENT_HEADER, params=params, timeout=15)
     resp.raise_for_status()
     return resp.json().get("data", [])
 
