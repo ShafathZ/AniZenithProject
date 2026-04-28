@@ -3,4 +3,8 @@ fastapi-cli==0.0.23
 fastapi-cloud-cli==0.13.0
 jinja2==3.1.6
 prometheus-client>=0.24.1
+pydantic==2.12.5
+pydantic-core==2.41.5
+pydantic-extra-types==2.11.0
+pydantic-settings==2.13.1
 uvicorn==0.41.0

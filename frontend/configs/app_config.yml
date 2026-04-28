@@ -1,0 +1,7 @@
+default:
+  log_level: "info"
+  proxy_hostname: "localhost"
+  proxy_port: 9002
+production:
+  proxy_hostname: "localhost"
+  proxy_port: 9002

@@ -1,0 +1,7 @@
+default:
+  # Session cookie info
+  session_cookie_name: "session"
+  max_session_cookie_age: 3600
+  same_site_protection: "lax"
+
+  log_level: "info"

@@ -1,5 +1,5 @@
-# Ignore all .env files
-*.env
+# Ignore all .env files (within each directory as well)
+**/*.env
 
 # Ignore pycache and compiled python files
 **/__pycache__/
