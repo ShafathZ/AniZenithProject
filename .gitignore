@@ -1,6 +1,11 @@
 # Ignore CSV files
 *.csv
 
+# Ignore data folder
+data/*.bak
+data/*.json
+data/*.jsonl
+
 # Ignore SSH Keys
 *.pub
 group_key

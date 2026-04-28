@@ -58,7 +58,7 @@ def test_perform_vector_search_relevance(test_db_client: AniZenithMongoClient):
     top_doc = results[0]
     
     # Assert that one punch man is present in the name
-    assert "one punch man" in top_doc.name.lower()
+    assert "one-punch man" in top_doc.name.lower()
     
     # The similarity score should exist and be decently high
     assert top_doc.similarity_score > 0.5 
@@ -83,11 +83,26 @@ def test_add_anime(test_db_client: AniZenithMongoClient):
     
     # Create a dummy AnimeDocument
     test_anime_name = "Test Anime: Super Adventure"
+
     test_anime = AnimeDocument(
+        mal_id=999999,
         name=test_anime_name,
+        alt_titles={
+            "en": test_anime_name,
+        },
         score=9.9,
-        synopsis="A completely unique and fake anime created for testing purposes.",
-        genres=["Action", "Adventure", "Testing"]
+        synopsis="A completely unique and fake anime created for Testing purposes.",
+        genres=[],
+        demographic="Shounen",
+        age_rating="pg-13",
+        cover_image_url="",
+        date_aired="2025-01-01",
+        status="finished_airing",
+        episode_count=1,
+        avg_episode_len_mins=1,
+        publishing_company="Test Studio",
+        recommendations={},
+        node_name=test_anime_name
     )
     
     try:
