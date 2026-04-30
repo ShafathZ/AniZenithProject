@@ -23,6 +23,9 @@ class BackendAppConfig(Config):
     max_session_cookie_age: Optional[int] = None
     same_site_protection: Optional[str] = None
 
+    count_cache_time_seconds: Optional[int] = None
+    count_cache_max_size: Optional[int] = None
+
     HF_TOKEN: str = os.getenv("HF_TOKEN", "")
     MAL_CLIENT_ID: str = os.getenv("MAL_CLIENT_ID", "")
     MAL_CLIENT_SECRET: str = os.getenv("MAL_CLIENT_SECRET", "")

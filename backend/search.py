@@ -10,9 +10,11 @@ from starlette.requests import Request
 from backend.mongo.AnimeDocument import AnimeDocument
 from backend.utils.model_utils import DB_CLIENT
 
+from backend.configs import backend_app_config
+
 search_router = APIRouter()
 
-count_cache = TTLCache(maxsize=1000, ttl=120)
+count_cache = TTLCache(maxsize=backend_app_config.count_cache_max_size, ttl=backend_app_config.count_cache_time_seconds)
 
 class SearchResponse(BaseModel):
     total_count: int
