@@ -1,30 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="/static/css/main.css">
-{% block imports %}{% endblock%}
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="/static/js/main.js"></script>
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Aniℤenith{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="/static/css/main.css">
+    {% block imports %}{% endblock %}
 </head>
-
 <body class="main-background">
+    <!-- ===== TOP BAR ===== -->
+    <header class="top-bar">
+        <!-- Sidebar Toggle Hamburger -->
+        <button class="hamburger" id="sidebarToggle" aria-label="Toggle sidebar">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <!-- Logo -->
+        <a href="/" class="logo-link">
+            <div class="logo-area">
+                <i class="fa-solid fa-dragon"></i>
+                <h1 class="page-title">
+                  Ani<span class="fancy-z">ℤ</span>enith
+                </h1>
+            </div>
+        </a>
+
+        <!-- Search box -->
+        <div class="search-box">
+            <button class="search-icon-btn" aria-label="Search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <div class="search-input-wrapper">
+                <input type="text" id="search-input" placeholder="Search anime..." aria-label="Search">
+                <a class="filter-redirect-btn">Filters</a>
+            </div>
+        </div>
+
+        <!-- Random anime search button -->
+        <button class="random-btn" id="randomAnimeBtn">
+            <i class="fa-solid fa-shuffle"></i>
+            <span>Random</span>
+        </button>
+
+        <!-- Language toggle -->
+        <div class="lang-toggle" id="langToggle">
+            <button class="lang-option active" data-lang="en">EN</button>
+            <button class="lang-option" data-lang="jp">JP</button>
+        </div>
+
+        <!-- MAL Login Button -->
+        <button class="mal-login" id="malLoginBtn">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>MAL Login</span>
+        </button>
+    </header>
+
+    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar no-select collapsed" id="sidebar">
         <h2>Features</h2>
         <ul>
-            <li><a href="#"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li><a href="#"><i class="fa-solid fa-magnifying-glass"></i> Search Anime</a></li>
-            <li><a href="#"><i class="fa-solid fa-heart"></i> Favorites</a></li>
+            <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="/"><i class="fa-regular fa-comment-dots"></i> Recommendation Bot</a></li>
+            <li><a href="/search"><i class="fa-solid fa-magnifying-glass"></i> Search Anime</a></li>
+            <li><a href="/favorites"><i class="fa-solid fa-heart"></i> Favorites</a></li>
+            <li><a href="/about"><i class="fa-solid fa-circle-info"></i> About Us</a></li>
             <li><a href="#"><i class="fa-solid fa-cog"></i> Settings</a></li>
         </ul>
     </aside>
 
+    <!-- ===== MAIN CONTENT ===== -->
     <div id="main-container" class="main-container">
         <div id="error-container"></div>
         {% block content %}
         {% endblock %}
     </div>
+
+    {% block scripts %}{% endblock %}
+    <script type="module" src="/static/js/main.js"></script>
+    <script type="module" src="/static/js/auth.js"></script>
 </body>
 </html>

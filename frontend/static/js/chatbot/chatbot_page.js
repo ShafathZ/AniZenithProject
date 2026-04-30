@@ -1,6 +1,6 @@
 import { syncMessages } from "./chat_utils.js"
 import { renderMessages, appendUIMessage, addDefaultMessage } from "./chat_ui.js"
-import { postErrorMessage } from "./error.js"
+import { postErrorMessage } from "../error.js"
 
 document.addEventListener("DOMContentLoaded", async () => {
     const userInput = document.getElementById("userInput");

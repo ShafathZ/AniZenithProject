@@ -1,0 +1,307 @@
+@import url("../pagination.css");
+
+/* ===== Primary Container ===== */
+.favorites-container {
+  max-width: 900px;
+  height: 60vh;
+  margin: 0 auto 1rem;
+  background: var(--bg-glass-strong);
+  border-radius: 22px;
+  padding: 25px;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-soft);
+
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* ===== Favorites Options ===== */
+.favorites-options {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.sort-wrapper,
+.search-favorites-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--bg-glass-darker);
+    border-radius: 40px;
+    padding: 0.2rem 0.2rem 0.2rem 1rem;
+    border: 1px solid var(--border-soft);
+    backdrop-filter: blur(8px);
+}
+
+.sort-label {
+    color: var(--text-muted);
+    margin-right: 8px;
+}
+
+.sort-select {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-weight: 500;
+    padding: 10px 30px 10px 10px;
+    border-radius: 40px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+}
+
+.sort-select option {
+    background: var(--bg-main);
+    color: var(--text-main);
+}
+
+.search-favorites-wrapper .search-icon {
+    color: var(--text-muted);
+    margin-right: 8px;
+}
+
+.search-favorites-input {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    padding: 10px 10px 10px 0;
+    width: 220px;
+    outline: none;
+    font-size: 0.95rem;
+}
+
+.search-favorites-input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.clear-search-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.clear-search-btn:hover {
+    background: var(--bg-glass);
+    color: var(--text-main);
+}
+
+/* ===== Favorites Grid Section ===== */
+.favorites-bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.8rem;
+    margin: 3rem 0rem;
+}
+
+.anime-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border-soft);
+    transition: transform 0.25s ease, box-shadow 0.3s ease;
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+    aspect-ratio: 2/3;
+}
+
+.anime-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5), 0 0 0 2px var(--accent-primary);
+}
+
+.anime-card:hover .card-cover img {
+    transform: scale(1.05);
+}
+
+.favorite-heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--border-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 5;
+    box-shadow: var(--shadow-soft);
+}
+
+.favorite-heart:hover {
+    background: var(--accent-secondary);
+    color: white;
+    transform: scale(1.1);
+    border-color: transparent;
+}
+
+/* Hide the normal heart icon during hold */
+.favorite-heart.holding i {
+    opacity: 0;
+}
+
+/* Left half of broken heart */
+.favorite-heart.holding::before {
+    content: "\f004";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--accent-primary);
+    font-size: inherit;
+    clip-path: polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%);
+    animation: leftHalfBreak 1.8s ease-in-out forwards;
+    pointer-events: none;
+}
+
+/* Right half of broken heart */
+.favorite-heart.holding::after {
+    content: "\f004";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--accent-primary);
+    font-size: inherit;
+    clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
+    animation: rightHalfBreak 1.8s ease-in-out forwards;
+    pointer-events: none;
+}
+
+.favorite-heart.holding::before,
+.favorite-heart.holding::after {
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes leftHalfBreak {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-200%, -120%) rotate(-45deg);
+        opacity: 0.5;
+    }
+}
+
+@keyframes rightHalfBreak {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(100%, -120%) rotate(45deg);
+        opacity: 0.5;
+    }
+}
+
+.card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.2rem 0.8rem 0.8rem;
+    background: linear-gradient(to top, var(--bg-glass-strong) 0%, transparent 100%);
+    backdrop-filter: blur(6px);
+    color: var(--text-main);
+    border-radius: 0 0 20px 20px;
+    overflow: hidden;
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.card-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-rating i {
+    color: #ffb83d;
+}
+
+/* ===== No favorites state ===== */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-glass);
+    border-radius: 40px;
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-soft);
+    margin: 1rem 0;
+}
+
+.empty-illustration {
+    font-size: 5rem;
+    color: var(--accent-primary);
+    opacity: 0.7;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.browse-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    background: var(--accent-gradient);
+    border-radius: 40px;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--btn-glow);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.browse-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 25px var(--accent-glow);
+}

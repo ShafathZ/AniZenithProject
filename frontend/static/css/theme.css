@@ -1,5 +1,7 @@
 /* This page contains base theme colors for the app */
 :root {
+    /* Page Layout */
+    --top-bar-height: 70px;
     /* Base backgrounds */
     --bg-main: #0c0d23;
     --bg-glass: rgba(28, 20, 55, 0.55);
@@ -30,7 +32,7 @@
     --btn-bg-hover: linear-gradient(135deg, #8fd0ff, #aab3ff);
     --btn-bg-active: linear-gradient(135deg, #6bb6f5, #8f98ff);
 
-    --btn-text: #0c0d23;
+    --btn-text: #f0f0ff;
     --btn-border: rgba(122, 197, 255, 0.45);
 
     --btn-glow: 0 0 18px rgba(122, 197, 255, 0.55);
