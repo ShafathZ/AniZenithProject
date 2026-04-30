@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import List, Optional, Tuple, Dict, Any
+from cachetools import TTLCache
+from bson import json_util
 
 from fastapi import Query, APIRouter
 from pydantic import BaseModel
@@ -9,6 +11,8 @@ from backend.mongo.AnimeDocument import AnimeDocument
 from backend.utils.model_utils import DB_CLIENT
 
 search_router = APIRouter()
+
+count_cache = TTLCache(maxsize=1000, ttl=120)
 
 class SearchResponse(BaseModel):
     total_count: int
@@ -99,10 +103,16 @@ async def search(
         idx_to=idx_to,
     )
 
-    # TODO: Remove count documents as it is expensive
-    total_count = DB_CLIENT.anime_collection.count_documents(filter_query)
+    # Convert filter query into string for hashing
+    filter_key = json_util.dumps(filter_query, sort_keys=True)
+    if filter_key in count_cache:
+        # Retrieve the total count for this query from cache
+        total_count = count_cache[filter_key]
+    else:
+        # Cache expensive DB operation if not in cache
+        total_count = DB_CLIENT.anime_collection.count_documents(filter_query)
+        count_cache[filter_key] = total_count
 
-    # TODO: Convert skip and limit to cursor-based search with $gt
     docs = DB_CLIENT.execute_read_query(query=filter_query, skip=skip, limit=limit)
     shows = [AnimeDocument(**doc) for doc in docs]
 
