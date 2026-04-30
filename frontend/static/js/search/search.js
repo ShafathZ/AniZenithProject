@@ -178,6 +178,7 @@ async function performSearch() {
         // If error, show error message and UI item to user
         console.error('Search failed:', err);
         const errorTemplate = document.getElementById('tmpl-error').content.cloneNode(true);
+        resultsContainer.clear();
         resultsContainer.appendChild(errorTemplate);
         paginationWrapper.innerHTML = '';
     } finally {
@@ -268,6 +269,7 @@ function escapeHtml(text) {
 }
 
 // Loads the filters on the page if a direct URL with query params is used (stateless)
+// TODO: Remove idx_from and idx_to parameters or include logic to support it
 function loadStateFromURL() {
     const params = new URLSearchParams(window.location.search);
 

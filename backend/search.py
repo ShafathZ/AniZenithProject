@@ -5,6 +5,8 @@ from fastapi import Query, APIRouter
 from pydantic import BaseModel
 from starlette.requests import Request
 
+# TODO: This file will be modified in future PR and complete code will be removed
+
 search_router = APIRouter()
 
 class Anime(BaseModel):
