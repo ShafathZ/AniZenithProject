@@ -2,17 +2,17 @@
 ## Commands for building docker images
 ### Building backend image
 ```bash
-docker build -t surigo/anizenith_backend:latest -f ./backend/Dockerfile --progress=plain --no-cache .
+docker buildx build --platform linux/amd64 -t surigo/anizenith_backend:latest -f ./backend/Dockerfile --progress=plain --no-cache .
 ```
 
 ### Building frontend image
 ```bash
-docker build -t surigo/anizenith_frontend:latest -f ./frontend/Dockerfile --progress=plain --no-cache .
+docker buildx build --platform linux/amd64 -t surigo/anizenith_frontend:latest -f ./frontend/Dockerfile --progress=plain --no-cache .
 ```
 
 ### Building integrated image (backend + frontend)
 ```bash
-docker build -t surigo/anizenith:latest -f ./Dockerfile --progress=plain --no-cache .
+docker buildx build --platform linux/amd64 -t surigo/anizenith:latest -f ./Dockerfile --progress=plain --no-cache .
 ```
 
 ## Commands for pushing docker images to dockerhub
