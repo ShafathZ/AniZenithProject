@@ -2,8 +2,8 @@ name: Deploy to AWS ECS
 
 on:
   push:
-#    branches:
-#      - production
+    branches:
+      - production
   workflow_dispatch:
 
 env:
