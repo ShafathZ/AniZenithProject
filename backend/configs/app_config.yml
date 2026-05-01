@@ -1,0 +1,10 @@
+default:
+  # Session cookie info
+  session_cookie_name: "session"
+  max_session_cookie_age: 3600
+  same_site_protection: "lax"
+
+  mongo_anime_collection_name: "anime_enriched"
+  mongo_anime_db_name: "anizenith"
+
+  log_level: "info"

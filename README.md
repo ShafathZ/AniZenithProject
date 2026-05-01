@@ -1,22 +1,8 @@
----
-title: CS553 CaseStudy1
-emoji: 💬
-colorFrom: yellow
-colorTo: purple
-sdk: gradio
-sdk_version: 6.5.1
-python_version: 3.12.3
-app_file: app.py
-pinned: false
-hf_oauth: true
-hf_oauth_scopes:
-- inference-api
-license: mit
----
+# AniZenith
 
 An Anime Recommendation chatbot using [Gradio](https://gradio.app), [`huggingface_hub`](https://huggingface.co/docs/huggingface_hub/v0.22.2/en/index), and the [Hugging Face Inference API](https://huggingface.co/docs/api-inference/index).
 
-## Models Used by our Chatbot
+## Models Used by AniZenith
 | Type of Model | Model Name (Hugging Face Path) |
 |---------------|--------------------------------|
 | Local Model   | `Qwen/Qwen3-0.6B`         |
@@ -46,54 +32,44 @@ To add any new dependencies (libraries):
 uv add <library_name>
 ```
 
-## Working with HuggingFace Spaces Locally
-### Install Gradio with oAuth
-Run the following command in your Python environment:
+## Case Study 3
+### Login to VM
 ```bash
-uv add "gradio[oauth]"
+ssh -i ssh_keys/group02_key -p 22000 group02@paffenroth-23.dyn.wpi.edu
 ```
 
-### Set up HuggingFace Token
-1. Go to your HuggingFace profile at: https://huggingface.co/settings/tokens
-2. Generate a new token for your HuggingFace Space at `Create New Token` -> `Fine-grained`.
-3. Under `Repository permissions` section, search for the repo: "spaces/MLDevOps/CS553_CaseStudy1" and select it
-4. Check the box for "Write access to contents/settings of selected repos" and click "Create Token" at the bottom. 
-5. Copy and Paste the generated token into a `.env` file in the root directory of your local copy of CS553_CaseStudy1 repo:
-```
-HF_TOKEN=XXXXXXXXX
-```
-6. Login into HF:
+### Useful Links
+1. Frontend (ngrok): https://misty-subpalmate-liza.ngrok-free.dev/
+2. Grafana (ngrok): https://misty-subpalmate-liza.ngrok-free.dev/grafana
+
+## cURL commands to Test Backend Chat API
+### Remote Hosted Backend (on VMs)
+For Using Online Model:
 ```bash
-hf auth login
+curl --location 'http://paffenroth-23.dyn.wpi.edu:22021/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Give me action based anime"
+        }
+    ],
+    "use_local": false
+}'
 ```
 
-### Running Gradio App on HuggingFace Spaces Locally
-Run the following command:
+For Using Local Model:
 ```bash
-python app.py
+curl --location 'http://paffenroth-23.dyn.wpi.edu:22021/anizenith/chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "user",
+            "content": "Give me action based anime"
+        }
+    ],
+    "use_local": true
+}'
 ```
-
-It will spit out logs indicating the url to open in browser:
-```
-...
-* Running on local URL:  http://127.0.0.1:7860
-...
-```
-
-### Debugging Gradio Issue
-In app.py, the line:
-```python
-chatbot = gr.ChatInterface(
-    respond,
-    type="messages",
-    ...
-)
-```
-might need to be changed to remove the type line as follows due to a deprecation issue on HuggingFace Spaces:
-```python
-chatbot = gr.ChatInterface(
-    respond,
-    ...
-)
-```
-With this, run the program and it should work locally on localhost server!

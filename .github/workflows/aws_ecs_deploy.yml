@@ -1,0 +1,63 @@
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch:
+
+env:
+  # Configurable constants for deployment
+  AWS_REGION: us-east-2
+  ECR_REPOSITORY: anizenith/anizenith-repo
+  ECS_CLUSTER: anizenith-cluster
+  ECS_SERVICE: AniZenith-Single-Container-Deployment-Service
+  IMAGE_TAG: latest
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        # Special GitHub-native aws actions build which allows specifying keys directly
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION \
+          | docker login \
+          --username AWS \
+          --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      - name: Build Docker image
+        # Builds Docker Image like: ecr_repo:latest
+        run: |
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+
+      - name: Tag image for ECR
+        # Tags Docker image ecr_repo:latest --> AWS ECR Access IP (Required for pushing)
+        run: |
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Push image to ECR
+        run: |
+          docker push \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Force new ECS deployment
+        # Updates service to force new deployment with desired tasks count to 1
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 1 \
+            --force-new-deployment

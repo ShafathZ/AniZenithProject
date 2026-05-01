@@ -1,0 +1,60 @@
+name: Sync to HuggingFace Spaces
+on: 
+  # Disabling for Case Study 2
+  # workflow_run:
+  #   workflows: ["Run All Unit Tests", "Run Model Tests on Production Branch"]
+  #   types:
+  #     - completed
+  #   branches: [ "production" ]
+  workflow_dispatch:
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+
+    # Only run if the triggering workflows succeeded or when we run it manually from GH Actions UI
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: production
+          fetch-depth: 0
+          lfs: true
+      - name: Install xet
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/huggingface/xet-core/refs/heads/main/git_xet/install.sh | sh
+          echo "$HOME/.xet/bin" >> $GITHUB_PATH
+      - name: Set git user for xet security
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+      - name: Convert binaries to xet and Push to HuggingFace
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # 1. Install Xet
+          git xet install
+
+          # 2. Create a fresh, empty branch for deployment
+          # This disconnects from previous history, removing the "binary in history" error
+          git checkout --orphan deployment-branch
+          
+          # 3. Unstage everything so we can re-add them properly with Xet
+          git reset
+
+          # 4. Configure Xet tracking
+          # We do this *before* adding files so Xet handles them correctly
+          git xet track "anime.db" "static/images/*"
+
+          # 5. Add all files
+          # Since we are in a fresh branch, this adds everything currently on disk
+          git add .
+
+          # 6. Commit and Force Push
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git commit -m "Deploy to Spaces with Xet"
+          
+          # Force push to 'main' on Hugging Face
+          git push --force https://MLDevOps:$HF_TOKEN@huggingface.co/spaces/MLDevOps/CS553_CaseStudy1 HEAD:main

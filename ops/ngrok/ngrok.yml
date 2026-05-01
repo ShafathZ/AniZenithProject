@@ -1,0 +1,10 @@
+version: "3"
+endpoints:
+  - name: frontend_internal
+    url: https://frontend.internal
+    upstream:
+      url: frontend:7002
+  - name: grafana_internal
+    url: https://grafana.internal
+    upstream:
+      url: grafana:3000
