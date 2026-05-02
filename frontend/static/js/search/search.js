@@ -164,6 +164,7 @@ async function performSearch() {
     const params = buildQueryString(getCurrentFilters());
     const url = `${API_SEARCH_URL}?${params}`;
     history.replaceState(null, '', `?${params}`);
+    console.log(url);
 
     try {
         // TODO: Modify fetch url to include pagination params

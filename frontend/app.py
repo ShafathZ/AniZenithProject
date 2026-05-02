@@ -136,7 +136,7 @@ async def proxy(path: str, request: Request):
                 url=backend_url,
                 content=body,
                 headers=dict(request.headers),
-                params=request.query_params,
+                params=list(request.query_params.multi_items()), # Line supports multi-query parameters (e.g. lists)
             )
     except (httpx.ConnectError, httpx.TimeoutException):
         return JSONResponse({"error": "Backend server has timed out. Please try again later."}, status_code=504)

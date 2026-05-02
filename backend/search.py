@@ -43,7 +43,8 @@ def get_mongo_query(
 
     # Genre filter
     if genre:
-        query["genres"] = {"$in": genre}
+        genre = [g.capitalize() for g in genre] # Consistent with capitalized genres in db
+        query["genres"] = {"$all": genre} # Check that all genres requested match
 
     # Year range
     if year_min is not None or year_max is not None:
@@ -104,6 +105,8 @@ async def search(
         idx_from=idx_from,
         idx_to=idx_to,
     )
+
+    print(filter_query)
 
     # Convert filter query into string for hashing
     filter_key = json_util.dumps(filter_query, sort_keys=True)
