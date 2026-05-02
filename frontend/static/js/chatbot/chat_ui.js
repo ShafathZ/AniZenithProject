@@ -34,6 +34,7 @@ export function createMessageElement({ role, content }, index) {
         </span>
       `;
     } else {
+      // TODO: Need to import DOMPurify and include to sanitize LLM responses
       textDiv.innerHTML = marked.parse(content);
     }
   } else {

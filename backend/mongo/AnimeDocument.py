@@ -1,8 +1,6 @@
-from datetime import datetime
-
 from pydantic import BaseModel
+from datetime import datetime
 from typing import List, Dict
-
 
 # Class to Model a typical Anime Document
 class AnimeDocument(BaseModel):
