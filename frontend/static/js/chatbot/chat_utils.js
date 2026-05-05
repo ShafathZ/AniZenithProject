@@ -1,5 +1,5 @@
 import { postError, postErrorMessage } from "../error.js"
-import { pushMessages, pullMessages } from "./chat_history_db.js";
+import { pushMessages, pullMessages } from "../localDBs/chatHistoryDB.js";
 
 // Client-side conversation message storage (Chats are only stored on client side for now)
 export let messages = [];

@@ -1,9 +1,10 @@
 import { renderPagination } from '../pagination.js';
 import { postErrorMessage } from '../error.js';
+import { renderAnimeCard } from '../animecard.js';
 
 // ===== Configuration & State =====
 const API_SEARCH_URL = '/proxy/anizenith/search';
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 8;
 let currentPage = 1;
 let totalCount = 0;
 let totalPages = 1;
@@ -12,7 +13,7 @@ let totalPages = 1;
 const $ = id => document.getElementById(id);
 const searchForm = $('search-form');
 const searchQuery = $('search-query');
-const resultsContainer = $('search-results-container');
+const resultsContainer = $('results-container');
 const paginationWrapper = $('pagination-wrapper');
 const toggleBtn = $('filterToggleBtn');
 const filterPanel = $('filterPanel');
@@ -167,7 +168,6 @@ async function performSearch() {
     console.log(url);
 
     try {
-        // TODO: Modify fetch url to include pagination params
         const timeout = 60.0
         const res = await fetch(url, { "X-Request-Timeout": timeout.toString() });
         if (!res.ok) postErrorMessage(res.status, "Backend Search Error", API_SEARCH_URL);
@@ -190,58 +190,18 @@ async function performSearch() {
     }
 }
 
-// Renders a row object template to show a short panel describing an anime show dynamically
-function renderShowRow(show) {
-    const template = document.getElementById('tmpl-result-row');
-    const row = template.content.cloneNode(true);
-
-    // Cover image of anime
-    const img = row.querySelector('img');
-    img.src = show.cover_image_url || '';
-    img.alt = escapeHtml(show.name);
-
-    // Anime title
-    const titleEl = row.querySelector('.col-title');
-    titleEl.textContent = show.name;
-    titleEl.title = show.name;
-
-    // Anime genre
-    const genres = Array.isArray(show.genres) ? show.genres.join(', ') : show.genres || '';
-    const genresEl = row.querySelector('.col-genres');
-    genresEl.textContent = genres;
-    genresEl.title = genres;
-
-    // Anime short description
-    const descEl = row.querySelector('.col-desc');
-    descEl.textContent = show.synopsis || '';
-
-    // Adds row where clicking opens the anime's page
-    const rowElement = row.querySelector('.result-row')
-    rowElement.style.cursor = 'pointer';
-    rowElement.addEventListener('click', () => {
-        window.location.href = `/anime/${show.id}`;
-    });
-
-    return row;
-}
-
 // Renders all page results in the current page
 function renderResults({ shows = [] }) {
-    resultsContainer.innerHTML = '';
-    paginationWrapper.innerHTML = '';
+  if (!shows.length) {
+    const noResults = document.getElementById('tmpl-no-results').content.cloneNode(true);
+    resultsContainer.appendChild(noResults);
+    return;
+  }
 
-    if (!shows.length) {
-        const noResults = document.getElementById('tmpl-no-results').content.cloneNode(true);
-        resultsContainer.appendChild(noResults);
-        return;
-    }
-
-    const header = document.getElementById('tmpl-results-header').content.cloneNode(true);
-    resultsContainer.appendChild(header);
-
-    shows.forEach(show => {
-        resultsContainer.appendChild(renderShowRow(show));
-    });
+  shows.forEach(show => {
+    const card = renderAnimeCard(show);
+    resultsContainer.appendChild(card);
+  });
 }
 
 // Update controller function for pages
@@ -261,14 +221,6 @@ function changePage(delta) {
     currentPage += delta;
     performSearch();
     resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// Utility to escape HTML for elements that are not string-safe (e.g. images)
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 // Loads the filters on the page if a direct URL with query params is used (stateless)

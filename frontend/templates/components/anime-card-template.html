@@ -1,0 +1,35 @@
+<template id="tmpl-anime-card">
+  <div class="anime-card">
+    <div class="card-image-area">
+      <div class="card-genres"></div>
+      <div class="card-overlay">
+        <div class="card-title"></div>
+        <div class="card-score">
+          <i class="fa-solid fa-star"></i>
+          <span></span>
+        </div>
+      </div>
+      <button class="expand-arrow" aria-label="Show details">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <div class="card-expand-panel">
+      <div class="expand-info">
+        <p><strong>Studio:</strong> <span class="studio"></span></p>
+        <p><strong>Aired:</strong> <span class="aired"></span></p>
+        <div class="expand-description">
+          <strong>Description:</strong><br>
+          <span class="synopsis"></span>
+        </div>
+      </div>
+    </div>
+    <div class="card-bottom-icons">
+      <div class="favorite-heart" data-id="" data-favorited="false">
+        <i class="fa-regular fa-heart"></i>
+      </div>
+      <div class="chat-icon">
+        <i class="fa-regular fa-comment"></i>
+      </div>
+    </div>
+  </div>
+</template>
